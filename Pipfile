@@ -4,6 +4,7 @@ verify_ssl = true
 name = "pypi"
 
 [packages]
+synapse = "*"
 
 [dev-packages]
 black = "*"
@@ -14,6 +15,7 @@ sphinx = "*"
 sphinx-rtd-theme = "*"
 tomlkit = "*"
 twine = "*"
+pytest = "*"
 
 [requires]
 python_version = "3.11"

@@ -1,0 +1,17 @@
+name: othertest
+version: 0.0.1
+guid: b99b1225fdc7c8ade6205dcf197c0be5
+
+synapse_minversion: [2, 137, 0]
+
+genopts:
+    dotstorm: true
+
+author:
+  url: http://example.com
+  name: An author
+
+desc: Another test Storm package.
+
+modules:
+  - name: othertest.lib
