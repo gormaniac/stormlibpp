@@ -36,3 +36,8 @@ def genDefaultTelepathRetn(obj=TelepathRetn, /, default_data=None) -> TelepathRe
     """
 
     return obj(status=True, mesg="", data=default_data)
+
+
+class BoolRetn(TelepathRetn):
+    """A TelepathRetn where ``data`` is a boolean value."""
+    data: bool

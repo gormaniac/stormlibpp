@@ -11,7 +11,7 @@ It also exposes a few of Synapses submodles with the following name mappings::
 
 """
 
-__version__ = "0.1.0"
+__version__ = "0.1.1"
 
 
 import synapse.common as s_common

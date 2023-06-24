@@ -54,3 +54,7 @@ release: change-version clean setup build docs # Build a new versioned release a
 	git tag -a v$(VERSION) -m "Release v$(VERSION)"
 	git push origin v$(VERSION)
 	$(MAKE) clean-py
+
+.PHONY: pypi
+pypi: # Send the items in "dist/*" to PyPI.
+	pipenv run python3 -m twine upload dist/*
