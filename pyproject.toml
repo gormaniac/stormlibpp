@@ -3,9 +3,9 @@ requires = ["setuptools"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "{{NAME}}"
+name = "stormlibpp"
 version = "0.0.1"
-description = "The {{NAME}} Python package"
+description = "The stormlibpp Python package"
 readme = "README.md"
 requires-python = ">=3.11"
 
@@ -13,14 +13,14 @@ requires-python = ">=3.11"
 dependencies = []
 
 [[project.authors]]
-name = "{{AUTHOR}}"
+name = "John Gorman"
 
 [project.license]
 file = "LICENSE"
 
 [project.urls]
-Homepage = "{{GHBASE}}/{{NAME}}"
-Documentation = "{{DOCSBASE}}/{{NAME}}/"
+Homepage = "https://github.com/gormaniac/stormlibpp"
+Documentation = "https://gormo.co/stormlibpp/"
 
 [tool.setuptools.packages.find]
 namespaces = true

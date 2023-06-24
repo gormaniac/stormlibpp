@@ -1,13 +1,13 @@
-:github_url: {{GHBASE}}/{{NAME}}
+:github_url: https://github.com/gormaniac/stormlibpp
 
-Welcome to {{NAME}}'s documentation!
+Welcome to stormlibpp's documentation!
 =======================================
 
 .. toctree::
    :maxdepth: 3
    :caption: Contents:
 
-   {{NAME}}
+   stormlibpp
 
 * :ref:`modindex`
 * :ref:`search`
