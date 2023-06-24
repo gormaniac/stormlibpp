@@ -1,0 +1,21 @@
+name: test
+version: 0.0.1
+guid: 7348048db0c112e80087ffa313740c39
+
+synapse_minversion: [2, 137, 0]
+
+genopts:
+    dotstorm: true
+
+author:
+  url: http://example.com
+  name: An author
+
+desc: A test Storm package.
+
+modules:
+  - name: test.lib
+
+commands:
+  - name: test.test
+    descr: A test command.

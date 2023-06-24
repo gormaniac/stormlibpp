@@ -4,13 +4,15 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "stormlibpp"
-version = "0.0.1"
+version = "0.1.0"
 description = "The stormlibpp Python package"
 readme = "README.md"
 requires-python = ">=3.11"
 
 # Fill in dependencies here.
-dependencies = []
+dependencies = [
+    "synapse==2.139.0"
+]
 
 [[project.authors]]
 name = "John Gorman"

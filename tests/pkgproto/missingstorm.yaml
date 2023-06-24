@@ -1,0 +1,17 @@
+name: missingstorm
+version: 0.0.1
+guid: dd554a8ed318a5a4c687a90f5c79ff27
+
+synapse_minversion: [2, 137, 0]
+
+genopts:
+    dotstorm: true
+
+author:
+  url: http://example.com
+  name: An author
+
+desc: A test Storm package that attempts to load a missing .storm module file.
+
+modules:
+  - name: missingstorm.lib

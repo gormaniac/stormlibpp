@@ -1,0 +1,17 @@
+name: badname
+version: 0.0.1
+guid: 72a575c5f66286e13221303fd784c8a5
+
+synapse_minversion: [2, 137, 0]
+
+genopts:
+    dotstorm: true
+
+author:
+  url: http://example.com
+  name: An author
+
+desc: A test Storm package that attempts to load a Storm module a bad name.
+
+commands:
+  - name: badLib
