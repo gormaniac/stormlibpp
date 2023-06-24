@@ -26,19 +26,24 @@ class StormPkg:
 
     It takes the following steps on start up:
 
-        - Resolves the path of the package proto based on ``proto_name`` and
-        ``proto_dir``.
-        - Loads the package proto using ``synapse.tools.genpkg.tryLoadPkgProto``.
-        - Converts the returned object to a ``dict`` using ``json.dumps`` and
-        ``json.loads``.
-            - This is necessary because ``tryLoadPkgProto`` returns a "tuplified"
-            object (the return of ``synapse.common.tuplify``). Which can return
-            immutable objects that ``synapse.cortex.Cortex.addStormPkg`` expects
-            to be mutable. So a ``StormSvc._storm_svc_pkgs`` works best when it
-            is set to a ``dict``.
-        - Sets the loaded package definition's ``build`` key to a ``dict`` containing
-        the time using ``synapse.common.now``.
-        - Stores the package definition ``dict`` in the ``pkdef`` property.
+    - Resolves the path of the package proto based on ``proto_name`` and
+      ``proto_dir``.
+
+    - Loads the package proto using ``synapse.tools.genpkg.tryLoadPkgProto``.
+
+    - Converts the returned object to a ``dict`` using ``json.dumps`` and
+      ``json.loads``.
+
+        - This is necessary because ``tryLoadPkgProto`` returns a "tuplified"
+          object (the return of ``synapse.common.tuplify``). Which can return
+          immutable objects that ``synapse.cortex.Cortex.addStormPkg`` expects
+          to be mutable. So a ``StormSvc._storm_svc_pkgs`` works best when it
+          is set to a ``dict``.
+
+    - Sets the loaded package definition's ``build`` key to a ``dict``
+      containing the time using ``synapse.common.now``.
+
+    - Stores the package definition ``dict`` in the ``pkdef`` property.
 
     Parameters
     ----------

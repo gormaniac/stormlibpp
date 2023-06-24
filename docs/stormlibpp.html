@@ -158,29 +158,26 @@ your Python module.</p>
 the full Storm package definition loaded from the definied package proto.
 The <code class="docutils literal notranslate"><span class="pre">pkgdef</span></code> property is also returned by this object’s <code class="docutils literal notranslate"><span class="pre">asdict</span></code> method.</p>
 <p>It takes the following steps on start up:</p>
-<blockquote>
-<div><ul class="simple">
-<li><p>Resolves the path of the package proto based on <code class="docutils literal notranslate"><span class="pre">proto_name</span></code> and</p></li>
-</ul>
-<p><code class="docutils literal notranslate"><span class="pre">proto_dir</span></code>.
-- Loads the package proto using <code class="docutils literal notranslate"><span class="pre">synapse.tools.genpkg.tryLoadPkgProto</span></code>.
-- Converts the returned object to a <code class="docutils literal notranslate"><span class="pre">dict</span></code> using <code class="docutils literal notranslate"><span class="pre">json.dumps</span></code> and
+<ul>
+<li><p>Resolves the path of the package proto based on <code class="docutils literal notranslate"><span class="pre">proto_name</span></code> and
+<code class="docutils literal notranslate"><span class="pre">proto_dir</span></code>.</p></li>
+<li><p>Loads the package proto using <code class="docutils literal notranslate"><span class="pre">synapse.tools.genpkg.tryLoadPkgProto</span></code>.</p></li>
+<li><p>Converts the returned object to a <code class="docutils literal notranslate"><span class="pre">dict</span></code> using <code class="docutils literal notranslate"><span class="pre">json.dumps</span></code> and
 <code class="docutils literal notranslate"><span class="pre">json.loads</span></code>.</p>
 <blockquote>
 <div><ul class="simple">
-<li><p>This is necessary because <code class="docutils literal notranslate"><span class="pre">tryLoadPkgProto</span></code> returns a “tuplified”</p></li>
-</ul>
-<p>object (the return of <code class="docutils literal notranslate"><span class="pre">synapse.common.tuplify</span></code>). Which can return
+<li><p>This is necessary because <code class="docutils literal notranslate"><span class="pre">tryLoadPkgProto</span></code> returns a “tuplified”
+object (the return of <code class="docutils literal notranslate"><span class="pre">synapse.common.tuplify</span></code>). Which can return
 immutable objects that <code class="docutils literal notranslate"><span class="pre">synapse.cortex.Cortex.addStormPkg</span></code> expects
 to be mutable. So a <code class="docutils literal notranslate"><span class="pre">StormSvc._storm_svc_pkgs</span></code> works best when it
-is set to a <code class="docutils literal notranslate"><span class="pre">dict</span></code>.</p>
-</div></blockquote>
-<ul class="simple">
-<li><p>Sets the loaded package definition’s <code class="docutils literal notranslate"><span class="pre">build</span></code> key to a <code class="docutils literal notranslate"><span class="pre">dict</span></code> containing</p></li>
+is set to a <code class="docutils literal notranslate"><span class="pre">dict</span></code>.</p></li>
 </ul>
-<p>the time using <code class="docutils literal notranslate"><span class="pre">synapse.common.now</span></code>.
-- Stores the package definition <code class="docutils literal notranslate"><span class="pre">dict</span></code> in the <code class="docutils literal notranslate"><span class="pre">pkdef</span></code> property.</p>
 </div></blockquote>
+</li>
+<li><p>Sets the loaded package definition’s <code class="docutils literal notranslate"><span class="pre">build</span></code> key to a <code class="docutils literal notranslate"><span class="pre">dict</span></code>
+containing the time using <code class="docutils literal notranslate"><span class="pre">synapse.common.now</span></code>.</p></li>
+<li><p>Stores the package definition <code class="docutils literal notranslate"><span class="pre">dict</span></code> in the <code class="docutils literal notranslate"><span class="pre">pkdef</span></code> property.</p></li>
+</ul>
 <section id="parameters">
 <h3>Parameters<a class="headerlink" href="#parameters" title="Permalink to this heading"></a></h3>
 <dl class="simple">
