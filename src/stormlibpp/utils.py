@@ -1,4 +1,7 @@
-"""Miscellaneous functions for working with Storm/Synapse."""
+"""Miscellaneous functions that are helpful for working with Storm/Synapse."""
+
+
+import os
 
 
 def normver(ver: str | tuple) -> tuple[str, tuple]:
@@ -20,3 +23,20 @@ def normver(ver: str | tuple) -> tuple[str, tuple]:
         raise TypeError("Can only use a str or tuple as a Storm pkg version")
 
     return (verstr, vertup)
+
+
+def absjoin(*paths: str) -> str:
+    """Join paths with os.path.join and then pass it to os.path.abspath.
+
+    Parameters
+    ----------
+    *paths : str
+        The path strings to join together, as would be passed to ``os.path.join``.
+
+    Returns
+    -------
+    str
+        The absolute path derived from the joined ``paths``.
+    """
+
+    return os.path.abspath(os.path.join(*paths))
