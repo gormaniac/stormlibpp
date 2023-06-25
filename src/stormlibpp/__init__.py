@@ -33,5 +33,6 @@ __version__ = "0.2.0"
 
 from . import errors
 from . import utils
+from .node import StormNode
 from .stormpkg import StormPkg
 from .telepath import (genDefaultTelepathRetn, TelepathRetn)
