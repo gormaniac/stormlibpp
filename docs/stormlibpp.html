@@ -367,12 +367,12 @@ may be empty, but <code class="docutils literal notranslate"><span class="pre">d
 <section id="id2">
 <h3>Parameters<a class="headerlink" href="#id2" title="Permalink to this heading"></a></h3>
 <dl class="simple">
-<dt><a href="#id3"><span class="problematic" id="id4">*</span></a>paths<span class="classifier">str</span></dt><dd><p>The path strings to join together, as would be passed to <code class="docutils literal notranslate"><span class="pre">os.path.join</span></code>.</p>
+<dt>paths<span class="classifier">list[str]</span></dt><dd><p>The path strings to join together, as would be passed to <code class="docutils literal notranslate"><span class="pre">os.path.join</span></code>.</p>
 </dd>
 </dl>
 </section>
-<section id="id5">
-<h3>Returns<a class="headerlink" href="#id5" title="Permalink to this heading"></a></h3>
+<section id="id3">
+<h3>Returns<a class="headerlink" href="#id3" title="Permalink to this heading"></a></h3>
 <dl class="simple">
 <dt>str</dt><dd><p>The absolute path derived from the joined <code class="docutils literal notranslate"><span class="pre">paths</span></code>.</p>
 </dd>
@@ -384,8 +384,8 @@ may be empty, but <code class="docutils literal notranslate"><span class="pre">d
 <dt class="sig sig-object py" id="stormlibpp.utils.chk_storm_syntax">
 <span class="sig-prename descclassname"><span class="pre">stormlibpp.utils.</span></span><span class="sig-name descname"><span class="pre">chk_storm_syntax</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">storm</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#stormlibpp.utils.chk_storm_syntax" title="Permalink to this definition"></a></dt>
 <dd><p>Check if the given Storm code has valid syntax, raise exception if not.</p>
-<section id="id6">
-<h3>Raises<a class="headerlink" href="#id6" title="Permalink to this heading"></a></h3>
+<section id="id4">
+<h3>Raises<a class="headerlink" href="#id4" title="Permalink to this heading"></a></h3>
 <dl class="simple">
 <dt>StormSyntaxError</dt><dd><p>If a Storm syntax error was found in the given Storm code.</p>
 </dd>
@@ -397,8 +397,8 @@ may be empty, but <code class="docutils literal notranslate"><span class="pre">d
 <dt class="sig sig-object py" id="stormlibpp.utils.normver">
 <span class="sig-prename descclassname"><span class="pre">stormlibpp.utils.</span></span><span class="sig-name descname"><span class="pre">normver</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ver</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">tuple</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">tuple</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#stormlibpp.utils.normver" title="Permalink to this definition"></a></dt>
 <dd><p>Take either a version str “x.x.x” or tuple (x, x, x) and return both.</p>
-<section id="id7">
-<h3>Raises<a class="headerlink" href="#id7" title="Permalink to this heading"></a></h3>
+<section id="id5">
+<h3>Raises<a class="headerlink" href="#id5" title="Permalink to this heading"></a></h3>
 <dl class="simple">
 <dt>TypeError</dt><dd><p>If <code class="docutils literal notranslate"><span class="pre">ver</span></code> is not a str or tuple.</p>
 </dd>

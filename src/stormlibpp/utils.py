@@ -12,7 +12,7 @@ def absjoin(*paths: str) -> str:
 
     Parameters
     ----------
-    *paths : str
+    paths : list[str]
         The path strings to join together, as would be passed to ``os.path.join``.
 
     Returns
