@@ -6,7 +6,7 @@ import os
 import sys
 
 from . import errors
-from . import s_common, s_exc, s_genpkg, s_parser
+from . import s_common, s_exc, s_genpkg
 from . import utils
 
 
@@ -186,10 +186,11 @@ class StormPkg:
 
         for stormname, code in self.storm().items():
             try:
-                s_parser.parseQuery(code)
-            except s_exc.BadSyntax as err:
+                utils.chk_storm_syntax(code)
+            except errors.StormSyntaxError as err:
                 raise errors.StormPkgSyntaxError(
-                    f"{stormname} has a Storm syntax error: {err}"
+                    f"{stormname} from {self.proto_name}.yaml has a Storm "
+                    f"syntax error: {err}"
                 ) from err
 
     def cmds(self) -> list[str]:

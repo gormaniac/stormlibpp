@@ -3,6 +3,41 @@
 
 import os
 
+from . import errors
+from . import s_exc, s_parser
+
+
+def absjoin(*paths: str) -> str:
+    """Join paths with os.path.join and then pass it to os.path.abspath.
+
+    Parameters
+    ----------
+    *paths : str
+        The path strings to join together, as would be passed to ``os.path.join``.
+
+    Returns
+    -------
+    str
+        The absolute path derived from the joined ``paths``.
+    """
+
+    return os.path.abspath(os.path.join(*paths))
+
+
+def chk_storm_syntax(storm: str) -> None:
+    """Check if the given Storm code has valid syntax, raise exception if not.
+    
+    Raises
+    ------
+    StormSyntaxError
+        If a Storm syntax error was found in the given Storm code.
+    """
+
+    try:
+        s_parser.parseQuery(storm)
+    except s_exc.BadSyntax as err:
+        raise errors.StormSyntaxError() from err
+
 
 def normver(ver: str | tuple) -> tuple[str, tuple]:
     """Take either a version str "x.x.x" or tuple (x, x, x) and return both.
@@ -23,20 +58,3 @@ def normver(ver: str | tuple) -> tuple[str, tuple]:
         raise TypeError("Can only use a str or tuple as a Storm pkg version")
 
     return (verstr, vertup)
-
-
-def absjoin(*paths: str) -> str:
-    """Join paths with os.path.join and then pass it to os.path.abspath.
-
-    Parameters
-    ----------
-    *paths : str
-        The path strings to join together, as would be passed to ``os.path.join``.
-
-    Returns
-    -------
-    str
-        The absolute path derived from the joined ``paths``.
-    """
-
-    return os.path.abspath(os.path.join(*paths))

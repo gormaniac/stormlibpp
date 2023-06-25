@@ -1,6 +1,10 @@
 """Errors for StormLib++."""
 
 
+class StormSyntaxError(Exception):
+    """There was a syntax error in Storm code."""
+
+
 class StormPkgError(Exception):
     """An error in a StormPkg."""
 
@@ -16,5 +20,5 @@ class StormPkgResolveError(StormPkgError):
 class StormPkgBadDefError(StormPkgError):
     """The package proto's directory for a StormPkg could not be resolved."""
 
-class StormPkgSyntaxError(StormPkgError):
+class StormPkgSyntaxError(StormPkgError, StormSyntaxError):
     """The Storm code defined in a StormPkg has a syntax error."""
