@@ -50,12 +50,19 @@
 <li class="toctree-l3"><a class="reference internal" href="#stormlibpp.errors.StormPkgError"><code class="docutils literal notranslate"><span class="pre">StormPkgError</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#stormlibpp.errors.StormPkgNoProtoError"><code class="docutils literal notranslate"><span class="pre">StormPkgNoProtoError</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#stormlibpp.errors.StormPkgResolveError"><code class="docutils literal notranslate"><span class="pre">StormPkgResolveError</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#stormlibpp.errors.StormPkgSyntaxError"><code class="docutils literal notranslate"><span class="pre">StormPkgSyntaxError</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#stormlibpp.errors.StormSyntaxError"><code class="docutils literal notranslate"><span class="pre">StormSyntaxError</span></code></a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="#module-stormlibpp.stormpkg">stormlibpp.stormpkg module</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#stormlibpp.stormpkg.StormPkg"><code class="docutils literal notranslate"><span class="pre">StormPkg</span></code></a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#stormlibpp.stormpkg.StormPkg.asdict"><code class="docutils literal notranslate"><span class="pre">StormPkg.asdict()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#stormlibpp.stormpkg.StormPkg.check_syntax"><code class="docutils literal notranslate"><span class="pre">StormPkg.check_syntax()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#stormlibpp.stormpkg.StormPkg.cmds"><code class="docutils literal notranslate"><span class="pre">StormPkg.cmds()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#stormlibpp.stormpkg.StormPkg.mods"><code class="docutils literal notranslate"><span class="pre">StormPkg.mods()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#stormlibpp.stormpkg.StormPkg.pkgdef"><code class="docutils literal notranslate"><span class="pre">StormPkg.pkgdef</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#stormlibpp.stormpkg.StormPkg.proto_name"><code class="docutils literal notranslate"><span class="pre">StormPkg.proto_name</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#stormlibpp.stormpkg.StormPkg.storm"><code class="docutils literal notranslate"><span class="pre">StormPkg.storm()</span></code></a></li>
 </ul>
 </li>
 </ul>
@@ -71,6 +78,8 @@
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="#module-stormlibpp.utils">stormlibpp.utils module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#stormlibpp.utils.absjoin"><code class="docutils literal notranslate"><span class="pre">absjoin()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#stormlibpp.utils.chk_storm_syntax"><code class="docutils literal notranslate"><span class="pre">chk_storm_syntax()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#stormlibpp.utils.normver"><code class="docutils literal notranslate"><span class="pre">normver()</span></code></a></li>
 </ul>
 </li>
@@ -139,21 +148,38 @@
 <p>The package proto’s directory for a StormPkg could not be resolved.</p>
 </dd></dl>
 
+<dl class="py exception">
+<dt class="sig sig-object py" id="stormlibpp.errors.StormPkgSyntaxError">
+<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">stormlibpp.errors.</span></span><span class="sig-name descname"><span class="pre">StormPkgSyntaxError</span></span><a class="headerlink" href="#stormlibpp.errors.StormPkgSyntaxError" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#stormlibpp.errors.StormPkgError" title="stormlibpp.errors.StormPkgError"><code class="xref py py-class docutils literal notranslate"><span class="pre">StormPkgError</span></code></a>, <a class="reference internal" href="#stormlibpp.errors.StormSyntaxError" title="stormlibpp.errors.StormSyntaxError"><code class="xref py py-class docutils literal notranslate"><span class="pre">StormSyntaxError</span></code></a></p>
+<p>The Storm code defined in a StormPkg has a syntax error.</p>
+</dd></dl>
+
+<dl class="py exception">
+<dt class="sig sig-object py" id="stormlibpp.errors.StormSyntaxError">
+<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">stormlibpp.errors.</span></span><span class="sig-name descname"><span class="pre">StormSyntaxError</span></span><a class="headerlink" href="#stormlibpp.errors.StormSyntaxError" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Exception</span></code></p>
+<p>There was a syntax error in Storm code.</p>
+</dd></dl>
+
 </section>
 <section id="module-stormlibpp.stormpkg">
 <span id="stormlibpp-stormpkg-module"></span><h2>stormlibpp.stormpkg module<a class="headerlink" href="#module-stormlibpp.stormpkg" title="Permalink to this heading"></a></h2>
 <p>Python objects for working with Storm Packages.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="stormlibpp.stormpkg.StormPkg">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">stormlibpp.stormpkg.</span></span><span class="sig-name descname"><span class="pre">StormPkg</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">proto_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">proto_dir</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#stormlibpp.stormpkg.StormPkg" title="Permalink to this definition"></a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">stormlibpp.stormpkg.</span></span><span class="sig-name descname"><span class="pre">StormPkg</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">check_syntax</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">proto_dir</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#stormlibpp.stormpkg.StormPkg" title="Permalink to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>A Python representation of a Storm package, proto and definition.</p>
 <p>This class must be subclassed - this is how default proto dir loading is supported.</p>
-<p>By default, this subclasses expect a Storm package proto to be stored in a
+<p>By default, the subclasses expect a Storm package proto to be stored in a
 <code class="docutils literal notranslate"><span class="pre">pkgproto</span></code> directory that is within the same directory as the <code class="docutils literal notranslate"><span class="pre">__init__.py</span></code>
 of the module the object is defined within. This can be changed. But, if
 it isn’t, this means you must setup your package proto files to be built with
 your Python module.</p>
+<p>By default, subclasses look for a Yaml package proto file with a basename
+equal to the lowercase version of the subclass’ name. Subclasses must
+override the <code class="docutils literal notranslate"><span class="pre">proto_name</span></code> class property to change this behavior.</p>
 <p>This object is ready to use on init - access the <code class="docutils literal notranslate"><span class="pre">pkgdef</span></code> prop for
 the full Storm package definition loaded from the definied package proto.
 The <code class="docutils literal notranslate"><span class="pre">pkgdef</span></code> property is also returned by this object’s <code class="docutils literal notranslate"><span class="pre">asdict</span></code> method.</p>
@@ -181,12 +207,12 @@ containing the time using <code class="docutils literal notranslate"><span class
 <section id="parameters">
 <h3>Parameters<a class="headerlink" href="#parameters" title="Permalink to this heading"></a></h3>
 <dl class="simple">
-<dt>proto_name<span class="classifier">str | None, optional</span></dt><dd><p>The name of the package’s proto Yaml file, without the extension,
-if it is different from <code class="docutils literal notranslate"><span class="pre">pkg_name</span></code>. A value of <code class="docutils literal notranslate"><span class="pre">None</span></code> means
-<code class="docutils literal notranslate"><span class="pre">pkg_name</span></code> is used. By default None.</p>
+<dt>check_syntax<span class="classifier">bool, optional</span></dt><dd><p>Whether to check the syntax of this package’s loaded Storm code.
+By default True.</p>
 </dd>
 <dt>proto_dir<span class="classifier">str | None, optional</span></dt><dd><p>The fully resolved directory that the package proto is in. A value
-of <code class="docutils literal notranslate"><span class="pre">None</span></code> tells <code class="docutils literal notranslate"><span class="pre">StormPkg</span></code>. By default None.</p>
+of <code class="docutils literal notranslate"><span class="pre">None</span></code> tells <code class="docutils literal notranslate"><span class="pre">StormPkg</span></code> to resolve this path automatically based
+on the rules defined elsewhere in this docstring. By default None.</p>
 </dd>
 </dl>
 </section>
@@ -202,9 +228,11 @@ at init, finding the object this resolves to in <code class="docutils literal no
 and reading the module’s <code class="docutils literal notranslate"><span class="pre">__file__</span></code>. Then joining this file’s
 dir name with the value <code class="docutils literal notranslate"><span class="pre">pkgproto</span></code>.</p>
 </dd>
-<dt>proto_name<span class="classifier">str</span></dt><dd><p>The name of the Storm package’s proto Yaml file (without extension).
-This is the <code class="docutils literal notranslate"><span class="pre">proto_name</span></code> argument if passed.
-Otherwise, it is <code class="docutils literal notranslate"><span class="pre">self.name</span></code>.</p>
+<dt>proto_name<span class="classifier">str | None</span></dt><dd><p>A class property containing the name of the Storm package’s proto
+Yaml file (without extension). Subclasses may override this class
+property to set a custom proto Yaml file basename. If they don’t,
+this property is automatically set to the value of
+<code class="docutils literal notranslate"><span class="pre">self.__class__.__name__.lower()</span></code>.</p>
 </dd>
 </dl>
 </section>
@@ -230,10 +258,55 @@ but a custom <code class="docutils literal notranslate"><span class="pre">proto_
 <p>Pointer to <code class="docutils literal notranslate"><span class="pre">self.pkgdef</span></code>.</p>
 </dd></dl>
 
+<dl class="py method">
+<dt class="sig sig-object py" id="stormlibpp.stormpkg.StormPkg.check_syntax">
+<span class="sig-name descname"><span class="pre">check_syntax</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#stormlibpp.stormpkg.StormPkg.check_syntax" title="Permalink to this definition"></a></dt>
+<dd><p>Check the Storm syntax of this package’s loaded Storm code.</p>
+<section id="id1">
+<h4>Raises<a class="headerlink" href="#id1" title="Permalink to this heading"></a></h4>
+<dl class="simple">
+<dt>StormPkgSyntaxError</dt><dd><p>If the syntax of a any Storm code is invalid. We fail the whole
+package because one bad Storm file will cause loading failures on
+the Cortex for all other files too.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="stormlibpp.stormpkg.StormPkg.cmds">
+<span class="sig-name descname"><span class="pre">cmds</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#stormlibpp.stormpkg.StormPkg.cmds" title="Permalink to this definition"></a></dt>
+<dd><p>The commands this package defines.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="stormlibpp.stormpkg.StormPkg.mods">
+<span class="sig-name descname"><span class="pre">mods</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#stormlibpp.stormpkg.StormPkg.mods" title="Permalink to this definition"></a></dt>
+<dd><p>The modules this package defines.</p>
+</dd></dl>
+
 <dl class="py attribute">
 <dt class="sig sig-object py" id="stormlibpp.stormpkg.StormPkg.pkgdef">
 <span class="sig-name descname"><span class="pre">pkgdef</span></span><a class="headerlink" href="#stormlibpp.stormpkg.StormPkg.pkgdef" title="Permalink to this definition"></a></dt>
 <dd><p>A Python dict containing the full Storm package definition.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="stormlibpp.stormpkg.StormPkg.proto_name">
+<span class="sig-name descname"><span class="pre">proto_name</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#stormlibpp.stormpkg.StormPkg.proto_name" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="stormlibpp.stormpkg.StormPkg.storm">
+<span class="sig-name descname"><span class="pre">storm</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#stormlibpp.stormpkg.StormPkg.storm" title="Permalink to this definition"></a></dt>
+<dd><p>The Storm code this package defines.</p>
+<section id="returns">
+<h4>Returns<a class="headerlink" href="#returns" title="Permalink to this heading"></a></h4>
+<dl class="simple">
+<dt>dict[str, str]</dt><dd><p>Keys are the module/command name and values are the Storm code.</p>
+</dd>
+</dl>
+</section>
 </dd></dl>
 
 </section>
@@ -286,13 +359,46 @@ may be empty, but <code class="docutils literal notranslate"><span class="pre">d
 </section>
 <section id="module-stormlibpp.utils">
 <span id="stormlibpp-utils-module"></span><h2>stormlibpp.utils module<a class="headerlink" href="#module-stormlibpp.utils" title="Permalink to this heading"></a></h2>
-<p>Miscellaneous functions for working with Storm/Synapse.</p>
+<p>Miscellaneous functions that are helpful for working with Storm/Synapse.</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="stormlibpp.utils.absjoin">
+<span class="sig-prename descclassname"><span class="pre">stormlibpp.utils.</span></span><span class="sig-name descname"><span class="pre">absjoin</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">paths</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="headerlink" href="#stormlibpp.utils.absjoin" title="Permalink to this definition"></a></dt>
+<dd><p>Join paths with os.path.join and then pass it to os.path.abspath.</p>
+<section id="id2">
+<h3>Parameters<a class="headerlink" href="#id2" title="Permalink to this heading"></a></h3>
+<dl class="simple">
+<dt><a href="#id3"><span class="problematic" id="id4">*</span></a>paths<span class="classifier">str</span></dt><dd><p>The path strings to join together, as would be passed to <code class="docutils literal notranslate"><span class="pre">os.path.join</span></code>.</p>
+</dd>
+</dl>
+</section>
+<section id="id5">
+<h3>Returns<a class="headerlink" href="#id5" title="Permalink to this heading"></a></h3>
+<dl class="simple">
+<dt>str</dt><dd><p>The absolute path derived from the joined <code class="docutils literal notranslate"><span class="pre">paths</span></code>.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="stormlibpp.utils.chk_storm_syntax">
+<span class="sig-prename descclassname"><span class="pre">stormlibpp.utils.</span></span><span class="sig-name descname"><span class="pre">chk_storm_syntax</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">storm</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#stormlibpp.utils.chk_storm_syntax" title="Permalink to this definition"></a></dt>
+<dd><p>Check if the given Storm code has valid syntax, raise exception if not.</p>
+<section id="id6">
+<h3>Raises<a class="headerlink" href="#id6" title="Permalink to this heading"></a></h3>
+<dl class="simple">
+<dt>StormSyntaxError</dt><dd><p>If a Storm syntax error was found in the given Storm code.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
 <dl class="py function">
 <dt class="sig sig-object py" id="stormlibpp.utils.normver">
 <span class="sig-prename descclassname"><span class="pre">stormlibpp.utils.</span></span><span class="sig-name descname"><span class="pre">normver</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ver</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">tuple</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">tuple</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#stormlibpp.utils.normver" title="Permalink to this definition"></a></dt>
 <dd><p>Take either a version str “x.x.x” or tuple (x, x, x) and return both.</p>
-<section id="id1">
-<h3>Raises<a class="headerlink" href="#id1" title="Permalink to this heading"></a></h3>
+<section id="id7">
+<h3>Raises<a class="headerlink" href="#id7" title="Permalink to this heading"></a></h3>
 <dl class="simple">
 <dt>TypeError</dt><dd><p>If <code class="docutils literal notranslate"><span class="pre">ver</span></code> is not a str or tuple.</p>
 </dd>
