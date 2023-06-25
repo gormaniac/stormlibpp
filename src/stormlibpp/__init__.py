@@ -17,6 +17,7 @@ __version__ = "0.1.0"
 import synapse.common as s_common
 import synapse.exc as s_exc
 import synapse.tools.genpkg as s_genpkg
+import synapse.lib.parser as s_parser
 
 from . import errors
 from . import utils

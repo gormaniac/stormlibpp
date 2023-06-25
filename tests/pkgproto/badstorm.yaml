@@ -1,0 +1,17 @@
+name: badstorm
+version: 0.0.1
+guid: 77c52e6802ca68aba78779e1dcdb3912
+
+synapse_minversion: [2, 137, 0]
+
+genopts:
+    dotstorm: true
+
+author:
+  url: http://example.com
+  name: An author
+
+desc: A test Storm package that attempts to load Storm code with a syntax error.
+
+commands:
+  - name: badstorm

@@ -9,31 +9,31 @@ import stormlibpp
 class TestStormPkg:
     def test_not_subclass(self):
         with pytest.raises(RuntimeError):
-            badcls = stormlibpp.StormPkg()
+            stormlibpp.StormPkg()
 
     def test_missing_proto(self):
         class X(stormlibpp.StormPkg):
-            pass
+            """If using StormPkg defaults, we can just define a docstring.
+            
+            We could also just write ``pass``.
+            """
 
         with pytest.raises(stormlibpp.errors.StormPkgNoProtoError):
-            x = X()
+            X()
 
     def test_bad_pkg_name(self):
         class Bad(stormlibpp.StormPkg):
-            pass
+            proto_name = "badname"
 
         with pytest.raises(stormlibpp.errors.StormPkgBadDefError):
-            badname = Bad(proto_name="badname")
+            Bad()
 
     def test_missing_storm_file(self):
         class Missing(stormlibpp.StormPkg):
-            pass
+            proto_name = "missingstorm"
 
         with pytest.raises(stormlibpp.errors.StormPkgNoProtoError):
-            missing = Missing(
-                proto_name="missingstorm",
-                proto_dir=os.path.abspath(os.path.dirname(__file__)),
-            )
+            Missing(proto_dir=os.path.abspath(os.path.dirname(__file__)))
 
     def test_multi_pkg(self):
         class Test(stormlibpp.StormPkg):
@@ -47,3 +47,16 @@ class TestStormPkg:
 
         assert isinstance(test.asdict(), dict)
         assert isinstance(othertest.pkgdef, dict)
+
+    def test_storm_parse(self):
+        class BadStorm(stormlibpp.StormPkg):
+            pass
+
+        with pytest.raises(stormlibpp.errors.StormPkgSyntaxError):
+            BadStorm()
+
+    def test_storm_parse_disable(self):
+        class BadStorm(stormlibpp.StormPkg):
+            pass
+
+        assert "badstorm" in BadStorm(check_syntax=False).cmds()

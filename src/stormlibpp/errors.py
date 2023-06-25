@@ -15,3 +15,6 @@ class StormPkgResolveError(StormPkgError):
 
 class StormPkgBadDefError(StormPkgError):
     """The package proto's directory for a StormPkg could not be resolved."""
+
+class StormPkgSyntaxError(StormPkgError):
+    """The Storm code defined in a StormPkg has a syntax error."""
