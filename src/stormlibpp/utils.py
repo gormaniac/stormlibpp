@@ -3,8 +3,10 @@
 
 import os
 
+import synapse.exc as s_exc
+import synapse.lib.parser as s_parser
+
 from . import errors
-from . import s_exc, s_parser
 
 
 def absjoin(*paths: str) -> str:

@@ -12,6 +12,14 @@ stormlibpp.errors module
    :undoc-members:
    :show-inheritance:
 
+stormlibpp.node module
+----------------------
+
+.. automodule:: stormlibpp.node
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 stormlibpp.stormpkg module
 --------------------------
 
