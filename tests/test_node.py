@@ -1,6 +1,6 @@
 """Tests for stormlibpp.node."""
 
-import pytest
+
 import stormlibpp
 
 
@@ -21,6 +21,8 @@ class TestNode:
         for tag in tags:
             assert tag in node.tags
 
+        assert dir(node.tags) == [item[0] for item in iter(node.tags)]
+
     def test_add_props(self):
         props = {'prop': 'test', 'other': 'value'}
         node = stormlibpp.StormNode.unpack(PACKED_NODE)
@@ -28,6 +30,10 @@ class TestNode:
 
         for prop in props:
             assert prop in node.props
+
+        for propname, propval in node.props:
+            if propname in props:
+                assert props[propname] == propval
 
     def test_values(self):
         node = stormlibpp.StormNode.unpack(PACKED_NODE)
