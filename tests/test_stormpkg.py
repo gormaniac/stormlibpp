@@ -47,6 +47,7 @@ class TestStormPkg:
 
         assert isinstance(test.asdict(), dict)
         assert isinstance(othertest.pkgdef, dict)
+        assert "othertest.lib" in othertest.modnames
 
     def test_storm_parse(self):
         class BadStorm(stormlibpp.StormPkg):
@@ -59,4 +60,4 @@ class TestStormPkg:
         class BadStorm(stormlibpp.StormPkg):
             pass
 
-        assert "badstorm" in BadStorm(check_syntax=False).cmds()
+        assert "badstorm" in BadStorm(check_syntax=False).cmdnames

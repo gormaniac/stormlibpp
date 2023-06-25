@@ -53,6 +53,10 @@ class StormPkg:
 
     - Stores the package definition ``dict`` in the ``pkdef`` property.
 
+    - If ``check_syntax`` is True, all Storm code that is loaded in the ``pkdef``
+      is passed to Synapse's Storm parser to check for Storm syntax errors.
+      Any errors are raised as a ``StormPkgSyntaxError`` exception.
+
     Parameters
     ----------
     check_syntax : bool, optional
@@ -94,6 +98,8 @@ class StormPkg:
         If the default package proto dir cannot be resolved. This can be the case
         if a `StormPkg` is created and doesn't expect to use the default proto dir
         but a custom ``proto_dir`` is not passed.
+    StormPkgSyntaxError
+        If ``check_syntax`` is True and the Storm code in this package has syntax errors.
     RuntimeError
         If this class is instantiated directly and not subclassed.
     """
@@ -166,11 +172,6 @@ class StormPkg:
 
         return pkgdef
 
-    def _search_def(self, primkey: str, seckey: str) -> list[str]:
-        """Search the iterable keys of the pkgdef for a secondary keys."""
-
-        return [val[seckey] for val in self.pkgdef.get(primkey, []) if seckey in val]
-
     def asdict(self):
         """Return this objects full Storm package definition as a Python dict.
 
@@ -199,15 +200,15 @@ class StormPkg:
                     f"syntax error: {err}"
                 ) from err
 
-    def cmds(self) -> list[str]:
-        """The commands this package defines."""
+    def cmds(self) -> list[dict]:
+        """The full definitions of the commands this package defines."""
 
-        return self._search_def("commands", "name")
+        return self.pkgdef.get("commands", [])
 
-    def mods(self) -> list[str]:
-        """The modules this package defines."""
+    def mods(self) -> list[dict]:
+        """The full definitions of the modules this package defines."""
 
-        return self._search_def("modules", "name")
+        return self.pkgdef.get("modules", [])
 
     def storm(self) -> dict[str, str]:
         """The Storm code this package defines.
@@ -219,12 +220,37 @@ class StormPkg:
         """
 
         storm = {}
-        for items in [
-            self.pkgdef[item]
-            for item in self.pkgdef.keys()
-            if item in ("commands", "modules")
-        ]:
-            for item in items:
-                if "name" in item and "storm" in item:
-                    storm[item["name"]] = item["storm"]
+        for item in self.cmds() + self.mods():
+            if "name" in item and "storm" in item:
+                storm[item["name"]] = item["storm"]
         return storm
+
+    @property
+    def cmdnames(self) -> list[str]:
+        """The names of the commands this package defines, if any."""
+
+        return [cmd.get("name") for cmd in self.cmds() if "name" in cmd]
+
+    @property
+    def modnames(self) -> list[str]:
+        """The names of the modules this package defines, if any."""
+
+        return [mod.get("name") for mod in self.mods() if "name" in mod]
+
+    @property
+    def pkg_guid(self) -> str:
+        """The package's guid, None if not set."""
+
+        return self.pkgdef.get("guid")
+
+    @property
+    def pkg_name(self) -> str:
+        """The package's name, None if not set."""
+
+        return self.pkgdef.get("name")
+
+    @property
+    def pkg_ver(self) -> str:
+        """The package's version, None if not set."""
+
+        return self.pkgdef.get("version")
