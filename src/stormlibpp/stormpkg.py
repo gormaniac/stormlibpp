@@ -5,8 +5,11 @@ import json
 import os
 import sys
 
+import synapse.common as s_common
+import synapse.exc as s_exc
+import synapse.tools.genpkg as s_genpkg
+
 from . import errors
-from . import s_common, s_exc, s_genpkg
 from . import utils
 
 
@@ -62,6 +65,9 @@ class StormPkg:
 
     Properties
     ----------
+    default_name : str
+        The Yaml basename used if ``proto_name`` is empty (not set).
+        Set to the value of ``self.__class__.__name__.lower()``.
     pkgdef : dict
         The loaded Storm package definition.
     proto_dir : str
@@ -71,12 +77,11 @@ class StormPkg:
         at init, finding the object this resolves to in ``sys.modules``,
         and reading the module's ``__file__``. Then joining this file's
         dir name with the value ``pkgproto``.
-    proto_name : str | None
+    proto_name : str
         A class property containing the name of the Storm package's proto
         Yaml file (without extension). Subclasses may override this class
         property to set a custom proto Yaml file basename. If they don't,
-        this property is automatically set to the value of
-        ``self.__class__.__name__.lower()``.
+        this property is automatically set to the value of ``self.default_name``.
 
     Raises
     ------
@@ -84,7 +89,7 @@ class StormPkg:
         If the package proto either has an invalid schema or bad value.
     StormPkgNoProtoError
         If the proto Yaml file cannot be loaded. This can happen if the file name
-        will not match ``name``/``pkg_name`` but ``proto_name`` is not passed.
+        will not match ``self.default_name`` but ``proto_name`` is not set.
     StormPkgResolveError
         If the default package proto dir cannot be resolved. This can be the case
         if a `StormPkg` is created and doesn't expect to use the default proto dir
@@ -94,6 +99,7 @@ class StormPkg:
     """
 
     proto_name: str | None = None
+    """The basename of this Storm package's Yaml proto file."""
 
     def __init__(
         self,
@@ -102,6 +108,10 @@ class StormPkg:
     ) -> None:
         if StormPkg not in self.__class__.__bases__:
             raise RuntimeError("StormPkg must be subclassed.")
+
+        self.default_name = self.__class__.__name__.lower()
+        if not self.proto_name:
+            self.proto_name = self.default_name
 
         if proto_dir:
             self.proto_dir = proto_dir
@@ -119,10 +129,10 @@ class StormPkg:
                 "pkgproto",
             )
 
-        if not self.proto_name:
-            self.proto_name = self.__class__.__name__.lower()
-
-        self.proto = os.path.join(self.proto_dir, f"{self.proto_name}.yaml",)
+        self.proto = os.path.join(
+            self.proto_dir,
+            f"{self.proto_name}.yaml",
+        )
 
         self.pkgdef = self._load_proto()
         """A Python dict containing the full Storm package definition."""
@@ -157,13 +167,9 @@ class StormPkg:
         return pkgdef
 
     def _search_def(self, primkey: str, seckey: str) -> list[str]:
-        """Search the modules or commands of the pkgdef for a secondary key."""
+        """Search the iterable keys of the pkgdef for a secondary keys."""
 
-        vals = []
-        for val in self.pkgdef.get(primkey, []):
-            if seckey in val:
-                vals.append(val[seckey])
-        return vals
+        return [val[seckey] for val in self.pkgdef.get(primkey, []) if seckey in val]
 
     def asdict(self):
         """Return this objects full Storm package definition as a Python dict.
@@ -205,7 +211,7 @@ class StormPkg:
 
     def storm(self) -> dict[str, str]:
         """The Storm code this package defines.
-        
+
         Returns
         -------
         dict[str, str]
@@ -213,10 +219,12 @@ class StormPkg:
         """
 
         storm = {}
-        for mod in self.pkgdef.get("modules", []):
-            if "name" in mod and "storm" in mod:
-                storm[mod["name"]] = mod["storm"]
-        for cmd in self.pkgdef.get("commands", []):
-            if "name" in cmd and "storm" in cmd:
-                storm[cmd["name"]] = cmd["storm"]
+        for items in [
+            self.pkgdef[item]
+            for item in self.pkgdef.keys()
+            if item in ("commands", "modules")
+        ]:
+            for item in items:
+                if "name" in item and "storm" in item:
+                    storm[item["name"]] = item["storm"]
         return storm
