@@ -54,3 +54,11 @@ release: change-version clean setup build docs # Build a new versioned release a
 	git tag -a v$(VERSION) -m "Release v$(VERSION)"
 	git push origin v$(VERSION)
 	$(MAKE) clean-py
+
+.PHONY: tests
+tests: # Run the pytest suite for this project.
+	pipenv run pytest tests/
+
+.PHONY: pypi
+pypi: # Upload all Python packages in "dist/" to PyPI.
+	pipenv run python3 -m twine upload dist/*
