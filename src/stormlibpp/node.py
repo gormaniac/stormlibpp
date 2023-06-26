@@ -2,7 +2,7 @@
 
 
 from types import SimpleNamespace
-from typing import Any, Self, TypedDict
+from typing import Any, TypedDict
 
 
 NodeForm = str
@@ -120,8 +120,8 @@ class StormNode:
         self._form = form
         self._value = value
 
-        self._tags = Props(**tags)
-        self._props = Tags(**props)
+        self._tags = Tags(**tags)
+        self._props = Props(**props)
 
         self.iden = iden
         self.nodedata = nodedata
@@ -167,7 +167,7 @@ class StormNode:
         )
 
     @classmethod
-    def unpack(cls, packedtup: NodeTuple) -> Self:
+    def unpack(cls, packedtup: NodeTuple) -> 'StormNode':
         form, name = packedtup[0]
         vals = NodeVals(**packedtup[1])
         return cls(
