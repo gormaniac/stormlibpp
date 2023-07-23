@@ -1,6 +1,14 @@
 stormlibpp package
 ==================
 
+Subpackages
+-----------
+
+.. toctree::
+   :maxdepth: 4
+
+   stormlibpp.stormgen
+
 Submodules
 ----------
 
