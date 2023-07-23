@@ -110,6 +110,24 @@
 <li class="toctree-l4"><a class="reference internal" href="#stormlibpp.telepath.BoolRetn.status"><code class="docutils literal notranslate"><span class="pre">BoolRetn.status</span></code></a></li>
 </ul>
 </li>
+<li class="toctree-l3"><a class="reference internal" href="#stormlibpp.telepath.DictRetn"><code class="docutils literal notranslate"><span class="pre">DictRetn</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#stormlibpp.telepath.DictRetn.data"><code class="docutils literal notranslate"><span class="pre">DictRetn.data</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#stormlibpp.telepath.DictRetn.mesg"><code class="docutils literal notranslate"><span class="pre">DictRetn.mesg</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#stormlibpp.telepath.DictRetn.status"><code class="docutils literal notranslate"><span class="pre">DictRetn.status</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#stormlibpp.telepath.ListRetn"><code class="docutils literal notranslate"><span class="pre">ListRetn</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#stormlibpp.telepath.ListRetn.data"><code class="docutils literal notranslate"><span class="pre">ListRetn.data</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#stormlibpp.telepath.ListRetn.mesg"><code class="docutils literal notranslate"><span class="pre">ListRetn.mesg</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#stormlibpp.telepath.ListRetn.status"><code class="docutils literal notranslate"><span class="pre">ListRetn.status</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#stormlibpp.telepath.StrRetn"><code class="docutils literal notranslate"><span class="pre">StrRetn</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#stormlibpp.telepath.StrRetn.data"><code class="docutils literal notranslate"><span class="pre">StrRetn.data</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#stormlibpp.telepath.StrRetn.mesg"><code class="docutils literal notranslate"><span class="pre">StrRetn.mesg</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#stormlibpp.telepath.StrRetn.status"><code class="docutils literal notranslate"><span class="pre">StrRetn.status</span></code></a></li>
+</ul>
+</li>
 <li class="toctree-l3"><a class="reference internal" href="#stormlibpp.telepath.TelepathRetn"><code class="docutils literal notranslate"><span class="pre">TelepathRetn</span></code></a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#stormlibpp.telepath.TelepathRetn.data"><code class="docutils literal notranslate"><span class="pre">TelepathRetn.data</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#stormlibpp.telepath.TelepathRetn.mesg"><code class="docutils literal notranslate"><span class="pre">TelepathRetn.mesg</span></code></a></li>
@@ -223,7 +241,8 @@ container, <code class="docutils literal notranslate"><span class="pre">None</sp
 <p>Supports iteration of items in the SimpleNamespace. Each iteration returns
 a tuple of the item name followed by the item value.</p>
 <p>Implements only magic methods, and all of them operate on the underlying
-SimpleNamespace. To convert this object to a <code class="docutils literal notranslate"><span class="pre">dict</span></code> of the items it holds,
+SimpleNamespace.</p>
+<p>To convert this object to a <code class="docutils literal notranslate"><span class="pre">dict</span></code> of the items it holds,
 call <code class="docutils literal notranslate"><span class="pre">vars</span></code> on an instance.</p>
 </dd></dl>
 
@@ -295,7 +314,7 @@ call <code class="docutils literal notranslate"><span class="pre">vars</span></c
 <p>It supports “unpacking” the node into this object, edits to the object, and
 repacking of the node to be sent back to Storm.</p>
 <p>This node can be created purely from Python code rather than a packed
-<code class="docutils literal notranslate"><span class="pre">storm:node</span></code> object. Use the <code class="docutils literal notranslate"><span class="pre">__init__</span></code> directly instead of <code class="docutils literal notranslate"><span class="pre">unpack</span></code>.
+<code class="docutils literal notranslate"><span class="pre">storm:node</span></code> object. Use <code class="docutils literal notranslate"><span class="pre">__init__</span></code> directly instead of <code class="docutils literal notranslate"><span class="pre">unpack</span></code>.
 This allows the creation of a new node in Python that can be passed back to
 Storm.</p>
 <p>The intent is to represent an object that can be read from and written back
@@ -324,7 +343,7 @@ has in Storm.</p>
 <dl class="py property">
 <dt class="sig sig-object py" id="stormlibpp.node.StormNode.form">
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">form</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#stormlibpp.node.StormNode.form" title="Permalink to this definition"></a></dt>
-<dd><p>The form of this Node.</p>
+<dd><p>The form of this StormNode.</p>
 </dd></dl>
 
 <dl class="py property">
@@ -341,24 +360,24 @@ has in Storm.</p>
 <dl class="py property">
 <dt class="sig sig-object py" id="stormlibpp.node.StormNode.props">
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">props</span></span><a class="headerlink" href="#stormlibpp.node.StormNode.props" title="Permalink to this definition"></a></dt>
-<dd><p>The properties of this Node.</p>
+<dd><p>The properties of this StormNode.</p>
 </dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="stormlibpp.node.StormNode.tags">
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">tags</span></span><a class="headerlink" href="#stormlibpp.node.StormNode.tags" title="Permalink to this definition"></a></dt>
-<dd><p>The tags of this Node.</p>
+<dd><p>The tags of this StormNode.</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="stormlibpp.node.StormNode.unpack">
-<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">unpack</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">packedtup</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="#stormlibpp.node.NodeVals" title="stormlibpp.node.NodeVals"><span class="pre">stormlibpp.node.NodeVals</span></a><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Self</span></span></span><a class="headerlink" href="#stormlibpp.node.StormNode.unpack" title="Permalink to this definition"></a></dt>
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">unpack</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">packedtup</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="#stormlibpp.node.NodeVals" title="stormlibpp.node.NodeVals"><span class="pre">stormlibpp.node.NodeVals</span></a><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#stormlibpp.node.StormNode" title="stormlibpp.node.StormNode"><span class="pre">StormNode</span></a></span></span><a class="headerlink" href="#stormlibpp.node.StormNode.unpack" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="stormlibpp.node.StormNode.value">
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">value</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#stormlibpp.node.StormNode.value" title="Permalink to this definition"></a></dt>
-<dd><p>The value of this Node.</p>
+<dd><p>The value of this StormNode.</p>
 </dd></dl>
 
 </dd></dl>
@@ -514,19 +533,19 @@ the Cortex for all other files too.</p>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="stormlibpp.stormpkg.StormPkg.pkg_guid">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">pkg_guid</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#stormlibpp.stormpkg.StormPkg.pkg_guid" title="Permalink to this definition"></a></dt>
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">pkg_guid</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#stormlibpp.stormpkg.StormPkg.pkg_guid" title="Permalink to this definition"></a></dt>
 <dd><p>The package’s guid, None if not set.</p>
 </dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="stormlibpp.stormpkg.StormPkg.pkg_name">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">pkg_name</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#stormlibpp.stormpkg.StormPkg.pkg_name" title="Permalink to this definition"></a></dt>
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">pkg_name</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#stormlibpp.stormpkg.StormPkg.pkg_name" title="Permalink to this definition"></a></dt>
 <dd><p>The package’s name, None if not set.</p>
 </dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="stormlibpp.stormpkg.StormPkg.pkg_ver">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">pkg_ver</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#stormlibpp.stormpkg.StormPkg.pkg_ver" title="Permalink to this definition"></a></dt>
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">pkg_ver</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#stormlibpp.stormpkg.StormPkg.pkg_ver" title="Permalink to this definition"></a></dt>
 <dd><p>The package’s version, None if not set.</p>
 </dd></dl>
 
@@ -546,6 +565,8 @@ the Cortex for all other files too.</p>
 <dt class="sig sig-object py" id="stormlibpp.stormpkg.StormPkg.storm">
 <span class="sig-name descname"><span class="pre">storm</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#stormlibpp.stormpkg.StormPkg.storm" title="Permalink to this definition"></a></dt>
 <dd><p>The Storm code this package defines.</p>
+<p>Iterates over the dicts from <code class="docutils literal notranslate"><span class="pre">cmds()</span></code> + <code class="docutils literal notranslate"><span class="pre">mods()</span></code> to map all names
+to the Storm code each dict defines in the <code class="docutils literal notranslate"><span class="pre">storm</span></code> key.</p>
 <section id="returns">
 <h4>Returns<a class="headerlink" href="#returns" title="Permalink to this heading"></a></h4>
 <dl class="simple">
@@ -580,6 +601,72 @@ the Cortex for all other files too.</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="stormlibpp.telepath.BoolRetn.status">
 <span class="sig-name descname"><span class="pre">status</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><a class="headerlink" href="#stormlibpp.telepath.BoolRetn.status" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="stormlibpp.telepath.DictRetn">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">stormlibpp.telepath.</span></span><span class="sig-name descname"><span class="pre">DictRetn</span></span><a class="headerlink" href="#stormlibpp.telepath.DictRetn" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></p>
+<p>A TelepathRetn where <code class="docutils literal notranslate"><span class="pre">data</span></code> is a dict value.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="stormlibpp.telepath.DictRetn.data">
+<span class="sig-name descname"><span class="pre">data</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">dict</span></em><a class="headerlink" href="#stormlibpp.telepath.DictRetn.data" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="stormlibpp.telepath.DictRetn.mesg">
+<span class="sig-name descname"><span class="pre">mesg</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#stormlibpp.telepath.DictRetn.mesg" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="stormlibpp.telepath.DictRetn.status">
+<span class="sig-name descname"><span class="pre">status</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><a class="headerlink" href="#stormlibpp.telepath.DictRetn.status" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="stormlibpp.telepath.ListRetn">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">stormlibpp.telepath.</span></span><span class="sig-name descname"><span class="pre">ListRetn</span></span><a class="headerlink" href="#stormlibpp.telepath.ListRetn" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></p>
+<p>A TelepathRetn where <code class="docutils literal notranslate"><span class="pre">data</span></code> is a list value.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="stormlibpp.telepath.ListRetn.data">
+<span class="sig-name descname"><span class="pre">data</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">list</span></em><a class="headerlink" href="#stormlibpp.telepath.ListRetn.data" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="stormlibpp.telepath.ListRetn.mesg">
+<span class="sig-name descname"><span class="pre">mesg</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#stormlibpp.telepath.ListRetn.mesg" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="stormlibpp.telepath.ListRetn.status">
+<span class="sig-name descname"><span class="pre">status</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><a class="headerlink" href="#stormlibpp.telepath.ListRetn.status" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="stormlibpp.telepath.StrRetn">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">stormlibpp.telepath.</span></span><span class="sig-name descname"><span class="pre">StrRetn</span></span><a class="headerlink" href="#stormlibpp.telepath.StrRetn" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></p>
+<p>A TelepathRetn where <code class="docutils literal notranslate"><span class="pre">data</span></code> is a str value.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="stormlibpp.telepath.StrRetn.data">
+<span class="sig-name descname"><span class="pre">data</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#stormlibpp.telepath.StrRetn.data" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="stormlibpp.telepath.StrRetn.mesg">
+<span class="sig-name descname"><span class="pre">mesg</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#stormlibpp.telepath.StrRetn.mesg" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="stormlibpp.telepath.StrRetn.status">
+<span class="sig-name descname"><span class="pre">status</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><a class="headerlink" href="#stormlibpp.telepath.StrRetn.status" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
 
 </dd></dl>

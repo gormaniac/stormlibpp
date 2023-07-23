@@ -29,7 +29,7 @@ are briefly described below:
 
 """
 
-__version__ = "0.3.0"
+__version__ = "0.3.1"
 
 # TODO - Do we want to change this to only import submods, or do we even need that?
 from . import errors
