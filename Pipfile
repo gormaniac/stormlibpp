@@ -5,6 +5,7 @@ name = "pypi"
 
 [packages]
 synapse = "*"
+marko = "*"
 
 [dev-packages]
 black = "*"
