@@ -28,6 +28,26 @@ class TelepathRetn(TypedDict):
     data: Any
 
 
+class BoolRetn(TelepathRetn):
+    """A TelepathRetn where ``data`` is a boolean value."""
+    data: bool
+
+
+class ListRetn(TelepathRetn):
+    """A TelepathRetn where ``data`` is a list value."""
+    data: list
+
+
+class DictRetn(TelepathRetn):
+    """A TelepathRetn where ``data`` is a dict value."""
+    data: dict
+
+
+class StrRetn(TelepathRetn):
+    """A TelepathRetn where ``data`` is a str value."""
+    data: str
+
+
 def genDefaultTelepathRetn(obj=TelepathRetn, /, default_data=None) -> TelepathRetn:
     """Generate a default TelepathRetn return object, or the given subclass.
 
@@ -36,8 +56,3 @@ def genDefaultTelepathRetn(obj=TelepathRetn, /, default_data=None) -> TelepathRe
     """
 
     return obj(status=True, mesg="", data=default_data)
-
-
-class BoolRetn(TelepathRetn):
-    """A TelepathRetn where ``data`` is a boolean value."""
-    data: bool
