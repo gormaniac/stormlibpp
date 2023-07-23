@@ -48,7 +48,9 @@ class ItemContainer:
     a tuple of the item name followed by the item value.
 
     Implements only magic methods, and all of them operate on the underlying
-    SimpleNamespace. To convert this object to a ``dict`` of the items it holds,
+    SimpleNamespace.
+    
+    To convert this object to a ``dict`` of the items it holds,
     call ``vars`` on an instance.
     """
 
@@ -85,7 +87,6 @@ class Props(ItemContainer):
 
 class Tags(ItemContainer):
     """Tags of a StormNode."""
-
 
 
 class StormNode:
