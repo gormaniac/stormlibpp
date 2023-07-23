@@ -132,6 +132,7 @@ class StormPkg:
 
             self.proto_dir = utils.absjoin(
                 os.path.dirname(resolved_path),
+                # TODO - Make this configurable
                 "pkgproto",
             )
 
@@ -213,6 +214,9 @@ class StormPkg:
     def storm(self) -> dict[str, str]:
         """The Storm code this package defines.
 
+        Iterates over the dicts from ``cmds()`` + ``mods()`` to map all names
+        to the Storm code each dict defines in the ``storm`` key.
+
         Returns
         -------
         dict[str, str]
@@ -238,19 +242,19 @@ class StormPkg:
         return [mod.get("name") for mod in self.mods() if "name" in mod]
 
     @property
-    def pkg_guid(self) -> str:
+    def pkg_guid(self) -> str | None:
         """The package's guid, None if not set."""
 
         return self.pkgdef.get("guid")
 
     @property
-    def pkg_name(self) -> str:
+    def pkg_name(self) -> str | None:
         """The package's name, None if not set."""
 
         return self.pkgdef.get("name")
 
     @property
-    def pkg_ver(self) -> str:
+    def pkg_ver(self) -> str | None:
         """The package's version, None if not set."""
 
         return self.pkgdef.get("version")

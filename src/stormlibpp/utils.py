@@ -38,6 +38,8 @@ def chk_storm_syntax(storm: str) -> None:
     try:
         s_parser.parseQuery(storm)
     except s_exc.BadSyntax as err:
+        # TODO - Make sure this gives the caller verbose error info
+        # and add it to the StormSyntaxError if not.
         raise errors.StormSyntaxError() from err
 
 

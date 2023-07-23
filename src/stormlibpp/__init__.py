@@ -31,6 +31,7 @@ are briefly described below:
 
 __version__ = "0.3.0"
 
+# TODO - Do we want to change this to only import submods, or do we even need that?
 from . import errors
 from . import utils
 from .node import StormNode

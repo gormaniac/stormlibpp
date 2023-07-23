@@ -55,6 +55,7 @@ class ItemContainer:
     """
 
     def __init__(self, /, **kwargs) -> None:
+        # TODO - Is SimpleNamespace really the best option for this?
         self.__ns = SimpleNamespace(**kwargs)
     
     def __contains__(self, __name: str) -> bool:
@@ -96,7 +97,7 @@ class StormNode:
     repacking of the node to be sent back to Storm.
 
     This node can be created purely from Python code rather than a packed
-    ``storm:node`` object. Use the ``__init__`` directly instead of ``unpack``.
+    ``storm:node`` object. Use ``__init__`` directly instead of ``unpack``.
     This allows the creation of a new node in Python that can be passed back to
     Storm.
 
@@ -133,25 +134,25 @@ class StormNode:
 
     @property
     def form(self) -> str:
-        """The form of this Node."""
+        """The form of this StormNode."""
 
         return self._form
 
     @property
     def value(self) -> str:
-        """The value of this Node."""
+        """The value of this StormNode."""
 
         return self._value
 
     @property
     def tags(self):
-        """The tags of this Node."""
+        """The tags of this StormNode."""
 
         return self._tags
 
     @property
     def props(self):
-        """The properties of this Node."""
+        """The properties of this StormNode."""
 
         return self._props
 
@@ -180,6 +181,7 @@ class StormNode:
     def pack(self) -> NodeTuple:
         return ((self.form, self.value), self.nodevals)
 
+    # TODO - Support tag properties
     def addTag(self, tag, timestamps: tuple = (None, None)) -> None:
         if tag in self._tags and timestamps != (None, None) and self._tags[tag] != timestamps:
             self._tags[tag] = timestamps
