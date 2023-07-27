@@ -144,3 +144,54 @@ Nodes should be parsed based on the following rules:
 - `edge statement`: A special heading+list pair that will be turned into edges of one type (the value of the heading) between the node being defined and the form/valu pairs in the list.
 - `edge documentation`: An arbitrary list under an edges heading that documents the possible edges types that the source node may use.
 - `source node`: The node being defined in the current context.
+
+
+# Appendix
+Saving this code for now
+```python
+class Section:
+    """All Markdown tokens between two headings of the same level.
+    
+    ``Section``s are organized into a list of ``Part``s. Each part
+    is all content between two headings including the first heading.
+
+    A "root section" is a ``Section`` that exists because there is no top level
+    heading in the original Markdown document. This section cannot have a level
+    because there is no heading, so ``level`` will equal 0.
+
+    A root section is created when no ``heading`` is passed to the constructor.
+    """
+
+    def __init__(self, heading: marko.block.Heading | None = None) -> None:
+        self.heading = heading
+        self.cur = Part(self.heading)
+        self.level = 0
+        self.parts: list[Part] = [self.cur]
+
+        self.root = True if heading is None else False
+        """The root section holds all blocks that exists before any headings."""
+
+        if not self.root:
+            self.level = heading.level
+
+    def add_part(self, heading: marko.block.Heading):
+        # The first part will always be in the list.
+        if self.cur not in self.parts:
+            self.parts.append(self.cur)
+        self.cur = Part(heading)
+
+    def add_block(self, block: marko.block.BlockElement):
+        self.cur.add_block(block)
+
+def parse(self) -> list[Section]:
+    section = Section()
+    for child in self.ast.children:
+        if isinstance(child, marko.block.Heading):
+            if section.level <= child.level:
+                self.sections.append(section)
+                section = Section(heading=child)
+            else:
+                section.add_part(child)
+        section.add_block(child)
+    return
+```

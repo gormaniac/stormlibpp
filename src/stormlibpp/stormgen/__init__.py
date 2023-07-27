@@ -10,17 +10,51 @@ import marko
 from .. import StormNode
 
 
-class Element:
-    """An element is a unit of processable information found in a StormGenDoc.
+class Part:
+    """An element is all blocks between any two headings."""
 
-    Multiple elements may be in a Section. Elements may contain child Elements.
-    Elements are broken up by Markdown headings.
-    """
+    def __init__(self, heading: marko.block.Heading) -> None:
+        self.heading = heading
+        self.blocks: list[marko.block.BlockElement] = []
+        self.children = []
+
+    def add_block(self, block: marko.block.BlockElement):
+        self.blocks.append(block)
 
 
 class Section:
-    """All Markdown tokens between two headings of the same level."""
+    """All Markdown tokens between two headings of the same level.
+    
+    ``Section``s are organized into a list of ``Part``s. Each part
+    is all content between two headings including the first heading.
 
+    A "root section" is a ``Section`` that exists because there is no top level
+    heading in the original Markdown document. This section cannot have a level
+    because there is no heading, so ``level`` will equal 0.
+
+    A root section is created when no ``heading`` is passed to the constructor.
+    """
+
+    def __init__(self, heading: marko.block.Heading | None = None) -> None:
+        self.heading = heading
+        self.cur = Part(self.heading)
+        self.level = 0
+        self.parts: list[Part] = [self.cur]
+
+        self.root = True if heading is None else False
+        """The root section holds all blocks that exists before any headings."""
+
+        if not self.root:
+            self.level = heading.level
+
+    def add_part(self, heading: marko.block.Heading):
+        # The first part will always be in the list.
+        if self.cur not in self.parts:
+            self.parts.append(self.cur)
+        self.cur = Part(heading)
+
+    def add_block(self, block: marko.block.BlockElement):
+        self.cur.add_block(block)
 
 class StormGenDoc:
     """A Markdown document that is ready for processing with stormgen.
@@ -34,26 +68,31 @@ class StormGenDoc:
 
     def __init__(self, text: str) -> None:
         self.ast = marko.parse(text)
-        self.sections = self.get_sections(self.ast)
-        self.elements = self.get_elements()
-        self.node_elements = self.get_node_elements()
+        self.parts = []
 
-    def get_sections(self) -> list[Section]:
-        pass
+    def parse(self) -> list[Section]:
+        part = Part(heading=None)
+        for child in self.ast.children:
+            if isinstance(child, marko.block.Heading):
+                self.parts.append(part)
+                part = Part(heading=child)
+            part.add_block(child)
+        return
 
-    def get_elements(self) -> list[Element]:
-        pass
 
-    # TODO - Do we really need this?
-    def get_node_elements(self) -> list[Element]:
-        pass
+class StormGenElement:
+    """Processable pieces of a StormGenDoc."""
 
 
 def parse(text: str) -> StormGenDoc:
-    return StormGenDoc(text)
+    doc = StormGenDoc(text)
+    doc.parse()
+    return doc
 
-def convert(doc: StormGenDoc) -> list[StormNode]:
+
+def extract(doc: StormGenDoc) -> list[StormGenElement]:
     pass
 
-def export(nodes: list[StormNode]):
+
+def convert(doc: StormGenDoc) -> list[StormNode]:
     pass
