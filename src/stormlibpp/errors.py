@@ -22,3 +22,9 @@ class StormPkgBadDefError(StormPkgError):
 
 class StormPkgSyntaxError(StormPkgError, StormSyntaxError):
     """The Storm code defined in a StormPkg has a syntax error."""
+
+class HttpCortexError(Exception):
+    """An error occurred in HttpCortex."""
+
+class HttpCortexLoginError(HttpCortexError):
+    """Unable to login to Synapse with HttpCortex."""
