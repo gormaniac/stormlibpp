@@ -32,7 +32,7 @@ class HttpCortex:
         )
 
     async def __aenter__(self):
-        await self.start()
+        await self.login()
         return self
 
     async def __aexit__(self, *args, **kwargs):
@@ -76,11 +76,15 @@ class HttpCortex:
             code = item.get("code")
             mesg = item.get("mesg")
             raise HttpCortexLoginError(f"Login error ({code}): {mesg}")
+        
+        session_cookie = resp.cookies.get("sess")
 
-    async def start(self):
-        """Start this instance by initializing the HTTP session and logging in."""
+        if session_cookie is None:
+            raise HttpCortexLoginError(
+                "Successfully authenticated but Synapse did not send session cookie"
+            )
 
-        await self.login()
+        self.sess.cookie_jar.update_cookies({"sess": session_cookie.value})
 
     async def stop(self):
         await self.sess.close()
