@@ -46,12 +46,26 @@
 <li class="toctree-l1 current"><a class="current reference internal" href="#">stormlibpp package</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#submodules">Submodules</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#module-stormlibpp.errors">stormlibpp.errors module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#stormlibpp.errors.HttpCortexError"><code class="docutils literal notranslate"><span class="pre">HttpCortexError</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#stormlibpp.errors.HttpCortexLoginError"><code class="docutils literal notranslate"><span class="pre">HttpCortexLoginError</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#stormlibpp.errors.StormPkgBadDefError"><code class="docutils literal notranslate"><span class="pre">StormPkgBadDefError</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#stormlibpp.errors.StormPkgError"><code class="docutils literal notranslate"><span class="pre">StormPkgError</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#stormlibpp.errors.StormPkgNoProtoError"><code class="docutils literal notranslate"><span class="pre">StormPkgNoProtoError</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#stormlibpp.errors.StormPkgResolveError"><code class="docutils literal notranslate"><span class="pre">StormPkgResolveError</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#stormlibpp.errors.StormPkgSyntaxError"><code class="docutils literal notranslate"><span class="pre">StormPkgSyntaxError</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#stormlibpp.errors.StormSyntaxError"><code class="docutils literal notranslate"><span class="pre">StormSyntaxError</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#module-stormlibpp.httpcore">stormlibpp.httpcore module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#stormlibpp.httpcore.HttpCortex"><code class="docutils literal notranslate"><span class="pre">HttpCortex</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#stormlibpp.httpcore.HttpCortex.callStorm"><code class="docutils literal notranslate"><span class="pre">HttpCortex.callStorm()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#stormlibpp.httpcore.HttpCortex.login"><code class="docutils literal notranslate"><span class="pre">HttpCortex.login()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#stormlibpp.httpcore.HttpCortex.stop"><code class="docutils literal notranslate"><span class="pre">HttpCortex.stop()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#stormlibpp.httpcore.HttpCortex.storm"><code class="docutils literal notranslate"><span class="pre">HttpCortex.storm()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#stormlibpp.httpcore.StormMsg"><code class="docutils literal notranslate"><span class="pre">StormMsg</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#stormlibpp.httpcore.StormMsgType"><code class="docutils literal notranslate"><span class="pre">StormMsgType</span></code></a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="#module-stormlibpp.node">stormlibpp.node module</a><ul>
@@ -181,6 +195,20 @@
 <span id="stormlibpp-errors-module"></span><h2>stormlibpp.errors module<a class="headerlink" href="#module-stormlibpp.errors" title="Permalink to this heading"></a></h2>
 <p>Errors for StormLib++.</p>
 <dl class="py exception">
+<dt class="sig sig-object py" id="stormlibpp.errors.HttpCortexError">
+<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">stormlibpp.errors.</span></span><span class="sig-name descname"><span class="pre">HttpCortexError</span></span><a class="headerlink" href="#stormlibpp.errors.HttpCortexError" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Exception</span></code></p>
+<p>An error occurred in HttpCortex.</p>
+</dd></dl>
+
+<dl class="py exception">
+<dt class="sig sig-object py" id="stormlibpp.errors.HttpCortexLoginError">
+<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">stormlibpp.errors.</span></span><span class="sig-name descname"><span class="pre">HttpCortexLoginError</span></span><a class="headerlink" href="#stormlibpp.errors.HttpCortexLoginError" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#stormlibpp.errors.HttpCortexError" title="stormlibpp.errors.HttpCortexError"><code class="xref py py-class docutils literal notranslate"><span class="pre">HttpCortexError</span></code></a></p>
+<p>Unable to login to Synapse with HttpCortex.</p>
+</dd></dl>
+
+<dl class="py exception">
 <dt class="sig sig-object py" id="stormlibpp.errors.StormPkgBadDefError">
 <em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">stormlibpp.errors.</span></span><span class="sig-name descname"><span class="pre">StormPkgBadDefError</span></span><a class="headerlink" href="#stormlibpp.errors.StormPkgBadDefError" title="Permalink to this definition"></a></dt>
 <dd><p>Bases: <a class="reference internal" href="#stormlibpp.errors.StormPkgError" title="stormlibpp.errors.StormPkgError"><code class="xref py py-class docutils literal notranslate"><span class="pre">StormPkgError</span></code></a></p>
@@ -220,6 +248,148 @@
 <em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">stormlibpp.errors.</span></span><span class="sig-name descname"><span class="pre">StormSyntaxError</span></span><a class="headerlink" href="#stormlibpp.errors.StormSyntaxError" title="Permalink to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Exception</span></code></p>
 <p>There was a syntax error in Storm code.</p>
+</dd></dl>
+
+</section>
+<section id="module-stormlibpp.httpcore">
+<span id="stormlibpp-httpcore-module"></span><h2>stormlibpp.httpcore module<a class="headerlink" href="#module-stormlibpp.httpcore" title="Permalink to this heading"></a></h2>
+<p>Implements some methods from synapse.cortex.Cortex but with HTTP.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="stormlibpp.httpcore.HttpCortex">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">stormlibpp.httpcore.</span></span><span class="sig-name descname"><span class="pre">HttpCortex</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">url</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'https://localhost:4443'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">usr</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pwd</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">default_opts</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">{'repr':</span> <span class="pre">True}</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ssl_verify</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#stormlibpp.httpcore.HttpCortex" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>A class with some methods from synapse.cortex.Cortex but over HTTP.</p>
+<p>For now, it only supports the <cite>storm</cite> and <cite>callStorm</cite> methods. These methods
+take the same arguments and return the same types of values as their Cortex
+equivalents.</p>
+<p>Communicating with Synapse over HTTP requires a user on the Cortex that has
+a password set. HttpCortex needs to authenticate to the Cortex before making
+requests (i.e. using any of this objects methods). Because of this, HttpCortex
+implements a <code class="docutils literal notranslate"><span class="pre">login</span></code> method, and the object constructor expects a username
+and password.</p>
+<p>HttpCortex relies on an <code class="docutils literal notranslate"><span class="pre">aiohttp.ClientSession</span></code> underneath to make HTTP
+requests. This session needs to be closed to avoid errors at the end of
+program execution. HttpCortex exposes a <code class="docutils literal notranslate"><span class="pre">close</span></code> method that must be called
+when this object is no longer needed.</p>
+<p>HttpCortex is an async context manager. It calls the <code class="docutils literal notranslate"><span class="pre">login</span></code> and <code class="docutils literal notranslate"><span class="pre">close</span></code>
+methods for you upon entrance and exit of the object.</p>
+<section id="parameters">
+<h3>Parameters<a class="headerlink" href="#parameters" title="Permalink to this heading"></a></h3>
+<dl class="simple">
+<dt>url<span class="classifier">str, optional</span></dt><dd><p>The URL of the Synapse Cortex to connect to,
+by default <cite>“https://localhost:4443”</cite>.</p>
+</dd>
+<dt>usr<span class="classifier">str, optional</span></dt><dd><p>The username to authenticate with, by default <cite>“”</cite>.</p>
+</dd>
+<dt>pwd<span class="classifier">str, optional</span></dt><dd><p>The password to authenticate with, by default <cite>“”</cite>.</p>
+</dd>
+<dt>default_opts<span class="classifier">dict, optional</span></dt><dd><p>The default Storm options to pass with every request made by this instance.
+Set this to an empty dict to disable. By default <cite>{“repr”: True}</cite>.</p>
+</dd>
+<dt>ssl_verify<span class="classifier">bool, optional</span></dt><dd><p>Whether to verify the Cortex’s SSL certificate, by default <cite>True</cite>.</p>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="stormlibpp.httpcore.HttpCortex.callStorm">
+<em class="property"><span class="pre">async</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">callStorm</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">text</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">opts</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#stormlibpp.httpcore.HttpCortex.callStorm" title="Permalink to this definition"></a></dt>
+<dd><p>Execute a Storm query and return the value passed to a Storm return() call.</p>
+<section id="id1">
+<h4>Parameters<a class="headerlink" href="#id1" title="Permalink to this heading"></a></h4>
+<dl class="simple">
+<dt>text<span class="classifier">str</span></dt><dd><p>The Storm code to execute.</p>
+</dd>
+<dt>opts<span class="classifier">dict | None, optional</span></dt><dd><p>Storm options to use when executing this Storm code, by default None.</p>
+</dd>
+</dl>
+</section>
+<section id="returns">
+<h4>Returns<a class="headerlink" href="#returns" title="Permalink to this heading"></a></h4>
+<dl>
+<dt>dict</dt><dd><p>The response from the Cortex’s HTTP API. It contains 2 keys:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">result</span>
+<span class="n">status</span>
+</pre></div>
+</div>
+</dd>
+</dl>
+</section>
+<section id="raises">
+<h4>Raises<a class="headerlink" href="#raises" title="Permalink to this heading"></a></h4>
+<dl class="simple">
+<dt>HttpCortexError</dt><dd><p>If an exception is raised when making an HTTP request to the Cortex.
+This will likely either be from an HTTP error, a connection error,
+or an error decoding the JSON response.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="stormlibpp.httpcore.HttpCortex.login">
+<em class="property"><span class="pre">async</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">login</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#stormlibpp.httpcore.HttpCortex.login" title="Permalink to this definition"></a></dt>
+<dd><p>Login to the Cortex with the user/pass supplied at instantiation.</p>
+<p>Sets the cookie returned by the Cortex in the underlying <code class="docutils literal notranslate"><span class="pre">ClientSession</span></code>.
+Ignores the expiration date because there was errors adding the
+<code class="docutils literal notranslate"><span class="pre">SimpleCookie</span></code> to the session’s <code class="docutils literal notranslate"><span class="pre">CookieJar</span></code>. Instead we use the
+raw cookie value, without options set by the server.</p>
+<p>Cortex cookies expire after 2 weeks. So this object shouldn’t live
+longer than that without calling this method again.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="stormlibpp.httpcore.HttpCortex.stop">
+<em class="property"><span class="pre">async</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">stop</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#stormlibpp.httpcore.HttpCortex.stop" title="Permalink to this definition"></a></dt>
+<dd><p>Stop this instance by closing its HTTP session.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="stormlibpp.httpcore.HttpCortex.storm">
+<em class="property"><span class="pre">async</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">storm</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">text</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">opts</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dict</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#stormlibpp.httpcore.HttpCortex.storm" title="Permalink to this definition"></a></dt>
+<dd><p>Evaulate a Storm query and yield the streamed Storm messages.
+Parameters
+———-
+text : str</p>
+<blockquote>
+<div><p>The Storm code to execute.</p>
+</div></blockquote>
+<dl class="simple">
+<dt>opts<span class="classifier">dict | None, optional</span></dt><dd><p>Storm options to use when executing this Storm code, by default None.</p>
+</dd>
+</dl>
+<section id="yields">
+<h4>Yields<a class="headerlink" href="#yields" title="Permalink to this heading"></a></h4>
+<dl class="simple">
+<dt>StormMsg</dt><dd><p>Each message streamed by the Cortex.</p>
+</dd>
+</dl>
+</section>
+<section id="id2">
+<h4>Raises<a class="headerlink" href="#id2" title="Permalink to this heading"></a></h4>
+<dl class="simple">
+<dt>HttpCortexError</dt><dd><p>If an exception is raised when making an HTTP request to the Cortex.
+This will likely either be from an HTTP error, a connection error,
+or an error decoding the JSON response.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+</section>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="stormlibpp.httpcore.StormMsg">
+<span class="sig-prename descclassname"><span class="pre">stormlibpp.httpcore.</span></span><span class="sig-name descname"><span class="pre">StormMsg</span></span><a class="headerlink" href="#stormlibpp.httpcore.StormMsg" title="Permalink to this definition"></a></dt>
+<dd><p>A message yielded by a Cortex <code class="docutils literal notranslate"><span class="pre">storm</span></code> call.</p>
+<p>See <a class="reference external" href="https://synapse.docs.vertex.link/en/latest/synapse/devguides/storm_api.html#message-types">Storm Message Types</a>.</p>
+<p>alias of <code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code>]</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="stormlibpp.httpcore.StormMsgType">
+<span class="sig-prename descclassname"><span class="pre">stormlibpp.httpcore.</span></span><span class="sig-name descname"><span class="pre">StormMsgType</span></span><a class="headerlink" href="#stormlibpp.httpcore.StormMsgType" title="Permalink to this definition"></a></dt>
+<dd><p>The type of Storm message.</p>
+<p>See <a class="reference external" href="https://synapse.docs.vertex.link/en/latest/synapse/devguides/storm_api.html#message-types">Storm Message Types</a>.</p>
 </dd></dl>
 
 </section>
@@ -434,8 +604,8 @@ containing the time using <code class="docutils literal notranslate"><span class
 is passed to Synapse’s Storm parser to check for Storm syntax errors.
 Any errors are raised as a <code class="docutils literal notranslate"><span class="pre">StormPkgSyntaxError</span></code> exception.</p></li>
 </ul>
-<section id="parameters">
-<h3>Parameters<a class="headerlink" href="#parameters" title="Permalink to this heading"></a></h3>
+<section id="id4">
+<h3>Parameters<a class="headerlink" href="#id4" title="Permalink to this heading"></a></h3>
 <dl class="simple">
 <dt>check_syntax<span class="classifier">bool, optional</span></dt><dd><p>Whether to check the syntax of this package’s loaded Storm code.
 By default True.</p>
@@ -468,8 +638,8 @@ this property is automatically set to the value of <code class="docutils literal
 </dd>
 </dl>
 </section>
-<section id="raises">
-<h3>Raises<a class="headerlink" href="#raises" title="Permalink to this heading"></a></h3>
+<section id="id5">
+<h3>Raises<a class="headerlink" href="#id5" title="Permalink to this heading"></a></h3>
 <dl class="simple">
 <dt>StormPkgBadDefError</dt><dd><p>If the package proto either has an invalid schema or bad value.</p>
 </dd>
@@ -496,8 +666,8 @@ but a custom <code class="docutils literal notranslate"><span class="pre">proto_
 <dt class="sig sig-object py" id="stormlibpp.stormpkg.StormPkg.check_syntax">
 <span class="sig-name descname"><span class="pre">check_syntax</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#stormlibpp.stormpkg.StormPkg.check_syntax" title="Permalink to this definition"></a></dt>
 <dd><p>Check the Storm syntax of this package’s loaded Storm code.</p>
-<section id="id1">
-<h4>Raises<a class="headerlink" href="#id1" title="Permalink to this heading"></a></h4>
+<section id="id6">
+<h4>Raises<a class="headerlink" href="#id6" title="Permalink to this heading"></a></h4>
 <dl class="simple">
 <dt>StormPkgSyntaxError</dt><dd><p>If the syntax of a any Storm code is invalid. We fail the whole
 package because one bad Storm file will cause loading failures on
@@ -567,8 +737,8 @@ the Cortex for all other files too.</p>
 <dd><p>The Storm code this package defines.</p>
 <p>Iterates over the dicts from <code class="docutils literal notranslate"><span class="pre">cmds()</span></code> + <code class="docutils literal notranslate"><span class="pre">mods()</span></code> to map all names
 to the Storm code each dict defines in the <code class="docutils literal notranslate"><span class="pre">storm</span></code> key.</p>
-<section id="returns">
-<h4>Returns<a class="headerlink" href="#returns" title="Permalink to this heading"></a></h4>
+<section id="id7">
+<h4>Returns<a class="headerlink" href="#id7" title="Permalink to this heading"></a></h4>
 <dl class="simple">
 <dt>dict[str, str]</dt><dd><p>Keys are the module/command name and values are the Storm code.</p>
 </dd>
@@ -719,15 +889,15 @@ may be empty, but <code class="docutils literal notranslate"><span class="pre">d
 <dt class="sig sig-object py" id="stormlibpp.utils.absjoin">
 <span class="sig-prename descclassname"><span class="pre">stormlibpp.utils.</span></span><span class="sig-name descname"><span class="pre">absjoin</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">paths</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="headerlink" href="#stormlibpp.utils.absjoin" title="Permalink to this definition"></a></dt>
 <dd><p>Join paths with os.path.join and then pass it to os.path.abspath.</p>
-<section id="id2">
-<h3>Parameters<a class="headerlink" href="#id2" title="Permalink to this heading"></a></h3>
+<section id="id8">
+<h3>Parameters<a class="headerlink" href="#id8" title="Permalink to this heading"></a></h3>
 <dl class="simple">
 <dt>paths<span class="classifier">list[str]</span></dt><dd><p>The path strings to join together, as would be passed to <code class="docutils literal notranslate"><span class="pre">os.path.join</span></code>.</p>
 </dd>
 </dl>
 </section>
-<section id="id3">
-<h3>Returns<a class="headerlink" href="#id3" title="Permalink to this heading"></a></h3>
+<section id="id9">
+<h3>Returns<a class="headerlink" href="#id9" title="Permalink to this heading"></a></h3>
 <dl class="simple">
 <dt>str</dt><dd><p>The absolute path derived from the joined <code class="docutils literal notranslate"><span class="pre">paths</span></code>.</p>
 </dd>
@@ -739,8 +909,8 @@ may be empty, but <code class="docutils literal notranslate"><span class="pre">d
 <dt class="sig sig-object py" id="stormlibpp.utils.chk_storm_syntax">
 <span class="sig-prename descclassname"><span class="pre">stormlibpp.utils.</span></span><span class="sig-name descname"><span class="pre">chk_storm_syntax</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">storm</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#stormlibpp.utils.chk_storm_syntax" title="Permalink to this definition"></a></dt>
 <dd><p>Check if the given Storm code has valid syntax, raise exception if not.</p>
-<section id="id4">
-<h3>Raises<a class="headerlink" href="#id4" title="Permalink to this heading"></a></h3>
+<section id="id10">
+<h3>Raises<a class="headerlink" href="#id10" title="Permalink to this heading"></a></h3>
 <dl class="simple">
 <dt>StormSyntaxError</dt><dd><p>If a Storm syntax error was found in the given Storm code.</p>
 </dd>
@@ -752,8 +922,8 @@ may be empty, but <code class="docutils literal notranslate"><span class="pre">d
 <dt class="sig sig-object py" id="stormlibpp.utils.normver">
 <span class="sig-prename descclassname"><span class="pre">stormlibpp.utils.</span></span><span class="sig-name descname"><span class="pre">normver</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ver</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">tuple</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">tuple</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#stormlibpp.utils.normver" title="Permalink to this definition"></a></dt>
 <dd><p>Take either a version str “x.x.x” or tuple (x, x, x) and return both.</p>
-<section id="id5">
-<h3>Raises<a class="headerlink" href="#id5" title="Permalink to this heading"></a></h3>
+<section id="id11">
+<h3>Raises<a class="headerlink" href="#id11" title="Permalink to this heading"></a></h3>
 <dl class="simple">
 <dt>TypeError</dt><dd><p>If <code class="docutils literal notranslate"><span class="pre">ver</span></code> is not a str or tuple.</p>
 </dd>

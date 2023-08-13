@@ -12,6 +12,14 @@ stormlibpp.errors module
    :undoc-members:
    :show-inheritance:
 
+stormlibpp.httpcore module
+--------------------------
+
+.. automodule:: stormlibpp.httpcore
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 stormlibpp.node module
 ----------------------
 
