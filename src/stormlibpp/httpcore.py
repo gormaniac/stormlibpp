@@ -7,8 +7,60 @@ import json
 from .errors import HttpCortexError, HttpCortexLoginError
 
 
+StormMsgType = str
+"""The type of Storm message.
+
+See `Storm Message Types`_.
+
+.. _Storm Message Types: https://synapse.docs.vertex.link/en/latest/synapse/devguides/storm_api.html#message-types
+"""
+
+StormMsg = tuple[StormMsgType, dict]
+"""A message yielded by a Cortex ``storm`` call.
+
+See `Storm Message Types`_.
+
+.. _Storm Message Types: https://synapse.docs.vertex.link/en/latest/synapse/devguides/storm_api.html#message-types
+"""
+
+
 class HttpCortex:
-    """A class with some methods from synapse.cortex.Cortex but over HTTP."""
+    """A class with some methods from synapse.cortex.Cortex but over HTTP.
+
+    For now, it only supports the `storm` and `callStorm` methods. These methods
+    take the same arguments and return the same types of values as their Cortex
+    equivalents.
+
+    Communicating with Synapse over HTTP requires a user on the Cortex that has
+    a password set. HttpCortex needs to authenticate to the Cortex before making
+    requests (i.e. using any of this objects methods). Because of this, HttpCortex
+    implements a ``login`` method, and the object constructor expects a username
+    and password.
+
+    HttpCortex relies on an ``aiohttp.ClientSession`` underneath to make HTTP
+    requests. This session needs to be closed to avoid errors at the end of
+    program execution. HttpCortex exposes a ``close`` method that must be called
+    when this object is no longer needed.
+
+    HttpCortex is an async context manager. It calls the ``login`` and ``close``
+    methods for you upon entrance and exit of the object.
+
+    Parameters
+    ----------
+    url : str, optional
+        The URL of the Synapse Cortex to connect to,
+        by default `"https://localhost:4443"`.
+    usr : str, optional
+        The username to authenticate with, by default `""`.
+    pwd : str, optional
+        The password to authenticate with, by default `""`.
+    default_opts : dict, optional
+        The default Storm options to pass with every request made by this instance.
+        Set this to an empty dict to disable. By default `{"repr": True}`.
+    ssl_verify : bool, optional
+        Whether to verify the Cortex's SSL certificate, by default `True`.
+    """
+
 
     def __init__(
         self,
@@ -44,7 +96,30 @@ class HttpCortex:
         return {"query": text, "opts": opts}
 
     async def callStorm(self, text: str, opts: dict | None = None):
-        """Execute a Storm query and return the value passed to a Storm return() call."""
+        """Execute a Storm query and return the value passed to a Storm return() call.
+
+        Parameters
+        ----------
+        text : str
+            The Storm code to execute.
+        opts : dict | None, optional
+            Storm options to use when executing this Storm code, by default None.
+
+        Returns
+        -------
+        dict
+            The response from the Cortex's HTTP API. It contains 2 keys::
+
+                result
+                status
+
+        Raises
+        ------
+        HttpCortexError
+            If an exception is raised when making an HTTP request to the Cortex.
+            This will likely either be from an HTTP error, a connection error,
+            or an error decoding the JSON response.
+        """
 
         url = "/api/v1/storm/call"
 
@@ -60,6 +135,16 @@ class HttpCortex:
             ) from err
     
     async def login(self):
+        """Login to the Cortex with the user/pass supplied at instantiation.
+        
+        Sets the cookie returned by the Cortex in the underlying ``ClientSession``.
+        Ignores the expiration date because there was errors adding the
+        ``SimpleCookie`` to the session's ``CookieJar``. Instead we use the
+        raw cookie value, without options set by the server.
+
+        Cortex cookies expire after 2 weeks. So this object shouldn't live
+        longer than that without calling this method again.
+        """
 
         info = {"user": self.usr, "passwd": self.pwd}
         url = "/api/v1/login"
@@ -87,10 +172,31 @@ class HttpCortex:
         self.sess.cookie_jar.update_cookies({"sess": session_cookie.value})
 
     async def stop(self):
+        """Stop this instance by closing its HTTP session."""
+
         await self.sess.close()
 
-    async def storm(self, text: str, opts: dict | None = None):
-        """Evaulate a Storm query and yield the streamed Storm messages."""
+    async def storm(self, text: str, opts: dict | None = None) -> StormMsg:
+        """Evaulate a Storm query and yield the streamed Storm messages.
+        Parameters
+        ----------
+        text : str
+            The Storm code to execute.
+        opts : dict | None, optional
+            Storm options to use when executing this Storm code, by default None.
+
+        Yields
+        -------
+        StormMsg
+            Each message streamed by the Cortex.
+
+        Raises
+        ------
+        HttpCortexError
+            If an exception is raised when making an HTTP request to the Cortex.
+            This will likely either be from an HTTP error, a connection error,
+            or an error decoding the JSON response.
+        """
 
         url = "/api/v1/storm"
 
