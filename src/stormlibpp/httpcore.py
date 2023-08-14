@@ -4,11 +4,13 @@
 import aiohttp
 import json
 
-from .errors import HttpCortexError, HttpCortexLoginError
+from .errors import (
+    HttpCortexError, HttpCortexLoginError, HttpCortexNotImplementedError,
+)
 
 
 StormMsgType = str
-"""The type of Storm message.
+"""The type of a Storm message.
 
 See `Storm Message Types`_.
 
@@ -61,7 +63,6 @@ class HttpCortex:
         Whether to verify the Cortex's SSL certificate, by default `True`.
     """
 
-
     def __init__(
         self,
         url: str = "https://localhost:4443",
@@ -70,7 +71,6 @@ class HttpCortex:
         default_opts: dict = {"repr": True},
         ssl_verify: bool = True,
     ) -> None:
-
         self.url = url
         self.ssl_verify = ssl_verify
         self.default_opts = default_opts
@@ -133,10 +133,10 @@ class HttpCortex:
             raise HttpCortexError(
                 f"Unable to call storm on {self.url}: {err}", err
             ) from err
-    
+
     async def login(self):
         """Login to the Cortex with the user/pass supplied at instantiation.
-        
+
         Sets the cookie returned by the Cortex in the underlying ``ClientSession``.
         Ignores the expiration date because there was errors adding the
         ``SimpleCookie`` to the session's ``CookieJar``. Instead we use the
@@ -161,7 +161,7 @@ class HttpCortex:
             code = item.get("code")
             mesg = item.get("mesg")
             raise HttpCortexLoginError(f"Login error ({code}): {mesg}")
-        
+
         session_cookie = resp.cookies.get("sess")
 
         if session_cookie is None:
@@ -178,6 +178,7 @@ class HttpCortex:
 
     async def storm(self, text: str, opts: dict | None = None) -> StormMsg:
         """Evaulate a Storm query and yield the streamed Storm messages.
+
         Parameters
         ----------
         text : str
@@ -213,3 +214,17 @@ class HttpCortex:
             raise HttpCortexError(
                 f"Unable to execute storm on {self.url}: {err}", err
             ) from err
+
+    # TODO - Implement these methods so we can fully support Storm CLI features.
+    async def exportStorm(self, *args, **kwargs):
+        raise HttpCortexNotImplementedError("HttpCortex doesn't implement exportStorm!")
+
+    async def getAxonBytes(self, *args, **kwargs):
+        raise HttpCortexNotImplementedError(
+            "HttpCortex doesn't implement getAxonBytes!"
+        )
+
+    async def getAxonUpload(self, *args, **kwargs):
+        raise HttpCortexNotImplementedError(
+            "HttpCortex doesn't implement getAxonUpload!"
+        )

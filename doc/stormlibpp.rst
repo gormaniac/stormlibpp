@@ -12,6 +12,14 @@ stormlibpp.errors module
    :undoc-members:
    :show-inheritance:
 
+stormlibpp.hstorm module
+------------------------
+
+.. automodule:: stormlibpp.hstorm
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 stormlibpp.httpcore module
 --------------------------
 
@@ -40,6 +48,14 @@ stormlibpp.telepath module
 --------------------------
 
 .. automodule:: stormlibpp.telepath
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+stormlibpp.tmpcortex module
+---------------------------
+
+.. automodule:: stormlibpp.tmpcortex
    :members:
    :undoc-members:
    :show-inheritance:
