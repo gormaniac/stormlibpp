@@ -1,11 +1,18 @@
-"""Implements some methods from synapse.cortex.Cortex but with HTTP."""
+"""Implements some methods from synapse.cortex.Cortex but with HTTP.
+
+This is useful when replicating Telepath based tools that need to be used with
+HTTP. For example, the ``hstorm`` CLI replaces a ``Cortex`` object with an
+``HttpCortex`` so it can run Storm commands over HTTP.
+"""
 
 
 import aiohttp
 import json
 
 from .errors import (
-    HttpCortexError, HttpCortexLoginError, HttpCortexNotImplementedError,
+    HttpCortexError,
+    HttpCortexLoginError,
+    HttpCortexNotImplementedError,
 )
 
 
@@ -46,6 +53,28 @@ class HttpCortex:
 
     HttpCortex is an async context manager. It calls the ``login`` and ``close``
     methods for you upon entrance and exit of the object.
+
+    Examples::
+
+        # Use HttpCortex as an async context manager so login/cleanup is handled
+        async with HttpCortex("<HTTP URL>", "<username>", "<password>") as hcore:
+            async for msg in hcore.storm("[inet:ipv4=1.1.1.1]"):
+                if msg[0] == "node":
+                    pprint.pprint(msg[1])
+
+        # Or handle login and object cleanup yourself
+        hcore = HttpCortex("<HTTP URL>", "<username>", "<password>")
+        await hcore.login()
+        async for msg in hcore.storm("[inet:ipv4=1.1.1.1]"):
+            print(msg)
+            # Do other things with each "msg"
+        await hcore.close()
+
+        # callStorm can be used to get a single value instead of streaming results
+        async with HttpCortex(...) as hcore:
+            retn = await hcore.callStorm("$var = 'some val' return($var)")
+            if retn["status"]:
+                print(retn["result"])
 
     Parameters
     ----------
@@ -217,14 +246,17 @@ class HttpCortex:
 
     # TODO - Implement these methods so we can fully support Storm CLI features.
     async def exportStorm(self, *args, **kwargs):
+        """Not implemented - here to support an HTTP Storm CLI."""
         raise HttpCortexNotImplementedError("HttpCortex doesn't implement exportStorm!")
 
     async def getAxonBytes(self, *args, **kwargs):
+        """Not implemented - here to support an HTTP Storm CLI."""
         raise HttpCortexNotImplementedError(
             "HttpCortex doesn't implement getAxonBytes!"
         )
 
     async def getAxonUpload(self, *args, **kwargs):
+        """Not implemented - here to support an HTTP Storm CLI."""
         raise HttpCortexNotImplementedError(
             "HttpCortex doesn't implement getAxonUpload!"
         )

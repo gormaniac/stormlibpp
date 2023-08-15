@@ -40,7 +40,7 @@ def chk_storm_syntax(storm: str) -> None:
     except s_exc.BadSyntax as err:
         # TODO - Make sure this gives the caller verbose error info
         # and add it to the StormSyntaxError if not.
-        raise errors.StormSyntaxError() from err
+        raise errors.StormSyntaxError("Storm Syntax Error!", err) from err
 
 
 def normver(ver: str | tuple) -> tuple[str, tuple]:
