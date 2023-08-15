@@ -9,6 +9,8 @@ HTTP. For example, the ``hstorm`` CLI replaces a ``Cortex`` object with an
 import aiohttp
 import json
 
+import synapse.common as s_common
+
 from .errors import (
     HttpCortexError,
     HttpCortexLoginError,
@@ -205,7 +207,9 @@ class HttpCortex:
 
         await self.sess.close()
 
-    async def storm(self, text: str, opts: dict | None = None) -> StormMsg:
+    async def storm(
+        self, text: str, opts: dict | None = None, tuplify: bool = True
+    ) -> StormMsg:
         """Evaulate a Storm query and yield the streamed Storm messages.
 
         Parameters
@@ -214,6 +218,14 @@ class HttpCortex:
             The Storm code to execute.
         opts : dict | None, optional
             Storm options to use when executing this Storm code, by default None.
+        tuplify : bool, optional
+            Whether to pass streamed Storm messages to the ``synapse.common.tuplify``
+            function for conversion to the "packed tuple" format that most Cortex
+            methods use. This results in a slight performance hit but it plays nice
+            with all of the existing Synapse code, most importantly the CLI. Setting
+            this option to False, will remove the performance concerns but it may
+            break other tooling that are expecting "packed tuple" input values.
+            By default True.
 
         Yields
         -------
@@ -238,7 +250,12 @@ class HttpCortex:
                     if not byts:
                         break
 
-                    yield json.loads(byts)
+                    data = json.loads(byts)
+                    if tuplify:
+                        yield s_common.tuplify(data)
+                    else:
+                        yield data
+
         except Exception as err:
             raise HttpCortexError(
                 f"Unable to execute storm on {self.url}: {err}", err
