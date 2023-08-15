@@ -445,7 +445,7 @@ longer than that without calling this method again.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="stormlibpp.httpcore.HttpCortex.storm">
-<em class="property"><span class="pre">async</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">storm</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">text</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">opts</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dict</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#stormlibpp.httpcore.HttpCortex.storm" title="Permalink to this definition"></a></dt>
+<em class="property"><span class="pre">async</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">storm</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">text</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">opts</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tuplify</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dict</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#stormlibpp.httpcore.HttpCortex.storm" title="Permalink to this definition"></a></dt>
 <dd><p>Evaulate a Storm query and yield the streamed Storm messages.</p>
 <section id="id3">
 <h4>Parameters<a class="headerlink" href="#id3" title="Permalink to this heading"></a></h4>
@@ -453,6 +453,14 @@ longer than that without calling this method again.</p>
 <dt>text<span class="classifier">str</span></dt><dd><p>The Storm code to execute.</p>
 </dd>
 <dt>opts<span class="classifier">dict | None, optional</span></dt><dd><p>Storm options to use when executing this Storm code, by default None.</p>
+</dd>
+<dt>tuplify<span class="classifier">bool, optional</span></dt><dd><p>Whether to pass streamed Storm messages to the <code class="docutils literal notranslate"><span class="pre">synapse.common.tuplify</span></code>
+function for conversion to the “packed tuple” format that most Cortex
+methods use. This results in a slight performance hit but it plays nice
+with all of the existing Synapse code, most importantly the CLI. Setting
+this option to False, will remove the performance concerns but it may
+break other tooling that are expecting “packed tuple” input values.
+By default True.</p>
 </dd>
 </dl>
 </section>
