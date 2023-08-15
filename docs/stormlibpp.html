@@ -276,20 +276,45 @@
 <section id="module-stormlibpp.hstorm">
 <span id="stormlibpp-hstorm-module"></span><h2>stormlibpp.hstorm module<a class="headerlink" href="#module-stormlibpp.hstorm" title="Permalink to this heading"></a></h2>
 <p>An HTTP based Storm CLI.</p>
+<p>This CLI relies on Synapse’s out of the box CLI objects. It just replaces the
+CLI’s Cortex with an <code class="docutils literal notranslate"><span class="pre">HttpCortex</span></code>, making it capable of executing Storm code via
+HTTP. However, currently <code class="docutils literal notranslate"><span class="pre">HttpCortex</span></code> only supports the <code class="docutils literal notranslate"><span class="pre">storm</span></code> and <code class="docutils literal notranslate"><span class="pre">callStorm</span></code>
+methods, so the builtin commands that do not rely on Storm (Axon-related commands)
+do not work. <code class="docutils literal notranslate"><span class="pre">HttpCortex</span></code> raises a <cite>synapse.exc.SynErr`</cite> when these unsupported
+CLI commands are used, so the commands fail cleanly from the user’s perspective.</p>
+<p>The script, like <code class="docutils literal notranslate"><span class="pre">HttpCortex</span></code>, requires a user and password to communicate
+with the Synapse Cortex. A user can be passed via the command-line, otherwise
+<code class="docutils literal notranslate"><span class="pre">getpass</span></code> is used to select the current user. A password is always prompted for.
+Future versions will allow for further user/pass customization options.</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">--no-verify</span></code> option tells the script to not check the Cortex’s HTTPS cert.
+This is needed to connect to any test Cortex or a Cortex that otherwise doesn’t
+use a trusted CA to sign HTTPS certificates.</p>
 <dl class="py function">
 <dt class="sig sig-object py" id="stormlibpp.hstorm.get_args">
 <span class="sig-prename descclassname"><span class="pre">stormlibpp.hstorm.</span></span><span class="sig-name descname"><span class="pre">get_args</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">argv</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#stormlibpp.hstorm.get_args" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
+<dd><p>Build an argument parser for this script and parse the passed in args.</p>
+</dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="stormlibpp.hstorm.main">
 <em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">stormlibpp.hstorm.</span></span><span class="sig-name descname"><span class="pre">main</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">argv</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#stormlibpp.hstorm.main" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
+<dd><p>The main functionality of the HTTP Storm CLI.</p>
+<section id="parameters">
+<h3>Parameters<a class="headerlink" href="#parameters" title="Permalink to this heading"></a></h3>
+<dl class="simple">
+<dt>argv<span class="classifier">list[str]</span></dt><dd><p>The unparsed CLI arguments for this script.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
 
 </section>
 <section id="module-stormlibpp.httpcore">
 <span id="stormlibpp-httpcore-module"></span><h2>stormlibpp.httpcore module<a class="headerlink" href="#module-stormlibpp.httpcore" title="Permalink to this heading"></a></h2>
 <p>Implements some methods from synapse.cortex.Cortex but with HTTP.</p>
+<p>This is useful when replicating Telepath based tools that need to be used with
+HTTP. For example, the <code class="docutils literal notranslate"><span class="pre">hstorm</span></code> CLI replaces a <code class="docutils literal notranslate"><span class="pre">Cortex</span></code> object with an
+<code class="docutils literal notranslate"><span class="pre">HttpCortex</span></code> so it can run Storm commands over HTTP.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="stormlibpp.httpcore.HttpCortex">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">stormlibpp.httpcore.</span></span><span class="sig-name descname"><span class="pre">HttpCortex</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">url</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'https://localhost:4443'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">usr</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pwd</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">default_opts</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">{'repr':</span> <span class="pre">True}</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ssl_verify</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#stormlibpp.httpcore.HttpCortex" title="Permalink to this definition"></a></dt>
@@ -309,8 +334,30 @@ program execution. HttpCortex exposes a <code class="docutils literal notranslat
 when this object is no longer needed.</p>
 <p>HttpCortex is an async context manager. It calls the <code class="docutils literal notranslate"><span class="pre">login</span></code> and <code class="docutils literal notranslate"><span class="pre">close</span></code>
 methods for you upon entrance and exit of the object.</p>
-<section id="parameters">
-<h3>Parameters<a class="headerlink" href="#parameters" title="Permalink to this heading"></a></h3>
+<p>Examples:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># Use HttpCortex as an async context manager so login/cleanup is handled</span>
+<span class="k">async</span> <span class="k">with</span> <span class="n">HttpCortex</span><span class="p">(</span><span class="s2">&quot;&lt;HTTP URL&gt;&quot;</span><span class="p">,</span> <span class="s2">&quot;&lt;username&gt;&quot;</span><span class="p">,</span> <span class="s2">&quot;&lt;password&gt;&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">hcore</span><span class="p">:</span>
+    <span class="k">async</span> <span class="k">for</span> <span class="n">msg</span> <span class="ow">in</span> <span class="n">hcore</span><span class="o">.</span><span class="n">storm</span><span class="p">(</span><span class="s2">&quot;[inet:ipv4=1.1.1.1]&quot;</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">msg</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;node&quot;</span><span class="p">:</span>
+            <span class="n">pprint</span><span class="o">.</span><span class="n">pprint</span><span class="p">(</span><span class="n">msg</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+
+<span class="c1"># Or handle login and object cleanup yourself</span>
+<span class="n">hcore</span> <span class="o">=</span> <span class="n">HttpCortex</span><span class="p">(</span><span class="s2">&quot;&lt;HTTP URL&gt;&quot;</span><span class="p">,</span> <span class="s2">&quot;&lt;username&gt;&quot;</span><span class="p">,</span> <span class="s2">&quot;&lt;password&gt;&quot;</span><span class="p">)</span>
+<span class="k">await</span> <span class="n">hcore</span><span class="o">.</span><span class="n">login</span><span class="p">()</span>
+<span class="k">async</span> <span class="k">for</span> <span class="n">msg</span> <span class="ow">in</span> <span class="n">hcore</span><span class="o">.</span><span class="n">storm</span><span class="p">(</span><span class="s2">&quot;[inet:ipv4=1.1.1.1]&quot;</span><span class="p">):</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+    <span class="c1"># Do other things with each &quot;msg&quot;</span>
+<span class="k">await</span> <span class="n">hcore</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+
+<span class="c1"># callStorm can be used to get a single value instead of streaming results</span>
+<span class="k">async</span> <span class="k">with</span> <span class="n">HttpCortex</span><span class="p">(</span><span class="o">...</span><span class="p">)</span> <span class="k">as</span> <span class="n">hcore</span><span class="p">:</span>
+    <span class="n">retn</span> <span class="o">=</span> <span class="k">await</span> <span class="n">hcore</span><span class="o">.</span><span class="n">callStorm</span><span class="p">(</span><span class="s2">&quot;$var = &#39;some val&#39; return($var)&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">retn</span><span class="p">[</span><span class="s2">&quot;status&quot;</span><span class="p">]:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">retn</span><span class="p">[</span><span class="s2">&quot;result&quot;</span><span class="p">])</span>
+</pre></div>
+</div>
+<section id="id1">
+<h3>Parameters<a class="headerlink" href="#id1" title="Permalink to this heading"></a></h3>
 <dl class="simple">
 <dt>url<span class="classifier">str, optional</span></dt><dd><p>The URL of the Synapse Cortex to connect to,
 by default <cite>“https://localhost:4443”</cite>.</p>
@@ -329,8 +376,8 @@ Set this to an empty dict to disable. By default <cite>{“repr”: True}</cite>
 <dt class="sig sig-object py" id="stormlibpp.httpcore.HttpCortex.callStorm">
 <em class="property"><span class="pre">async</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">callStorm</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">text</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">opts</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#stormlibpp.httpcore.HttpCortex.callStorm" title="Permalink to this definition"></a></dt>
 <dd><p>Execute a Storm query and return the value passed to a Storm return() call.</p>
-<section id="id1">
-<h4>Parameters<a class="headerlink" href="#id1" title="Permalink to this heading"></a></h4>
+<section id="id2">
+<h4>Parameters<a class="headerlink" href="#id2" title="Permalink to this heading"></a></h4>
 <dl class="simple">
 <dt>text<span class="classifier">str</span></dt><dd><p>The Storm code to execute.</p>
 </dd>
@@ -363,17 +410,20 @@ or an error decoding the JSON response.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="stormlibpp.httpcore.HttpCortex.exportStorm">
 <em class="property"><span class="pre">async</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">exportStorm</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#stormlibpp.httpcore.HttpCortex.exportStorm" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
+<dd><p>Not implemented - here to support an HTTP Storm CLI.</p>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="stormlibpp.httpcore.HttpCortex.getAxonBytes">
 <em class="property"><span class="pre">async</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">getAxonBytes</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#stormlibpp.httpcore.HttpCortex.getAxonBytes" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
+<dd><p>Not implemented - here to support an HTTP Storm CLI.</p>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="stormlibpp.httpcore.HttpCortex.getAxonUpload">
 <em class="property"><span class="pre">async</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">getAxonUpload</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#stormlibpp.httpcore.HttpCortex.getAxonUpload" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
+<dd><p>Not implemented - here to support an HTTP Storm CLI.</p>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="stormlibpp.httpcore.HttpCortex.login">
@@ -397,8 +447,8 @@ longer than that without calling this method again.</p>
 <dt class="sig sig-object py" id="stormlibpp.httpcore.HttpCortex.storm">
 <em class="property"><span class="pre">async</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">storm</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">text</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">opts</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dict</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#stormlibpp.httpcore.HttpCortex.storm" title="Permalink to this definition"></a></dt>
 <dd><p>Evaulate a Storm query and yield the streamed Storm messages.</p>
-<section id="id2">
-<h4>Parameters<a class="headerlink" href="#id2" title="Permalink to this heading"></a></h4>
+<section id="id3">
+<h4>Parameters<a class="headerlink" href="#id3" title="Permalink to this heading"></a></h4>
 <dl class="simple">
 <dt>text<span class="classifier">str</span></dt><dd><p>The Storm code to execute.</p>
 </dd>
@@ -413,8 +463,8 @@ longer than that without calling this method again.</p>
 </dd>
 </dl>
 </section>
-<section id="id3">
-<h4>Raises<a class="headerlink" href="#id3" title="Permalink to this heading"></a></h4>
+<section id="id4">
+<h4>Raises<a class="headerlink" href="#id4" title="Permalink to this heading"></a></h4>
 <dl class="simple">
 <dt>HttpCortexError</dt><dd><p>If an exception is raised when making an HTTP request to the Cortex.
 This will likely either be from an HTTP error, a connection error,
@@ -654,8 +704,24 @@ containing the time using <code class="docutils literal notranslate"><span class
 is passed to Synapse’s Storm parser to check for Storm syntax errors.
 Any errors are raised as a <code class="docutils literal notranslate"><span class="pre">StormPkgSyntaxError</span></code> exception.</p></li>
 </ul>
-<section id="id5">
-<h3>Parameters<a class="headerlink" href="#id5" title="Permalink to this heading"></a></h3>
+<p>Examples:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># Just subclass StormPkg with a name that matches the Yaml definition.</span>
+<span class="k">class</span> <span class="nc">ThePkg</span><span class="p">(</span><span class="n">StormPkg</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&#39;&#39;&#39;The Yaml file this class will read must be named ``thepkg.yaml``.&#39;&#39;&#39;</span>
+
+<span class="c1"># Or declare a subclass with a custom package def name</span>
+<span class="c1"># (``storm.pkg.yaml``) that is different from the class name.</span>
+<span class="k">class</span> <span class="nc">SomePkg</span><span class="p">(</span><span class="n">StormPkg</span><span class="p">):</span>
+    <span class="n">proto_name</span> <span class="o">=</span> <span class="s1">&#39;some.pkg&#39;</span>
+
+<span class="c1"># Use the package in a Storm Service API class declaration</span>
+<span class="k">class</span> <span class="nc">SomeApi</span><span class="p">(</span><span class="n">s_cell</span><span class="o">.</span><span class="n">CellApi</span><span class="p">,</span> <span class="n">s_stormsvc</span><span class="o">.</span><span class="n">StormSvc</span><span class="p">):</span>
+    <span class="o">...</span>
+    <span class="n">_storm_svc_pkgs</span> <span class="o">=</span> <span class="p">(</span><span class="n">SomePkg</span><span class="p">()</span><span class="o">.</span><span class="n">asdict</span><span class="p">(),)</span>
+</pre></div>
+</div>
+<section id="id6">
+<h3>Parameters<a class="headerlink" href="#id6" title="Permalink to this heading"></a></h3>
 <dl class="simple">
 <dt>check_syntax<span class="classifier">bool, optional</span></dt><dd><p>Whether to check the syntax of this package’s loaded Storm code.
 By default True.</p>
@@ -688,8 +754,8 @@ this property is automatically set to the value of <code class="docutils literal
 </dd>
 </dl>
 </section>
-<section id="id6">
-<h3>Raises<a class="headerlink" href="#id6" title="Permalink to this heading"></a></h3>
+<section id="id7">
+<h3>Raises<a class="headerlink" href="#id7" title="Permalink to this heading"></a></h3>
 <dl class="simple">
 <dt>StormPkgBadDefError</dt><dd><p>If the package proto either has an invalid schema or bad value.</p>
 </dd>
@@ -716,8 +782,8 @@ but a custom <code class="docutils literal notranslate"><span class="pre">proto_
 <dt class="sig sig-object py" id="stormlibpp.stormpkg.StormPkg.check_syntax">
 <span class="sig-name descname"><span class="pre">check_syntax</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#stormlibpp.stormpkg.StormPkg.check_syntax" title="Permalink to this definition"></a></dt>
 <dd><p>Check the Storm syntax of this package’s loaded Storm code.</p>
-<section id="id7">
-<h4>Raises<a class="headerlink" href="#id7" title="Permalink to this heading"></a></h4>
+<section id="id8">
+<h4>Raises<a class="headerlink" href="#id8" title="Permalink to this heading"></a></h4>
 <dl class="simple">
 <dt>StormPkgSyntaxError</dt><dd><p>If the syntax of a any Storm code is invalid. We fail the whole
 package because one bad Storm file will cause loading failures on
@@ -787,8 +853,8 @@ the Cortex for all other files too.</p>
 <dd><p>The Storm code this package defines.</p>
 <p>Iterates over the dicts from <code class="docutils literal notranslate"><span class="pre">cmds()</span></code> + <code class="docutils literal notranslate"><span class="pre">mods()</span></code> to map all names
 to the Storm code each dict defines in the <code class="docutils literal notranslate"><span class="pre">storm</span></code> key.</p>
-<section id="id8">
-<h4>Returns<a class="headerlink" href="#id8" title="Permalink to this heading"></a></h4>
+<section id="id9">
+<h4>Returns<a class="headerlink" href="#id9" title="Permalink to this heading"></a></h4>
 <dl class="simple">
 <dt>dict[str, str]</dt><dd><p>Keys are the module/command name and values are the Storm code.</p>
 </dd>
@@ -953,15 +1019,15 @@ may be empty, but <code class="docutils literal notranslate"><span class="pre">d
 <dt class="sig sig-object py" id="stormlibpp.utils.absjoin">
 <span class="sig-prename descclassname"><span class="pre">stormlibpp.utils.</span></span><span class="sig-name descname"><span class="pre">absjoin</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">paths</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="headerlink" href="#stormlibpp.utils.absjoin" title="Permalink to this definition"></a></dt>
 <dd><p>Join paths with os.path.join and then pass it to os.path.abspath.</p>
-<section id="id9">
-<h3>Parameters<a class="headerlink" href="#id9" title="Permalink to this heading"></a></h3>
+<section id="id10">
+<h3>Parameters<a class="headerlink" href="#id10" title="Permalink to this heading"></a></h3>
 <dl class="simple">
 <dt>paths<span class="classifier">list[str]</span></dt><dd><p>The path strings to join together, as would be passed to <code class="docutils literal notranslate"><span class="pre">os.path.join</span></code>.</p>
 </dd>
 </dl>
 </section>
-<section id="id10">
-<h3>Returns<a class="headerlink" href="#id10" title="Permalink to this heading"></a></h3>
+<section id="id11">
+<h3>Returns<a class="headerlink" href="#id11" title="Permalink to this heading"></a></h3>
 <dl class="simple">
 <dt>str</dt><dd><p>The absolute path derived from the joined <code class="docutils literal notranslate"><span class="pre">paths</span></code>.</p>
 </dd>
@@ -973,8 +1039,8 @@ may be empty, but <code class="docutils literal notranslate"><span class="pre">d
 <dt class="sig sig-object py" id="stormlibpp.utils.chk_storm_syntax">
 <span class="sig-prename descclassname"><span class="pre">stormlibpp.utils.</span></span><span class="sig-name descname"><span class="pre">chk_storm_syntax</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">storm</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#stormlibpp.utils.chk_storm_syntax" title="Permalink to this definition"></a></dt>
 <dd><p>Check if the given Storm code has valid syntax, raise exception if not.</p>
-<section id="id11">
-<h3>Raises<a class="headerlink" href="#id11" title="Permalink to this heading"></a></h3>
+<section id="id12">
+<h3>Raises<a class="headerlink" href="#id12" title="Permalink to this heading"></a></h3>
 <dl class="simple">
 <dt>StormSyntaxError</dt><dd><p>If a Storm syntax error was found in the given Storm code.</p>
 </dd>
@@ -986,8 +1052,8 @@ may be empty, but <code class="docutils literal notranslate"><span class="pre">d
 <dt class="sig sig-object py" id="stormlibpp.utils.normver">
 <span class="sig-prename descclassname"><span class="pre">stormlibpp.utils.</span></span><span class="sig-name descname"><span class="pre">normver</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ver</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">tuple</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">tuple</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#stormlibpp.utils.normver" title="Permalink to this definition"></a></dt>
 <dd><p>Take either a version str “x.x.x” or tuple (x, x, x) and return both.</p>
-<section id="id12">
-<h3>Raises<a class="headerlink" href="#id12" title="Permalink to this heading"></a></h3>
+<section id="id13">
+<h3>Raises<a class="headerlink" href="#id13" title="Permalink to this heading"></a></h3>
 <dl class="simple">
 <dt>TypeError</dt><dd><p>If <code class="docutils literal notranslate"><span class="pre">ver</span></code> is not a str or tuple.</p>
 </dd>
@@ -1001,7 +1067,7 @@ may be empty, but <code class="docutils literal notranslate"><span class="pre">d
 <p>The stormlibpp Python Package.</p>
 <p>StormLib++ provides a number of Python objects to make life as a Synapse/Storm
 developer easier.</p>
-<p>StormLib++ provides several useful utility functions in <code class="docutils literal notranslate"><span class="pre">utils</span></code>.</p>
+<p>StormLib++ has several useful utility functions in <code class="docutils literal notranslate"><span class="pre">utils</span></code>.</p>
 <p>StormLib++ errors can be found in <code class="docutils literal notranslate"><span class="pre">errors</span></code>. Each componenent of StormLib++
 uses these errors their own way. Information our how they’re used can be found
 in those components.</p>
@@ -1011,15 +1077,28 @@ it to a package definition, optionally check the Storm code’s syntax (enabled
 by default), and store a Python dict containing the Storm package’s definition.</p>
 <p><code class="docutils literal notranslate"><span class="pre">StormPkg</span></code> also provides some helpful properties to describe the Storm
 package’s configuration (<cite>cmds</cite>, <cite>mods</cite>, <cite>pkg_guid</cite>, <cite>pkg_name</cite>, <cite>pkg_ver</cite>, <cite>storm</cite>).</p>
-<p>There are also several submodules not directly imported by <code class="docutils literal notranslate"><span class="pre">stormlibpp</span></code> at
-init. However, some classes/functions from these submodules are. The submodules
-are briefly described below:</p>
-<ul class="simple">
-<li><p><code class="docutils literal notranslate"><span class="pre">telepath</span></code> has methods and classes for working with Telepath endpoints.
+<p>The <code class="docutils literal notranslate"><span class="pre">telepath</span></code> module has methods and classes for working with Telepath endpoints.
 It currently contains mostly classes for describing standard Telepath API
-return values.</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">stormpkg</span></code> defines the <code class="docutils literal notranslate"><span class="pre">StormPkg</span></code> class.</p></li>
-</ul>
+return values.</p>
+<p><code class="docutils literal notranslate"><span class="pre">StormNode</span></code> is a class giving users access to a Python API that can interface
+with a Storm Node that is sent to a Python runtime either through Telepath RPC
+or as a return message from an HTTP API call. It allows for unpacking of node
+tuples into objects as well as repacking for use in Cortex methods. Edits to the
+object can be made and later reflected when repacking the node.</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">node</span></code> module also contains some Python typing primitives for Storm Nodes.</p>
+<p><code class="docutils literal notranslate"><span class="pre">HttpCortex</span></code> is a fake <code class="docutils literal notranslate"><span class="pre">synapse.cortex.Cortex</span></code> object that communicates over
+HTTP instead of Telepath. This object can be passed around in place of a <code class="docutils literal notranslate"><span class="pre">Cortex</span></code>
+to support non-standard deployments that are unable use Telepath. Currently, it
+only supports the <code class="docutils literal notranslate"><span class="pre">storm</span></code> and <code class="docutils literal notranslate"><span class="pre">callStorm</span></code> methods.</p>
+<p><code class="docutils literal notranslate"><span class="pre">hstorm</span></code> is a submodule designed to be run as a CLI script. It starts a Storm
+CLI that uses an <code class="docutils literal notranslate"><span class="pre">HttpCortex</span></code> object rather than a <code class="docutils literal notranslate"><span class="pre">synapse.cortex.Cortex</span></code>.
+This script uses the same <code class="docutils literal notranslate"><span class="pre">synapse.tools.storm.StormCli</span></code> object that the official
+CLI relies on to handle IO and the command loop. So everything should feel
+familiar to those used to Synapse’s builtin tools.</p>
+<p><code class="docutils literal notranslate"><span class="pre">tmpcortex</span></code> is another CLI script that allows users to start a throwaway Cortex
+that can be used for testing other tools. It creates a user (<code class="docutils literal notranslate"><span class="pre">test</span></code>) with password
+(<code class="docutils literal notranslate"><span class="pre">test</span></code>) and starts the HTTP API over port <code class="docutils literal notranslate"><span class="pre">4443</span></code>. Future versions of this
+script will support custom Cortex configuration.</p>
 </section>
 </section>
 
