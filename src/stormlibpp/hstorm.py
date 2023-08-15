@@ -21,6 +21,7 @@ use a trusted CA to sign HTTPS certificates.
 import asyncio
 import argparse
 import getpass
+import os
 import sys
 
 import synapse.lib.output as s_output
@@ -70,21 +71,20 @@ async def main(argv: list[str]):
     outp = s_output.stdout
 
     if args.user:
-        user = args.user
+        username = args.user
+    elif (envusr := os.environ.get("CORTEX_USER")):
+        username = envusr
     else:
-        user = getpass.getuser()
-        # TODO - Dynamically capture user
-        # user_in = input(f"Username [{gp_user}]: ")
+        gp_user = getpass.getuser()
+        user_in = input(f"Username [{gp_user}]: ")
+        username = user_in if user_in else gp_user
 
-        # if user_in:
-        #     user = user_in
-        # else:
-        #     user = gp_user
+    if (envpw := os.environ.get("CORTEX_PASS")):
+        password = envpw
+    else:
+        password = getpass.getpass()
 
-    # TODO - Get password from config or envvar
-    password = getpass.getpass()
-
-    async with HttpCortex(args.cortex, user, password, ssl_verify=not args.no_verify) as hcore:
+    async with HttpCortex(args.cortex, username, password, ssl_verify=not args.no_verify) as hcore:
 
         async with await s_storm.StormCli.anit(hcore, outp=outp, opts=args) as cli:
 
