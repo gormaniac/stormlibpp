@@ -56,6 +56,22 @@ class StormPkg:
     - If ``check_syntax`` is True, all Storm code that is loaded in the ``pkdef``
       is passed to Synapse's Storm parser to check for Storm syntax errors.
       Any errors are raised as a ``StormPkgSyntaxError`` exception.
+ 
+    Examples::
+
+        # Just subclass StormPkg with a name that matches the Yaml definition.
+        class ThePkg(StormPkg):
+            '''The Yaml file this class will read must be named ``thepkg.yaml``.'''
+
+        # Or declare a subclass with a custom package def name
+        # (``storm.pkg.yaml``) that is different from the class name.
+        class SomePkg(StormPkg):
+            proto_name = 'some.pkg'
+
+        # Use the package in a Storm Service API class declaration
+        class SomeApi(s_cell.CellApi, s_stormsvc.StormSvc):
+            ...
+            _storm_svc_pkgs = (SomePkg().asdict(),)
 
     Parameters
     ----------
@@ -136,6 +152,7 @@ class StormPkg:
                 "pkgproto",
             )
 
+        # TODO - What about .yml files?
         self.proto = os.path.join(
             self.proto_dir,
             f"{self.proto_name}.yaml",

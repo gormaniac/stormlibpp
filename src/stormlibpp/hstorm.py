@@ -1,4 +1,21 @@
-"""An HTTP based Storm CLI."""
+"""An HTTP based Storm CLI.
+
+This CLI relies on Synapse's out of the box CLI objects. It just replaces the
+CLI's Cortex with an ``HttpCortex``, making it capable of executing Storm code via
+HTTP. However, currently ``HttpCortex`` only supports the ``storm`` and ``callStorm``
+methods, so the builtin commands that do not rely on Storm (Axon-related commands)
+do not work. ``HttpCortex`` raises a `synapse.exc.SynErr`` when these unsupported
+CLI commands are used, so the commands fail cleanly from the user's perspective.
+
+The script, like ``HttpCortex``, requires a user and password to communicate
+with the Synapse Cortex. A user can be passed via the command-line, otherwise
+``getpass`` is used to select the current user. A password is always prompted for.
+Future versions will allow for further user/pass customization options.
+
+The ``--no-verify`` option tells the script to not check the Cortex's HTTPS cert.
+This is needed to connect to any test Cortex or a Cortex that otherwise doesn't
+use a trusted CA to sign HTTPS certificates.
+"""
 
 
 import asyncio
@@ -13,6 +30,8 @@ from .httpcore import HttpCortex
 
 
 def get_args(argv: list[str]):
+    """Build an argument parser for this script and parse the passed in args."""
+
     args = argparse.ArgumentParser(prog="stormlibpp.hstorm")
     args.add_argument("cortex", help="An HTTP URL for the Cortex.")
     args.add_argument("onecmd", nargs="?", help="A Storm command to run and exit.")
@@ -39,6 +58,14 @@ def get_args(argv: list[str]):
 
 
 async def main(argv: list[str]):
+    """The main functionality of the HTTP Storm CLI.
+
+    Parameters
+    ----------
+    argv : list[str]
+        The unparsed CLI arguments for this script.
+    """
+
     args = get_args(argv)
     outp = s_output.stdout
 
