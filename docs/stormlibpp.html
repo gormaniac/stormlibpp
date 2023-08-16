@@ -454,12 +454,14 @@ longer than that without calling this method again.</p>
 </dd>
 <dt>opts<span class="classifier">dict | None, optional</span></dt><dd><p>Storm options to use when executing this Storm code, by default None.</p>
 </dd>
-<dt>tuplify<span class="classifier">bool, optional</span></dt><dd><p>Whether to pass streamed Storm messages to the <code class="docutils literal notranslate"><span class="pre">synapse.common.tuplify</span></code>
+<dt>tuplify<span class="classifier">bool, optional</span></dt><dd><p>Whether to pass streamed Storm messages to the <code class="docutils literal notranslate"><span class="pre">synapse.lib.msgpack.deepcopy</span></code>
 function for conversion to the “packed tuple” format that most Cortex
 methods use. This results in a slight performance hit but it plays nice
 with all of the existing Synapse code, most importantly the CLI. Setting
 this option to False, will remove the performance concerns but it may
 break other tooling that are expecting “packed tuple” input values.
+<code class="docutils literal notranslate"><span class="pre">synapse.common.tuplify</span></code> was another candidate over <code class="docutils literal notranslate"><span class="pre">deepcopy</span></code>, but
+<code class="docutils literal notranslate"><span class="pre">deepcopy</span></code> is faster.
 By default True.</p>
 </dd>
 </dl>
