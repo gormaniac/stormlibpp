@@ -9,7 +9,7 @@ HTTP. For example, the ``hstorm`` CLI replaces a ``Cortex`` object with an
 import aiohttp
 import json
 
-import synapse.common as s_common
+import synapse.lib.msgpack as s_msgpack
 
 from .errors import (
     HttpCortexError,
@@ -219,12 +219,14 @@ class HttpCortex:
         opts : dict | None, optional
             Storm options to use when executing this Storm code, by default None.
         tuplify : bool, optional
-            Whether to pass streamed Storm messages to the ``synapse.common.tuplify``
+            Whether to pass streamed Storm messages to the ``synapse.lib.msgpack.deepcopy``
             function for conversion to the "packed tuple" format that most Cortex
             methods use. This results in a slight performance hit but it plays nice
             with all of the existing Synapse code, most importantly the CLI. Setting
             this option to False, will remove the performance concerns but it may
             break other tooling that are expecting "packed tuple" input values.
+            ``synapse.common.tuplify`` was another candidate over ``deepcopy``, but
+            ``deepcopy`` is faster.
             By default True.
 
         Yields
@@ -252,7 +254,7 @@ class HttpCortex:
 
                     data = json.loads(byts)
                     if tuplify:
-                        yield s_common.tuplify(data)
+                        yield s_msgpack.deepcopy(data)
                     else:
                         yield data
 
