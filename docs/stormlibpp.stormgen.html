@@ -100,11 +100,11 @@
 <dt class="sig sig-object py" id="stormlibpp.stormgen.DocExtractor">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">stormlibpp.stormgen.</span></span><span class="sig-name descname"><span class="pre">DocExtractor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">doc</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#stormlibpp.stormgen.StormGenDoc" title="stormlibpp.stormgen.StormGenDoc"><span class="pre">StormGenDoc</span></a></span></em>, <em class="sig-param"><span class="o"><span class="pre">/</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">doc_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'full'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">form</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nodes_header</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'Nodes'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#stormlibpp.stormgen.DocExtractor" title="Permalink to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
-<p>Extracts <code class="docutils literal notranslate"><span class="pre">DocNode``s</span> <span class="pre">from</span> <span class="pre">a</span> <span class="pre">``StormGenDoc</span></code>.</p>
+<p>Extracts <code class="docutils literal notranslate"><span class="pre">DocNode</span></code> objects from a <code class="docutils literal notranslate"><span class="pre">StormGenDoc</span></code>.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="stormlibpp.stormgen.DocExtractor.extract">
 <span class="sig-name descname"><span class="pre">extract</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#stormlibpp.stormgen.DocNode" title="stormlibpp.stormgen.DocNode"><span class="pre">stormlibpp.stormgen.DocNode</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#stormlibpp.stormgen.DocExtractor.extract" title="Permalink to this definition"></a></dt>
-<dd><p>Get the <a href="#id1"><span class="problematic" id="id2">``</span></a>DocNode``s from the input document.</p>
+<dd><p>Get the <code class="docutils literal notranslate"><span class="pre">DocNode</span></code> objects from the input document.</p>
 </dd></dl>
 
 <dl class="py attribute">
@@ -118,13 +118,20 @@
 <dt class="sig sig-object py" id="stormlibpp.stormgen.DocNode">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">stormlibpp.stormgen.</span></span><span class="sig-name descname"><span class="pre">DocNode</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">parts</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#stormlibpp.stormgen.DocPart" title="stormlibpp.stormgen.DocPart"><span class="pre">stormlibpp.stormgen.DocPart</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">form</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#stormlibpp.stormgen.DocNode" title="Permalink to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
-<p>A node defined in Markdown - as a grouping of <a href="#id3"><span class="problematic" id="id4">``</span></a>DocPart``s.</p>
+<p>A node defined in Markdown - as a grouping of <code class="docutils literal notranslate"><span class="pre">DocPart</span></code> objects.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="stormlibpp.stormgen.DocNode.extract">
 <span class="sig-name descname"><span class="pre">extract</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#stormlibpp.stormgen.DocNode.extract" title="Permalink to this definition"></a></dt>
 <dd><p>Extract all parts of a DocNode from the input parts.</p>
 </dd></dl>
 
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="stormlibpp.stormgen.DocNodeExtractor">
+<span class="sig-prename descclassname"><span class="pre">stormlibpp.stormgen.</span></span><span class="sig-name descname"><span class="pre">DocNodeExtractor</span></span><a class="headerlink" href="#stormlibpp.stormgen.DocNodeExtractor" title="Permalink to this definition"></a></dt>
+<dd><p>A method that extracts <code class="docutils literal notranslate"><span class="pre">DocNodes</span></code> from a <code class="docutils literal notranslate"><span class="pre">StormGenDoc</span></code> of a given type.</p>
+<p>alias of <code class="xref py py-class docutils literal notranslate"><span class="pre">Callable</span></code>[StormGenDoc, <code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code>[DocNode]]</p>
 </dd></dl>
 
 <dl class="py class">
@@ -143,7 +150,7 @@
 <dt class="sig sig-object py" id="stormlibpp.stormgen.NodesConverter">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">stormlibpp.stormgen.</span></span><span class="sig-name descname"><span class="pre">NodesConverter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">doc_nodes</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#stormlibpp.stormgen.DocNode" title="stormlibpp.stormgen.DocNode"><span class="pre">stormlibpp.stormgen.DocNode</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">comments</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#stormlibpp.stormgen.NodesConverter" title="Permalink to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
-<p>Convert <a href="#id5"><span class="problematic" id="id6">``</span></a>DocNode``s to <a href="#id7"><span class="problematic" id="id8">``</span></a>StormNode``s.</p>
+<p>Convert <code class="docutils literal notranslate"><span class="pre">DocNodes</span></code> to <code class="docutils literal notranslate"><span class="pre">StormNodes</span></code>.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="stormlibpp.stormgen.NodesConverter.convert">
 <span class="sig-name descname"><span class="pre">convert</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#stormlibpp.stormgen.NodesConverter.convert" title="Permalink to this definition"></a></dt>
@@ -156,9 +163,9 @@
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">stormlibpp.stormgen.</span></span><span class="sig-name descname"><span class="pre">StormGenDoc</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">text</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#stormlibpp.stormgen.StormGenDoc" title="Permalink to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>A Markdown document that is ready for processing with stormgen.</p>
-<p>It contains a list of all <a href="#id9"><span class="problematic" id="id10">``</span></a>Section``s in a document, in order of appearance.</p>
-<p>It also stores the raw AST parsed by <a href="#id15"><span class="problematic" id="id16">marko_</span></a>.</p>
-<p>_marko: <a class="reference external" href="https://pypi.org/project/marko/">https://pypi.org/project/marko/</a></p>
+<p>It contains a list of all <code class="docutils literal notranslate"><span class="pre">DocPart</span></code> objects in a document,
+in order of appearance.</p>
+<p>It also stores the raw AST parsed by <a class="reference external" href="https://pypi.org/project/marko/">marko</a>.</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="stormlibpp.stormgen.StormGenDoc.ast">
 <span class="sig-name descname"><span class="pre">ast</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">marko.block.BlockElement</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#stormlibpp.stormgen.StormGenDoc.ast" title="Permalink to this definition"></a></dt>
@@ -168,22 +175,51 @@
 <dl class="py method">
 <dt class="sig sig-object py" id="stormlibpp.stormgen.StormGenDoc.parse">
 <span class="sig-name descname"><span class="pre">parse</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#stormlibpp.stormgen.StormGenDoc.parse" title="Permalink to this definition"></a></dt>
-<dd><p>Parse the input text into a list of blocks and a list of <a href="#id11"><span class="problematic" id="id12">``</span></a>DocPart``s.</p>
+<dd><p>Parse the input text into a list of blocks and a list of <code class="docutils literal notranslate"><span class="pre">DocPart</span></code> objects.</p>
 </dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="stormlibpp.stormgen.StormGenDoc.parts">
 <span class="sig-name descname"><span class="pre">parts</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#stormlibpp.stormgen.DocPart" title="stormlibpp.stormgen.DocPart"><span class="pre">stormlibpp.stormgen.DocPart</span></a><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#stormlibpp.stormgen.StormGenDoc.parts" title="Permalink to this definition"></a></dt>
-<dd><p>A list of all <a href="#id13"><span class="problematic" id="id14">``</span></a>DocPart``s in the input text, in order of appearance.</p>
-<p>A <code class="docutils literal notranslate"><span class="pre">DocPart</span></code> is all blocks between two headers.</p>
+<dd><p>A list of all <code class="docutils literal notranslate"><span class="pre">DocPart</span></code> objects in the input text, in order of appearance.</p>
+<p>A <code class="docutils literal notranslate"><span class="pre">DocPart</span></code> is all blocks between two headings.</p>
 </dd></dl>
 
 </dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="stormlibpp.stormgen.convert">
-<span class="sig-prename descclassname"><span class="pre">stormlibpp.stormgen.</span></span><span class="sig-name descname"><span class="pre">convert</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">doc</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#stormlibpp.stormgen.StormGenDoc" title="stormlibpp.stormgen.StormGenDoc"><span class="pre">StormGenDoc</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">comments</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">doc_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'full'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nodes_header</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'Nodes'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">form</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">''</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="stormlibpp.html#stormlibpp.node.StormNode" title="stormlibpp.node.StormNode"><span class="pre">stormlibpp.node.StormNode</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#stormlibpp.stormgen.convert" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
+<span class="sig-prename descclassname"><span class="pre">stormlibpp.stormgen.</span></span><span class="sig-name descname"><span class="pre">convert</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">doc:</span> <span class="pre">~stormlibpp.stormgen.StormGenDoc,</span> <span class="pre">comments:</span> <span class="pre">bool</span> <span class="pre">=</span> <span class="pre">False,</span> <span class="pre">doc_type:</span> <span class="pre">str</span> <span class="pre">=</span> <span class="pre">'full',</span> <span class="pre">nodes_header:</span> <span class="pre">str</span> <span class="pre">=</span> <span class="pre">'Nodes',</span> <span class="pre">form:</span> <span class="pre">str</span> <span class="pre">=</span> <span class="pre">'',</span> <span class="pre">extractor:</span> <span class="pre">~collections.abc.Callable[[~stormlibpp.stormgen.StormGenDoc,</span> <span class="pre">str,</span> <span class="pre">str,</span> <span class="pre">str],</span> <span class="pre">list[stormlibpp.stormgen.DocNode]]</span> <span class="pre">=</span> <span class="pre">&lt;function</span> <span class="pre">extract&gt;</span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="stormlibpp.html#stormlibpp.node.StormNode" title="stormlibpp.node.StormNode"><span class="pre">stormlibpp.node.StormNode</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#stormlibpp.stormgen.convert" title="Permalink to this definition"></a></dt>
+<dd><p>Convert a parsed stormgen Markdown document to a list of Storm nodes.</p>
+<section id="parameters">
+<h3>Parameters<a class="headerlink" href="#parameters" title="Permalink to this heading"></a></h3>
+<dl class="simple">
+<dt>doc<span class="classifier">StormGenDoc</span></dt><dd><p>The parsed Markdown document in a stormgen compatible format.</p>
+</dd>
+<dt>comments<span class="classifier">bool, optional</span></dt><dd><p>Whether to create meta:note nodes to link select Markdown text to the
+created nodes, by default False.</p>
+</dd>
+<dt>doc_type<span class="classifier">{“full”, “embedded”, “forms”} str, optional</span></dt><dd><p>The type of stormgen doc that is being converted, by default “full”.</p>
+</dd>
+<dt>nodes_header<span class="classifier">str, optional</span></dt><dd><p>The prefix for the header used to detect stormgen Markdown when processing
+an <code class="docutils literal notranslate"><span class="pre">embedded</span></code> doc, by default “Nodes”.</p>
+</dd>
+<dt>form<span class="classifier">str, optional</span></dt><dd><p>Optionally skip node form detection and treat all nodes defined in the doc
+as one form, by default “”.</p>
+</dd>
+<dt>extractor<span class="classifier">DocNodeExtractor, optional</span></dt><dd><p>A callable that can create a list of <code class="docutils literal notranslate"><span class="pre">DocNode</span></code> objects from an input
+<code class="docutils literal notranslate"><span class="pre">StormGenDoc</span></code>, by default <code class="docutils literal notranslate"><span class="pre">extract</span></code>.</p>
+</dd>
+</dl>
+</section>
+<section id="returns">
+<h3>Returns<a class="headerlink" href="#returns" title="Permalink to this heading"></a></h3>
+<dl class="simple">
+<dt>list[StormNode]</dt><dd><p>The Storm nodes created from the input <code class="docutils literal notranslate"><span class="pre">StormGenDoc</span></code>.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="stormlibpp.stormgen.extract">
@@ -193,7 +229,25 @@
 <dl class="py function">
 <dt class="sig sig-object py" id="stormlibpp.stormgen.parse">
 <span class="sig-prename descclassname"><span class="pre">stormlibpp.stormgen.</span></span><span class="sig-name descname"><span class="pre">parse</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">text</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#stormlibpp.stormgen.StormGenDoc" title="stormlibpp.stormgen.StormGenDoc"><span class="pre">StormGenDoc</span></a></span></span><a class="headerlink" href="#stormlibpp.stormgen.parse" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
+<dd><p>Parse a Markdown document into a <code class="docutils literal notranslate"><span class="pre">StormGenDoc</span></code>.</p>
+<section id="id1">
+<h3>Parameters<a class="headerlink" href="#id1" title="Permalink to this heading"></a></h3>
+<dl class="simple">
+<dt>text<span class="classifier">str</span></dt><dd><p>The Markdown document to parse.</p>
+</dd>
+</dl>
+</section>
+<section id="id2">
+<h3>Returns<a class="headerlink" href="#id2" title="Permalink to this heading"></a></h3>
+<dl>
+<dt>StormGenDoc</dt><dd><p>An object representing the parsed Markdown document.</p>
+<p>A <code class="docutils literal notranslate"><span class="pre">StormGenDoc</span></code> has an AST of all pieces of the document and list of
+<code class="docutils literal notranslate"><span class="pre">DocPart</span></code> objects. It can be passed to <code class="docutils literal notranslate"><span class="pre">convert</span></code> to make a list of
+<code class="docutils literal notranslate"><span class="pre">StormNode</span></code> objects that can be sent to Synapse.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
 
 </section>
 </section>

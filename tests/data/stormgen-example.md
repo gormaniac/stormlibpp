@@ -11,7 +11,7 @@ Explain stuff about this specific inet:ipv4 here.
 
 Comments directly under a primary property title may optionally be saved as `meta:notes` that get edged to this node.
 
-Images linked in this section should be saved to Synapse and edged to this node too.
+Images linked in this section should be saved to Synapse and edged to this node too (a wishlist feature).
 
 #### :dns:rev
 
