@@ -77,6 +77,21 @@
 <li class="toctree-l3"><a class="reference internal" href="#stormlibpp.httpcore.StormMsgType"><code class="docutils literal notranslate"><span class="pre">StormMsgType</span></code></a></li>
 </ul>
 </li>
+<li class="toctree-l2"><a class="reference internal" href="#module-stormlibpp.import">stormlibpp.import module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#stormlibpp.import.Importer"><code class="docutils literal notranslate"><span class="pre">Importer</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#stormlibpp.import.Importer.add_data"><code class="docutils literal notranslate"><span class="pre">Importer.add_data()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#stormlibpp.import.Importer.genrs"><code class="docutils literal notranslate"><span class="pre">Importer.genrs</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#stormlibpp.import.Importer.iterrows"><code class="docutils literal notranslate"><span class="pre">Importer.iterrows()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#stormlibpp.import.csv_genr"><code class="docutils literal notranslate"><span class="pre">csv_genr()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#stormlibpp.import.find_data_file"><code class="docutils literal notranslate"><span class="pre">find_data_file()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#stormlibpp.import.get_args"><code class="docutils literal notranslate"><span class="pre">get_args()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#stormlibpp.import.json_genr"><code class="docutils literal notranslate"><span class="pre">json_genr()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#stormlibpp.import.main"><code class="docutils literal notranslate"><span class="pre">main()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#stormlibpp.import.txt_genr"><code class="docutils literal notranslate"><span class="pre">txt_genr()</span></code></a></li>
+</ul>
+</li>
 <li class="toctree-l2"><a class="reference internal" href="#module-stormlibpp.node">stormlibpp.node module</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#stormlibpp.node.ItemContainer"><code class="docutils literal notranslate"><span class="pre">ItemContainer</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#stormlibpp.node.NodeDef"><code class="docutils literal notranslate"><span class="pre">NodeDef</span></code></a></li>
@@ -106,6 +121,16 @@
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="#stormlibpp.node.Tags"><code class="docutils literal notranslate"><span class="pre">Tags</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#module-stormlibpp.output">stormlibpp.output module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#stormlibpp.output.handleErr"><code class="docutils literal notranslate"><span class="pre">handleErr()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#stormlibpp.output.handle_msg"><code class="docutils literal notranslate"><span class="pre">handle_msg()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#stormlibpp.output.print_node_prop"><code class="docutils literal notranslate"><span class="pre">print_node_prop()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#module-stormlibpp.stormcli">stormlibpp.stormcli module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#stormlibpp.stormcli.start_storm_cli"><code class="docutils literal notranslate"><span class="pre">start_storm_cli()</span></code></a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="#module-stormlibpp.stormpkg">stormlibpp.stormpkg module</a><ul>
@@ -503,6 +528,62 @@ or an error decoding the JSON response.</p>
 </dd></dl>
 
 </section>
+<section id="module-stormlibpp.import">
+<span id="stormlibpp-import-module"></span><h2>stormlibpp.import module<a class="headerlink" href="#module-stormlibpp.import" title="Permalink to this heading"></a></h2>
+<p>Recursively execute all Storm scripts in a given folder on a given Synapse Cortex over HTTP.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="stormlibpp.import.Importer">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">stormlibpp.import.</span></span><span class="sig-name descname"><span class="pre">Importer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">core</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">files</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ftype</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">text</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stormopts={}</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">outp=&lt;synapse.lib.output.OutPut</span> <span class="pre">object&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">header=False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">debug=False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#stormlibpp.import.Importer" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="stormlibpp.import.Importer.add_data">
+<em class="property"><span class="pre">async</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">add_data</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#stormlibpp.import.Importer.add_data" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="stormlibpp.import.Importer.genrs">
+<span class="sig-name descname"><span class="pre">genrs</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{'csv':</span> <span class="pre">&lt;function</span> <span class="pre">csv_genr&gt;,</span> <span class="pre">'json':</span> <span class="pre">&lt;function</span> <span class="pre">json_genr&gt;,</span> <span class="pre">'txt':</span> <span class="pre">&lt;function</span> <span class="pre">txt_genr&gt;}</span></em><a class="headerlink" href="#stormlibpp.import.Importer.genrs" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="stormlibpp.import.Importer.iterrows">
+<span class="sig-name descname"><span class="pre">iterrows</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#stormlibpp.import.Importer.iterrows" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="stormlibpp.import.csv_genr">
+<span class="sig-prename descclassname"><span class="pre">stormlibpp.import.</span></span><span class="sig-name descname"><span class="pre">csv_genr</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fd</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#stormlibpp.import.csv_genr" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="stormlibpp.import.find_data_file">
+<span class="sig-prename descclassname"><span class="pre">stormlibpp.import.</span></span><span class="sig-name descname"><span class="pre">find_data_file</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">orig</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">files</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#stormlibpp.import.find_data_file" title="Permalink to this definition"></a></dt>
+<dd><p>Find a data file in a list of files that has the same name (and path) as the original file.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="stormlibpp.import.get_args">
+<span class="sig-prename descclassname"><span class="pre">stormlibpp.import.</span></span><span class="sig-name descname"><span class="pre">get_args</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">argv</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#stormlibpp.import.get_args" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="stormlibpp.import.json_genr">
+<span class="sig-prename descclassname"><span class="pre">stormlibpp.import.</span></span><span class="sig-name descname"><span class="pre">json_genr</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fd</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#stormlibpp.import.json_genr" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="stormlibpp.import.main">
+<em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">stormlibpp.import.</span></span><span class="sig-name descname"><span class="pre">main</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">argv</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#stormlibpp.import.main" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="stormlibpp.import.txt_genr">
+<span class="sig-prename descclassname"><span class="pre">stormlibpp.import.</span></span><span class="sig-name descname"><span class="pre">txt_genr</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fd</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#stormlibpp.import.txt_genr" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</section>
 <section id="module-stormlibpp.node">
 <span id="stormlibpp-node-module"></span><h2>stormlibpp.node module<a class="headerlink" href="#module-stormlibpp.node" title="Permalink to this heading"></a></h2>
 <p>Work with storm:node objects in Python.</p>
@@ -668,6 +749,36 @@ has in Storm.</p>
 <dd><p>Bases: <a class="reference internal" href="#stormlibpp.node.ItemContainer" title="stormlibpp.node.ItemContainer"><code class="xref py py-class docutils literal notranslate"><span class="pre">ItemContainer</span></code></a></p>
 <p>Tags of a StormNode.</p>
 </dd></dl>
+
+</section>
+<section id="module-stormlibpp.output">
+<span id="stormlibpp-output-module"></span><h2>stormlibpp.output module<a class="headerlink" href="#module-stormlibpp.output" title="Permalink to this heading"></a></h2>
+<p>Storm message printing code that was copied and modified from the Storm CLI.</p>
+<p>Unfortunately, the Storm CLI code does not include the following code as easily
+exportable methods for reuse in other code. I have copied the relevant code
+from the Storm CLI and modified it to work in standalone methods.</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="stormlibpp.output.handleErr">
+<em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">stormlibpp.output.</span></span><span class="sig-name descname"><span class="pre">handleErr</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mesg</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#stormlibpp.output.handleErr" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="stormlibpp.output.handle_msg">
+<span class="sig-prename descclassname"><span class="pre">stormlibpp.output.</span></span><span class="sig-name descname"><span class="pre">handle_msg</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mesg</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hideprops</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hidetags</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">print_skips</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">[]</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#stormlibpp.output.handle_msg" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="stormlibpp.output.print_node_prop">
+<span class="sig-prename descclassname"><span class="pre">stormlibpp.output.</span></span><span class="sig-name descname"><span class="pre">print_node_prop</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">valu</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#stormlibpp.output.print_node_prop" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</section>
+<section id="module-stormlibpp.stormcli">
+<span id="stormlibpp-stormcli-module"></span><h2>stormlibpp.stormcli module<a class="headerlink" href="#module-stormlibpp.stormcli" title="Permalink to this heading"></a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="stormlibpp.stormcli.start_storm_cli">
+<em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">stormlibpp.stormcli.</span></span><span class="sig-name descname"><span class="pre">start_storm_cli</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">core</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">outp</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">opts</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">onecmd</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[]</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#stormlibpp.stormcli.start_storm_cli" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
 
 </section>
 <section id="module-stormlibpp.stormpkg">

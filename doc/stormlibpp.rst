@@ -28,10 +28,34 @@ stormlibpp.httpcore module
    :undoc-members:
    :show-inheritance:
 
+stormlibpp.import module
+------------------------
+
+.. automodule:: stormlibpp.import
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 stormlibpp.node module
 ----------------------
 
 .. automodule:: stormlibpp.node
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+stormlibpp.output module
+------------------------
+
+.. automodule:: stormlibpp.output
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+stormlibpp.stormcli module
+--------------------------
+
+.. automodule:: stormlibpp.stormcli
    :members:
    :undoc-members:
    :show-inheritance:
