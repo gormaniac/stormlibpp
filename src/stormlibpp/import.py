@@ -22,19 +22,17 @@ from .stormcli import start_storm_cli
 
 
 def json_genr(fd):
+    # TODO - Support nested key to start with
     data = json.load(fd)
 
-    if type(data, list):
+    if type(data, dict):
+        for key, row in data.items():
+            yield [key, row]
+    else:
         count = 0
         for row in data:
             yield [count, row]
             count += 1
-    elif type(data, dict):
-        for key, row in data.items():
-            yield [key, row]
-    else:
-        for row in data:
-            yield [None, row]
 
 
 def txt_genr(fd):
@@ -64,6 +62,8 @@ class Importer:
         self.outp = outp
         self.header = header
         self.debug = debug
+
+        # TODO - Make sure this is actually necessary - or if just copy suffices
         self.stormopts = copy.deepcopy(stormopts)
 
     def iterrows(self):
@@ -112,6 +112,7 @@ def find_data_file(orig: str, files: list[str]):
     origparent = pathlib.Path(orig).parent
     origname = pathlib.Path(orig).stem
 
+    # TODO - Support multiple files with a _\d+ suffix
     for fname in files:
         fpath = pathlib.Path(fname)
         if fpath.parent == origparent and fpath.stem == origname and fpath.suffix in extension_map.keys():
@@ -180,6 +181,8 @@ def get_args(argv: list[str]):
         help="An optional view to work in - otherwise the Cortex's default is chosen",
         default=None,
     )
+    # TODO - Support a logfile
+    # TODO - Support custom "vars" or "stormopts" for each storm invocation
 
     return parser.parse_args(argv)
 
@@ -207,9 +210,6 @@ async def main(argv: list[str]):
         core_obj = s_cortex.getTempCortex
     else:
         return "Must provide a Cortex URL (--cortex) or use a temp Cortex (--local)!"
-    
-    if not core_obj:
-        breakpoint()
 
     storm_scripts = []
     data_files = []
@@ -230,7 +230,6 @@ async def main(argv: list[str]):
         else:
             print(f"{path} doesn't exist!")
 
-    # TODO - Support a logfile
     async with s_telepath.withTeleEnv():  # NOTE - We only need this for Telepath connections but still have to run it each time
         async with core_obj() as core:
             for storm_script in storm_scripts:
@@ -250,6 +249,7 @@ async def main(argv: list[str]):
                     ).add_data()
                 else:
                     async for msg in core.storm(text, opts=stormopts):
+                        # TODO - Make the skips optional with a --print-nodes or when --debug is used
                         handle_msg(msg, print_skips=["node", "node:edits"])
 
             if args.cli:

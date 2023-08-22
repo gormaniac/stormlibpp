@@ -13,65 +13,67 @@ OUTP = s_output.stdout
 
 
 def print_node_prop(name, valu):
-    OUTP.printf(f'        {name} = {valu}')
+    OUTP.printf(f"        {name} = {valu}")
 
 
 async def handleErr(mesg):
     err = mesg[1]
-    if err[0] == 'BadSyntax':
-        pos = err[1].get('at', None)
-        text = err[1].get('text', None)
+    if err[0] == "BadSyntax":
+        pos = err[1].get("at", None)
+        text = err[1].get("text", None)
         tlen = len(text)
-        mesg = err[1].get('mesg', None)
+        mesg = err[1].get("mesg", None)
         if pos is not None and text is not None and mesg is not None:
-            text = text.replace('\n', ' ')
+            text = text.replace("\n", " ")
             # Handle too-long text
             if tlen > 60:
-                text = text[max(0, pos - 30):pos + 30]
+                text = text[max(0, pos - 30) : pos + 30]
                 if pos < tlen - 30:
-                    text += '...'
+                    text += "..."
                 if pos > 30:
-                    text = '...' + text
+                    text = "..." + text
                     pos = 33
 
             OUTP.printf(text)
             OUTP.printf(f'{" " * pos}^')
-            OUTP.printf(f'Syntax Error: {mesg}')
+            OUTP.printf(f"Syntax Error: {mesg}")
             return
 
-    text = err[1].get('mesg', err[0])
-    OUTP.printf(f'ERROR: {text}')
+    text = err[1].get("mesg", err[0])
+    OUTP.printf(f"ERROR: {text}")
 
 
-def handle_msg(mesg: dict, hideprops: bool = False, hidetags: bool = False, print_skips: list[str] = []):
+def handle_msg(
+    mesg: dict,
+    hideprops: bool = False,
+    hidetags: bool = False,
+    print_skips: list[str] = [],
+):
     mtyp = mesg[0]
 
     # Do nothing if we don't want to handle this message type
     if mtyp in print_skips:
         return
 
-    if mtyp == 'node':
-
+    if mtyp == "node":
         node = mesg[1]
         formname, formvalu = s_node.reprNdef(node)
 
         # I think cause we're not using the CLI's printf, a newline is being missed somewhere.
         # We'll force it before each node is printed.
-        OUTP.printf(f'\n{formname}={formvalu}')
+        OUTP.printf(f"\n{formname}={formvalu}")
 
         if not hideprops:
-
             props = []
             extns = []
             univs = []
 
             for name in s_node.props(node).keys():
-
-                if name.startswith('.'):
+                if name.startswith("."):
                     univs.append(name)
                     continue
 
-                if name.startswith('_'):
+                if name.startswith("_"):
                     extns.append(name)
                     continue
 
@@ -83,12 +85,12 @@ def handle_msg(mesg: dict, hideprops: bool = False, hidetags: bool = False, prin
 
             for name in props:
                 valu = s_node.reprProp(node, name)
-                name = ':' + name
+                name = ":" + name
                 print_node_prop(name, valu)
 
             for name in extns:
                 valu = s_node.reprProp(node, name)
-                name = ':' + name
+                name = ":" + name
                 print_node_prop(name, valu)
 
             for name in univs:
@@ -96,46 +98,44 @@ def handle_msg(mesg: dict, hideprops: bool = False, hidetags: bool = False, prin
                 print_node_prop(name, valu)
 
         if not hidetags:
-
             for tag in sorted(s_node.tagsnice(node)):
-
                 valu = s_node.reprTag(node, tag)
                 tprops = s_node.reprTagProps(node, tag)
                 printed = False
                 if valu:
-                    OUTP.printf(f'        #{tag} = {valu}')
+                    OUTP.printf(f"        #{tag} = {valu}")
                     printed = True
 
                 if tprops:
                     for prop, pval in tprops:
-                        OUTP.printf(f'        #{tag}:{prop} = {pval}')
+                        OUTP.printf(f"        #{tag}:{prop} = {pval}")
                     printed = True
 
                 if not printed:
-                    OUTP.printf(f'        #{tag}')
+                    OUTP.printf(f"        #{tag}")
 
-    elif mtyp == 'node:edits':
+    elif mtyp == "node:edits":
         edit = mesg[1]
-        count = sum(len(e[2]) for e in edit.get('edits', ()))
-        OUTP.printf('.' * count, addnl=False)
+        count = sum(len(e[2]) for e in edit.get("edits", ()))
+        OUTP.printf("." * count, addnl=False)
 
-    elif mtyp == 'fini':
-        took = mesg[1].get('took')
+    elif mtyp == "fini":
+        took = mesg[1].get("took")
         took = max(took, 1)
-        count = mesg[1].get('count')
+        count = mesg[1].get("count")
         pers = float(count) / float(took / 1000)
-        OUTP.printf('complete. %d nodes in %d ms (%d/sec).' % (count, took, pers))
+        OUTP.printf("complete. %d nodes in %d ms (%d/sec)." % (count, took, pers))
 
-    elif mtyp == 'print':
-        OUTP.printf(mesg[1].get('mesg'))
+    elif mtyp == "print":
+        OUTP.printf(mesg[1].get("mesg"))
 
-    elif mtyp == 'warn':
+    elif mtyp == "warn":
         info = mesg[1]
-        warn = info.pop('mesg', '')
-        xtra = ', '.join([f'{k}={v}' for k, v in info.items()])
+        warn = info.pop("mesg", "")
+        xtra = ", ".join([f"{k}={v}" for k, v in info.items()])
         if xtra:
-            warn = ' '.join([warn, xtra])
-        OUTP.printf(f'WARNING: {warn}')
+            warn = " ".join([warn, xtra])
+        OUTP.printf(f"WARNING: {warn}")
 
-    elif mtyp == 'err':
+    elif mtyp == "err":
         handleErr(mesg)
