@@ -20,69 +20,92 @@ from .output import OUTP, handle_msg
 from .stormcli import start_storm_cli
 
 
-async def csv_import(core, csvfiles, text, stormopts={}, outp=OUTP, csv_header=False, debug=False):
-    """Import the given CSV files to the given core using the provided query text.
-    
-    This is modified from synapse.tools.csvtool.runCsvImport
-    """
+class Importer:
+    def __init__(self, core, files, ftype, stormopts={}, outp=OUTP, header=False, debug=False) -> None:
+        self.file_type = ftype
+        self.core = core
+        self.files = files
+        self.outp = outp
+        self.header = header
+        self.debug = debug
+        self.stormopts = stormopts
 
-    def iterrows():
-        for path in csvfiles:
+        self.genrs = {
+            "csv": self.csv_genr,
+            "txt": self.txt_genr,
+            "json": self.json_genr,
+        }
+
+    def json_genr(self, fd):
+        for row in json.load(fd):
+            yield row
+
+    def txt_genr(self, fd):
+        for row in fd.readlines():
+            yield row.strip()
+
+    def csv_genr(self, fd):
+        for row in csv.reader(fd):
+            yield row
+
+    def iterrows(self):
+        for path in self.files:
 
             with open(path, 'r', encoding='utf8') as fd:
 
-                if csv_header:
+                if self.header:
                     fd.readline()
 
-                def genr():
-
-                    for row in csv.reader(fd):
-                        yield row
-
-                for rows in s_common.chunks(genr(), 1000):
+                for rows in s_common.chunks(self.genrs[self.file_type](), 1000):
                     yield rows
 
-    rowgenr = iterrows()
-
-    async def addCsvData(core):
+    async def add_data(self):
 
         nodecount = 0
 
-        stormopts['editformat'] = 'splices'
-        vars = stormopts.setdefault('vars', {})
+        self.stormopts['editformat'] = 'splices'
+        vars = self.stormopts.setdefault('vars', {})
 
-        for rows in rowgenr:
+        for rows in self.iterrows():
 
             vars['rows'] = rows
 
-            async for mesg in core.storm(text, opts=stormopts):
+            async for mesg in self.core.storm(self.text, opts=self.stormopts):
 
                 if mesg[0] == 'node':
                     nodecount += 1
 
-                elif mesg[0] == 'err' and not debug:
-                    outp.printf(repr(mesg))
+                elif mesg[0] in ('err', 'warn') and not self.debug:
+                    self.outp.printf(repr(mesg))
 
                 elif mesg[0] == 'print':
-                    outp.printf(mesg[1].get('mesg'))
+                    self.outp.printf(mesg[1].get('mesg'))
 
-                if debug:
-                    outp.printf(repr(mesg))
-
-    nodecount = await addCsvData(core)
-
-    return nodecount
+                if self.debug:
+                    self.outp.printf(repr(mesg))
+        
+        return nodecount
 
 
-def find_csv_file(orig: str, files: list[str]):
-    """Find a CSV file in a list of files that has the same name (and path) as the original file."""
+def find_data_file(orig: str, files: list[str]):
+    """Find a data file in a list of files that has the same name (and path) as the original file."""
 
     origparent = pathlib.Path(orig).parent
     origname = pathlib.Path(orig).stem
 
+    data_names = (f"{origname}.csv", f"{origname}.json", f"{origname}.txt")
+    extension_map = {
+        ".csv": "csv",
+        ".json": "json",
+        ".txt": "txt",
+    }
+
     for fname in files:
-        if pathlib.Path(fname).parent == origparent and pathlib.Path(fname).stem == f"{origname}.csv":
-            return fname
+        fpath = pathlib.Path(fname)
+        if fpath.parent == origparent and fpath.stem in data_names:
+            return fname, extension_map[fpath.suffix]
+    
+    return None
 
 
 def get_args(argv: list[str]):
@@ -122,7 +145,7 @@ async def main(argv: list[str]):
     data_files = []
     for folder in args.folders:
         path = pathlib.Path(folder).expanduser().resolve()
-        if path.exists() and path.is_dir:
+        if path.exists() and path.is_dir():
             for dir, _, files in os.walk(path):
                 for file in files:
                     fullpath = os.path.join(dir, file)
@@ -140,8 +163,9 @@ async def main(argv: list[str]):
                 with open(storm_script, "r") as fd:
                     text = fd.read()
 
-                if (csv_file := find_csv_file(storm_script, data_files)):
-                    await csv_import(core, [csv_file], text, stormopts=stormopts, csv_header=args.csv_header, debug=args.debug)
+                if (file_info := find_data_file(storm_script, data_files)):
+                    fpath, ftype = file_info
+                    await Importer(core, [fpath], ftype, text, stormopts=stormopts, csv_header=args.csv_header, debug=args.debug).add_data()
                 else:
                     async for msg in core.storm(text, opts=stormopts):
                         handle_msg(msg, print_skips=["node", "node:edits"])
