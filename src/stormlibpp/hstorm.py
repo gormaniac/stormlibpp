@@ -27,6 +27,8 @@ import synapse.lib.output as s_output
 import synapse.tools.storm as s_storm
 
 from .httpcore import HttpCortex
+from .output import OUTP
+from .stormcli import start_storm_cli
 
 
 def get_args(argv: list[str]):
@@ -67,7 +69,6 @@ async def main(argv: list[str]):
     """
 
     args = get_args(argv)
-    outp = s_output.stdout
 
     if args.user:
         user = args.user
@@ -86,17 +87,7 @@ async def main(argv: list[str]):
 
     async with HttpCortex(args.cortex, user, password, ssl_verify=not args.no_verify) as hcore:
 
-        async with await s_storm.StormCli.anit(hcore, outp=outp, opts=args) as cli:
-
-            if args.onecmd:
-                await cli.runCmdLine(args.onecmd)
-                return
-
-            cli.colorsenabled = True
-            cli.printf(s_storm.welcome)
-
-            await cli.addSignalHandlers()
-            await cli.runCmdLoop()
+        await start_storm_cli(hcore, outp=OUTP, opts=args, onecmd=args.onecmd)
 
 
 if __name__ == "__main__":

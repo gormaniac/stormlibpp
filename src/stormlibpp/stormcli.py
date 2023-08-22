@@ -1,3 +1,6 @@
+"""Methods related to using the synapse.tools.storm Storm CLI."""
+
+
 import synapse.tools.storm as s_storm
 
 
