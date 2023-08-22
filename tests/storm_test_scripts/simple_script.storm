@@ -1,0 +1,5 @@
+[
+    inet:ipv4=1.1.1.1
+    inet:fqdn=example.com
+    +#test.tag
+]

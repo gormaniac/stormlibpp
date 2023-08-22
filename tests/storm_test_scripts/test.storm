@@ -1,0 +1,3 @@
+for ($tag, $value) in $rows {
+    [inet:fqdn=$value +#$tag]
+}
