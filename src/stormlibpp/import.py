@@ -3,6 +3,7 @@
 
 import argparse
 import asyncio
+import copy
 import csv
 import functools
 import getpass
@@ -20,106 +21,165 @@ from .output import OUTP, handle_msg
 from .stormcli import start_storm_cli
 
 
+def json_genr(fd):
+    data = json.load(fd)
+
+    if type(data, list):
+        count = 0
+        for row in data:
+            yield [count, row]
+            count += 1
+    elif type(data, dict):
+        for key, row in data.items():
+            yield [key, row]
+    else:
+        for row in data:
+            yield [None, row]
+
+
+def txt_genr(fd):
+    for row in fd.readlines():
+        yield row.strip()
+
+
+def csv_genr(fd):
+    for row in csv.reader(fd):
+        yield row
+
+
 class Importer:
-    def __init__(self, core, files, ftype, stormopts={}, outp=OUTP, header=False, debug=False) -> None:
+    genrs = {
+        "csv": csv_genr,
+        "txt": txt_genr,
+        "json": json_genr,
+    }
+
+    def __init__(
+        self, core, files, ftype, text, stormopts={}, outp=OUTP, header=False, debug=False
+    ) -> None:
         self.file_type = ftype
+        self.text = text
         self.core = core
         self.files = files
         self.outp = outp
         self.header = header
         self.debug = debug
-        self.stormopts = stormopts
-
-        self.genrs = {
-            "csv": self.csv_genr,
-            "txt": self.txt_genr,
-            "json": self.json_genr,
-        }
-
-    def json_genr(self, fd):
-        for row in json.load(fd):
-            yield row
-
-    def txt_genr(self, fd):
-        for row in fd.readlines():
-            yield row.strip()
-
-    def csv_genr(self, fd):
-        for row in csv.reader(fd):
-            yield row
+        self.stormopts = copy.deepcopy(stormopts)
 
     def iterrows(self):
         for path in self.files:
-
-            with open(path, 'r', encoding='utf8') as fd:
-
-                if self.header:
+            with open(path, "r", encoding="utf8") as fd:
+                if self.header and self.file_type in ("csv", "txt"):
                     fd.readline()
 
-                for rows in s_common.chunks(self.genrs[self.file_type](), 1000):
+                for rows in s_common.chunks(self.genrs[self.file_type](fd), 1000):
                     yield rows
 
     async def add_data(self):
-
         nodecount = 0
 
-        self.stormopts['editformat'] = 'splices'
-        vars = self.stormopts.setdefault('vars', {})
+        self.stormopts["editformat"] = "splices"
+        vars = self.stormopts.setdefault("vars", {})
 
         for rows in self.iterrows():
-
-            vars['rows'] = rows
+            vars["rows"] = rows
 
             async for mesg in self.core.storm(self.text, opts=self.stormopts):
-
-                if mesg[0] == 'node':
+                if mesg[0] == "node":
                     nodecount += 1
 
-                elif mesg[0] in ('err', 'warn') and not self.debug:
+                elif mesg[0] in ("err", "warn") and not self.debug:
                     self.outp.printf(repr(mesg))
 
-                elif mesg[0] == 'print':
-                    self.outp.printf(mesg[1].get('mesg'))
+                elif mesg[0] == "print":
+                    self.outp.printf(mesg[1].get("mesg"))
 
                 if self.debug:
                     self.outp.printf(repr(mesg))
-        
+
         return nodecount
 
 
 def find_data_file(orig: str, files: list[str]):
     """Find a data file in a list of files that has the same name (and path) as the original file."""
 
-    origparent = pathlib.Path(orig).parent
-    origname = pathlib.Path(orig).stem
-
-    data_names = (f"{origname}.csv", f"{origname}.json", f"{origname}.txt")
     extension_map = {
         ".csv": "csv",
         ".json": "json",
         ".txt": "txt",
     }
 
+    origparent = pathlib.Path(orig).parent
+    origname = pathlib.Path(orig).stem
+
     for fname in files:
         fpath = pathlib.Path(fname)
-        if fpath.parent == origparent and fpath.stem in data_names:
+        if fpath.parent == origparent and fpath.stem == origname and fpath.suffix in extension_map.keys():
             return fname, extension_map[fpath.suffix]
-    
+
     return None
 
 
 def get_args(argv: list[str]):
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("folders", help="The folder(s) containing Storm scripts to execute", nargs="+")
-    parser.add_argument("--cli", help="Start a Storm CLI connected to the Cortex after all scripts are executed", action="store_true")
-    parser.add_argument("--cortex", help="The URL of the Synapse Cortex to execute the Storm scripts on", type=str)
-    parser.add_argument("--csv-header", help="All CSVs processed by this script have headers", action="store_true")
-    parser.add_argument("--debug", help="Does two things - sets all Storm runtimes to debug mode AND prints all Storm messages during CSV imports", action="store_true")
-    parser.add_argument("--http", help="Connect to the Cortex over HTTP instead of Telepath", action="store_true")
-    parser.add_argument("--local", help="Start a temp Cortex locally to execute the Storm scripts on and enter a CLI for afterwards", action="store_true")
-    parser.add_argument("--no-verify", help="Skips verification of the Cortex's certificate when using --http", action="store_true")
-    parser.add_argument("--user", help="The Synapse user to authenticate with - by default the return of getpass.getuser()", default=getpass.getuser())
-    parser.add_argument("--view", help="An optional view to work in - otherwise the Cortex's default is chosen", default=None)
+    parser.add_argument(
+        "folders", help="The folder(s) containing Storm scripts to execute", nargs="+"
+    )
+    parser.add_argument(
+        "--cli",
+        help="Start a Storm CLI connected to the Cortex after all scripts are executed",
+        action="store_true",
+    )
+    parser.add_argument(
+        "--cortex",
+        help="The URL of the Synapse Cortex to execute the Storm scripts on",
+        type=str,
+    )
+    parser.add_argument(
+        "--csv-header",
+        help="All CSVs processed by this script have headers",
+        action="store_true",
+    )
+    parser.add_argument(
+        "--debug",
+        # TODO - Actually set Storm runtimes to debug
+        help=(
+            "Does two things - sets all Storm runtimes to debug mode AND prints all"
+            " Storm messages during CSV imports"
+        ),
+        action="store_true",
+    )
+    parser.add_argument(
+        "--http",
+        help="Connect to the Cortex over HTTP instead of Telepath",
+        action="store_true",
+    )
+    parser.add_argument(
+        "--local",
+        help=(
+            "Start a temp Cortex locally to execute the Storm scripts"
+            " on and enter a CLI for afterwards"
+        ),
+        action="store_true",
+    )
+    parser.add_argument(
+        "--no-verify",
+        help="Skips verification of the Cortex's certificate when using --http",
+        action="store_true",
+    )
+    parser.add_argument(
+        "--user",
+        help=(
+            "The Synapse user to authenticate with -"
+            " by default the return of getpass.getuser()"
+        ),
+        default=getpass.getuser(),
+    )
+    parser.add_argument(
+        "--view",
+        help="An optional view to work in - otherwise the Cortex's default is chosen",
+        default=None,
+    )
 
     return parser.parse_args(argv)
 
@@ -135,11 +195,21 @@ async def main(argv: list[str]):
         if args.http:
             synuser = args.user
             synpass = getpass.getpass()
-            core_obj = functools.partial(HttpCortex, args.cortex, synuser, synpass, ssl_verify=not args.no_verify)
+            core_obj = functools.partial(
+                HttpCortex, args.cortex, synuser, synpass, ssl_verify=not args.no_verify
+            )
         else:
-            core_obj = functools.partial(s_telepath.openurl, args.cortex)
+            # TODO - Actually get this working... maybe wrap it in a context manager? find dif method?
+            # The issue is that this becomes a coroutine and not a context manager like the others
+            # core_obj = functools.partial(s_telepath.openurl, args.cortex)
+            return "Telepath is currently not supported 😬 use --http"
     elif args.local:
         core_obj = s_cortex.getTempCortex
+    else:
+        return "Must provide a Cortex URL (--cortex) or use a temp Cortex (--local)!"
+    
+    if not core_obj:
+        breakpoint()
 
     storm_scripts = []
     data_files = []
@@ -151,7 +221,11 @@ async def main(argv: list[str]):
                     fullpath = os.path.join(dir, file)
                     if file.endswith(".storm"):
                         storm_scripts.append(fullpath)
-                    elif file.endswith(".csv"):  # TODO - Handle JSON and TXT files here too
+                    elif (
+                        file.endswith(".json")
+                        or file.endswith(".txt")
+                        or file.endswith(".csv")
+                    ):
                         data_files.append(fullpath)
         else:
             print(f"{path} doesn't exist!")
@@ -163,9 +237,17 @@ async def main(argv: list[str]):
                 with open(storm_script, "r") as fd:
                     text = fd.read()
 
-                if (file_info := find_data_file(storm_script, data_files)):
+                if file_info := find_data_file(storm_script, data_files):
                     fpath, ftype = file_info
-                    await Importer(core, [fpath], ftype, text, stormopts=stormopts, csv_header=args.csv_header, debug=args.debug).add_data()
+                    await Importer(
+                        core,
+                        [fpath],
+                        ftype,
+                        text,
+                        stormopts=stormopts,
+                        header=args.csv_header,
+                        debug=args.debug,
+                    ).add_data()
                 else:
                     async for msg in core.storm(text, opts=stormopts):
                         handle_msg(msg, print_skips=["node", "node:edits"])
