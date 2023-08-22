@@ -239,7 +239,7 @@ async def main(argv: list[str]):
 
     async with s_telepath.withTeleEnv():  # NOTE - We only need this for Telepath connections but still have to run it each time
         async with core_obj() as core:
-            for storm_script in storm_scripts:
+            for storm_script in sorted(storm_scripts):
                 with open(storm_script, "r") as fd:
                     text = fd.read()
 
@@ -256,6 +256,7 @@ async def main(argv: list[str]):
                     ).add_data()
                 else:
                     async for msg in core.storm(text, opts=stormopts):
+                        # TODO - Optionally use hide* args
                         handle_msg(msg, print_skips=print_skips)
 
             if args.cli:
