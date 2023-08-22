@@ -143,10 +143,9 @@ def get_args(argv: list[str]):
     )
     parser.add_argument(
         "--debug",
-        # TODO - Actually set Storm runtimes to debug
         help=(
             "Does two things - sets all Storm runtimes to debug mode AND prints all"
-            " Storm messages during CSV imports"
+            " Storm messages (including node/node:edits) during imports"
         ),
         action="store_true",
     )
@@ -183,6 +182,7 @@ def get_args(argv: list[str]):
     )
     # TODO - Support a logfile
     # TODO - Support custom "vars" or "stormopts" for each storm invocation
+    # TODO - User controled print skips
 
     return parser.parse_args(argv)
 
@@ -190,6 +190,12 @@ def get_args(argv: list[str]):
 async def main(argv: list[str]):
     args = get_args(argv)
     stormopts = {"repr": True}
+
+    if args.debug:
+        print_skips = []
+        stormopts["debug"] = True
+    else:
+        print_skips = ["node", "node:edits"]
 
     # TODO - Break the loading and then importing code out into methods
     if args.cortex and args.local:
@@ -232,7 +238,7 @@ async def main(argv: list[str]):
 
     async with s_telepath.withTeleEnv():  # NOTE - We only need this for Telepath connections but still have to run it each time
         async with core_obj() as core:
-            for storm_script in storm_scripts:
+            for storm_script in sorted(storm_scripts):
                 with open(storm_script, "r") as fd:
                     text = fd.read()
 
@@ -249,8 +255,8 @@ async def main(argv: list[str]):
                     ).add_data()
                 else:
                     async for msg in core.storm(text, opts=stormopts):
-                        # TODO - Make the skips optional with a --print-nodes or when --debug is used
-                        handle_msg(msg, print_skips=["node", "node:edits"])
+                        # TODO - Optionally use hide* args
+                        handle_msg(msg, print_skips=print_skips)
 
             if args.cli:
                 await start_storm_cli(core, outp=OUTP, opts=args)
