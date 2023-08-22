@@ -143,10 +143,9 @@ def get_args(argv: list[str]):
     )
     parser.add_argument(
         "--debug",
-        # TODO - Actually set Storm runtimes to debug
         help=(
             "Does two things - sets all Storm runtimes to debug mode AND prints all"
-            " Storm messages during CSV imports"
+            " Storm messages (including node/node:edits) during imports"
         ),
         action="store_true",
     )
