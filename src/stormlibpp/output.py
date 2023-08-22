@@ -43,8 +43,12 @@ async def handleErr(mesg):
     OUTP.printf(f'ERROR: {text}')
 
 
-def handle_msg(mesg: dict, hideprops: bool = False, hidetags: bool = False):
+def handle_msg(mesg: dict, hideprops: bool = False, hidetags: bool = False, print_skips: list[str] = []):
     mtyp = mesg[0]
+
+    # Do nothing if we don't want to handle this message type
+    if mtyp in print_skips:
+        return
 
     if mtyp == 'node':
 
