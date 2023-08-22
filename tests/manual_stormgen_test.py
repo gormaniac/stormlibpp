@@ -119,9 +119,8 @@ This example would produce the node `it:dev:str="A string with a comment // sepa
 """
 
 
-
 import stormlibpp.stormgen
 doc = stormlibpp.stormgen.parse(x)
-doc.sections
-doc.sections[0].parts
-doc.sections[1].parts
+doc.parts
+doc.parts[1].blocks
+doc.parts[6].blocks[0].children[0].children
