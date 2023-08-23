@@ -8,6 +8,10 @@ class StormSyntaxError(Exception):
     """There was a syntax error in Storm code."""
 
 
+class StormRaiseError(Exception):
+    """There was a syntax error in Storm code."""
+
+
 class StormPkgError(Exception):
     """An error in a StormPkg."""
 

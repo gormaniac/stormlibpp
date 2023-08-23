@@ -8,6 +8,8 @@ from the Storm CLI and modified it to work in standalone methods.
 import synapse.lib.node as s_node
 import synapse.lib.output as s_output
 
+from .errors import StormRaiseError
+
 
 OUTP = s_output.stdout
 
@@ -16,7 +18,7 @@ def print_node_prop(name, valu):
     OUTP.printf(f"        {name} = {valu}")
 
 
-async def handleErr(mesg):
+def handle_err(mesg, storm_raise=True):
     err = mesg[1]
     if err[0] == "BadSyntax":
         pos = err[1].get("at", None)
@@ -38,6 +40,10 @@ async def handleErr(mesg):
             OUTP.printf(f'{" " * pos}^')
             OUTP.printf(f"Syntax Error: {mesg}")
             return
+    elif err[0] == "StormRaise" and storm_raise:
+        errname = err[1].get("errname", "")
+        if errname == "stormlibpp:exit":
+            raise StormRaiseError(f"{errname}: {err[1].get('mesg', err[0])}")
 
     text = err[1].get("mesg", err[0])
     OUTP.printf(f"ERROR: {text}")
@@ -48,6 +54,7 @@ def handle_msg(
     hideprops: bool = False,
     hidetags: bool = False,
     print_skips: list[str] = [],
+    print_fini: bool = True
 ):
     mtyp = mesg[0]
 
@@ -119,7 +126,7 @@ def handle_msg(
         count = sum(len(e[2]) for e in edit.get("edits", ()))
         OUTP.printf("." * count, addnl=False)
 
-    elif mtyp == "fini":
+    elif mtyp == "fini" and print_fini:
         took = mesg[1].get("took")
         took = max(took, 1)
         count = mesg[1].get("count")
@@ -138,4 +145,4 @@ def handle_msg(
         OUTP.printf(f"WARNING: {warn}")
 
     elif mtyp == "err":
-        handleErr(mesg)
+        handle_err(mesg)

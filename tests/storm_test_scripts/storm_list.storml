@@ -1,0 +1,3 @@
+$lib.print("test1")
+$lib.print("test2")
+$test = x $lib.print($test)

@@ -21,6 +21,18 @@ from .output import OUTP, handle_msg
 from .stormcli import start_storm_cli
 
 
+def endswith(text, items):
+    for item in items:
+        if text.endswith(item):
+            return True
+    return False
+
+
+def csv_genr(fd):
+    for row in csv.reader(fd):
+        yield row
+
+
 def json_genr(fd):
     # TODO - Support nested key to start with
     data = json.load(fd)
@@ -40,9 +52,15 @@ def txt_genr(fd):
         yield row.strip()
 
 
-def csv_genr(fd):
-    for row in csv.reader(fd):
-        yield row
+async def import_storm_text(core, text, stormopts, print_skips):
+        async for msg in core.storm(text, opts=stormopts):
+            handle_msg(msg, print_skips=print_skips)
+    
+
+async def import_storml_file(core, storm_script, stormopts, print_skips):
+    with open(storm_script, "r") as fd:
+        for line in txt_genr(fd):
+            await import_storm_text(core, line, stormopts, print_skips)
 
 
 class Importer:
@@ -226,13 +244,9 @@ async def main(argv: list[str]):
                 dirs.sort()  # NOTE - Ensures the next iteration of dirs is in order.
                 for file in sorted(files):
                     fullpath = os.path.join(dir, file)
-                    if file.endswith(".storm"):
+                    if endswith(file, (".storm", ".storml")):
                         storm_scripts.append(fullpath)
-                    elif (
-                        file.endswith(".json")
-                        or file.endswith(".txt")
-                        or file.endswith(".csv")
-                    ):
+                    elif endswith(file, (".json", ".txt", ".csv")):
                         data_files.append(fullpath)
         else:
             print(f"{path} doesn't exist!")
@@ -255,9 +269,12 @@ async def main(argv: list[str]):
                         debug=args.debug,
                     ).add_data()
                 else:
-                    async for msg in core.storm(text, opts=stormopts):
-                        # TODO - Optionally use hide* args
-                        handle_msg(msg, print_skips=print_skips)
+                    if storm_script.endswith(".storml"):
+                        # TODO - This will wind up opening and closing the file twice.
+                        # Do we want that? Maybe we do because we won't get here much?
+                        await import_storml_file(core, storm_script, stormopts, print_skips)
+                    else:
+                       await import_storm_text(core, text, stormopts, print_skips)
 
             if args.cli:
                 await start_storm_cli(core, outp=OUTP, opts=args)
