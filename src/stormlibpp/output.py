@@ -16,7 +16,7 @@ def print_node_prop(name, valu):
     OUTP.printf(f"        {name} = {valu}")
 
 
-async def handleErr(mesg):
+def handle_err(mesg):
     err = mesg[1]
     if err[0] == "BadSyntax":
         pos = err[1].get("at", None)
@@ -48,6 +48,7 @@ def handle_msg(
     hideprops: bool = False,
     hidetags: bool = False,
     print_skips: list[str] = [],
+    print_fini: bool = True
 ):
     mtyp = mesg[0]
 
@@ -119,7 +120,7 @@ def handle_msg(
         count = sum(len(e[2]) for e in edit.get("edits", ()))
         OUTP.printf("." * count, addnl=False)
 
-    elif mtyp == "fini":
+    elif mtyp == "fini" and print_fini:
         took = mesg[1].get("took")
         took = max(took, 1)
         count = mesg[1].get("count")
@@ -138,4 +139,4 @@ def handle_msg(
         OUTP.printf(f"WARNING: {warn}")
 
     elif mtyp == "err":
-        handleErr(mesg)
+        handle_err(mesg)
