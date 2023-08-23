@@ -8,6 +8,8 @@ from the Storm CLI and modified it to work in standalone methods.
 import synapse.lib.node as s_node
 import synapse.lib.output as s_output
 
+from .errors import StormRaiseError
+
 
 OUTP = s_output.stdout
 
@@ -16,7 +18,7 @@ def print_node_prop(name, valu):
     OUTP.printf(f"        {name} = {valu}")
 
 
-def handle_err(mesg):
+def handle_err(mesg, storm_raise=True):
     err = mesg[1]
     if err[0] == "BadSyntax":
         pos = err[1].get("at", None)
@@ -38,6 +40,10 @@ def handle_err(mesg):
             OUTP.printf(f'{" " * pos}^')
             OUTP.printf(f"Syntax Error: {mesg}")
             return
+    elif err[0] == "StormRaise" and storm_raise:
+        errname = err[1].get("errname", "")
+        if errname == "stormlibpp:exit":
+            raise StormRaiseError(f"{errname}: {err[1].get('mesg', err[0])}")
 
     text = err[1].get("mesg", err[0])
     OUTP.printf(f"ERROR: {text}")
