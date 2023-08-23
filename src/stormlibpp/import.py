@@ -240,8 +240,9 @@ async def main(argv: list[str]):
     for folder in args.folders:
         path = pathlib.Path(folder).expanduser().resolve()
         if path.exists() and path.is_dir():
-            for dir, _, files in os.walk(path):
-                for file in files:
+            for dir, dirs, files in os.walk(path):
+                dirs.sort()  # NOTE - Ensures the next iteration of dirs is in order.
+                for file in sorted(files):
                     fullpath = os.path.join(dir, file)
                     if endswith(file, (".storm", ".storml")):
                         storm_scripts.append(fullpath)
@@ -252,7 +253,7 @@ async def main(argv: list[str]):
 
     async with s_telepath.withTeleEnv():  # NOTE - We only need this for Telepath connections but still have to run it each time
         async with core_obj() as core:
-            for storm_script in sorted(storm_scripts):
+            for storm_script in storm_scripts:  # NOTE - Don't use sorted here - it will put folders ahead of files
                 with open(storm_script, "r") as fd:
                     text = fd.read()
 
