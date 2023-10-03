@@ -3,6 +3,7 @@
 
 import argparse
 import asyncio
+import contextlib
 import copy
 import csv
 import functools
@@ -10,14 +11,16 @@ import getpass
 import json
 import os
 import pathlib
+import re
 import sys
 
 import synapse.cortex as s_cortex
 import synapse.common as s_common
 import synapse.telepath as s_telepath
+import yaml
 
 from .httpcore import HttpCortex
-from .output import OUTP, handle_msg
+from .output import handle_msg, log_storm_msg, OUTP
 from .stormcli import start_storm_cli
 
 
@@ -52,15 +55,15 @@ def txt_genr(fd):
         yield row.strip()
 
 
-async def import_storm_text(core, text, stormopts, print_skips):
-        async for msg in core.storm(text, opts=stormopts):
-            handle_msg(msg, print_skips=print_skips)
+async def import_storm_text(core, text, stormopts, print_skips, logfd):
+    async for msg in core.storm(text, opts=stormopts):
+        handle_msg(msg, print_skips=print_skips, logfd=logfd)
     
 
-async def import_storml_file(core, storm_script, stormopts, print_skips):
+async def import_storml_file(core, storm_script, stormopts, print_skips, logfd):
     with open(storm_script, "r") as fd:
         for line in txt_genr(fd):
-            await import_storm_text(core, line, stormopts, print_skips)
+            await import_storm_text(core, line, stormopts, print_skips, logfd)
 
 
 class Importer:
@@ -71,7 +74,16 @@ class Importer:
     }
 
     def __init__(
-        self, core, files, ftype, text, stormopts={}, outp=OUTP, header=False, debug=False
+        self,
+        core,
+        files,
+        ftype,
+        text,
+        stormopts={},
+        outp=OUTP,
+        header=False,
+        debug=False,
+        logfd=None,
     ) -> None:
         self.file_type = ftype
         self.text = text
@@ -80,6 +92,7 @@ class Importer:
         self.outp = outp
         self.header = header
         self.debug = debug
+        self.logfd = logfd
 
         # TODO - Make sure this is actually necessary - or if just copy suffices
         self.stormopts = copy.deepcopy(stormopts)
@@ -103,6 +116,7 @@ class Importer:
             vars["rows"] = rows
 
             async for mesg in self.core.storm(self.text, opts=self.stormopts):
+                # TODO - Use handle_msg here instead?
                 if mesg[0] == "node":
                     nodecount += 1
 
@@ -115,11 +129,15 @@ class Importer:
                 if self.debug:
                     self.outp.printf(repr(mesg))
 
+                log_storm_msg(self.logfd, mesg)
+
         return nodecount
 
 
-def find_data_file(orig: str, files: list[str]):
-    """Find a data file in a list of files that has the same name (and path) as the original file."""
+def find_data_files(orig: str, files: list[str]):
+    """
+    Find all data files in a list of files that have the same name (and path) as the original file.
+    """
 
     extension_map = {
         ".csv": "csv",
@@ -129,14 +147,27 @@ def find_data_file(orig: str, files: list[str]):
 
     origparent = pathlib.Path(orig).parent
     origname = pathlib.Path(orig).stem
+    origre = re.compile(f"{origname}(_\d+)?")
 
-    # TODO - Support multiple files with a _\d+ suffix
+    data_files = []
+
     for fname in files:
         fpath = pathlib.Path(fname)
-        if fpath.parent == origparent and fpath.stem == origname and fpath.suffix in extension_map.keys():
-            return fname, extension_map[fpath.suffix]
+        if (
+            fpath.parent == origparent
+            and origre.match(fpath.stem)
+            and fpath.suffix in extension_map.keys()
+        ):
+            data_files.append((fname, extension_map[fpath.suffix]))
 
-    return None
+    return data_files
+
+
+# TODO - Keep this in this file?
+# Maybe put in teletpath.py and rename to tpath_proxy_contextmanager
+@contextlib.contextmanager
+def cortex_proxy_contextmanager(cortex_url):
+    yield s_telepath.openurl(cortex_url)
 
 
 def get_args(argv: list[str]):
@@ -198,22 +229,45 @@ def get_args(argv: list[str]):
         help="An optional view to work in - otherwise the Cortex's default is chosen",
         default=None,
     )
-    # TODO - Support a logfile
-    # TODO - Support custom "vars" or "stormopts" for each storm invocation
-    # TODO - User controled print skips
+    parser.add_argument(
+        "--logfile", help="Set a logfile to save each Storm message as a JSON line"
+    )
+    parser.add_argument(
+        "--print-skips",
+        help="A list of Storm message types that will not be printed as long as --debug is not used",
+        nargs="+",
+        default=["node", "node:edits"],
+    )
+    parser.add_argument(
+        "--stormopts-file",
+        help=(
+            "A YAML file that defines custom stormopts to pass with each execution "
+            "of Storm code. The 'rows' key of the 'vars' opt will always be overwritten "
+            "by this script. The '--debug' flag will also override the 'debug' opt in "
+            "this file. 'repr' is always set to True regardless of this file's contents."
+        ),
+    )
+    # TODO - Add --quiet mode
+    # TODO - support hidetags/hideprops
 
     return parser.parse_args(argv)
 
 
 async def main(argv: list[str]):
     args = get_args(argv)
-    stormopts = {"repr": True}
+
+    if args.stormopts_file:
+        stormopts = yaml.safe_load(args.stormopts_file)
+    else:
+        stormopts = {}
+
+    stormopts.update({"repr": True})
 
     if args.debug:
         print_skips = []
         stormopts["debug"] = True
     else:
-        print_skips = ["node", "node:edits"]
+        print_skips = args.print_skips
 
     # TODO - Break the loading and then importing code out into methods
     if args.cortex and args.local:
@@ -226,10 +280,7 @@ async def main(argv: list[str]):
                 HttpCortex, args.cortex, synuser, synpass, ssl_verify=not args.no_verify
             )
         else:
-            # TODO - Actually get this working... maybe wrap it in a context manager? find dif method?
-            # The issue is that this becomes a coroutine and not a context manager like the others
-            # core_obj = functools.partial(s_telepath.openurl, args.cortex)
-            return "Telepath is currently not supported 😬 use --http"
+            core_obj = functools.partial(cortex_proxy_contextmanager, args.cortex)
     elif args.local:
         core_obj = s_cortex.getTempCortex
     else:
@@ -251,33 +302,47 @@ async def main(argv: list[str]):
         else:
             print(f"{path} doesn't exist!")
 
+    logfd = None
+    if args.logfile is not None:
+        logfd = s_common.genfile(args.logfile)
+        logfd.seek(0, 2)
+
     async with s_telepath.withTeleEnv():  # NOTE - We only need this for Telepath connections but still have to run it each time
         async with core_obj() as core:
             for storm_script in storm_scripts:  # NOTE - Don't use sorted here - it will put folders ahead of files
                 with open(storm_script, "r") as fd:
                     text = fd.read()
 
-                if file_info := find_data_file(storm_script, data_files):
-                    fpath, ftype = file_info
-                    await Importer(
-                        core,
-                        [fpath],
-                        ftype,
-                        text,
-                        stormopts=stormopts,
-                        header=args.csv_header,
-                        debug=args.debug,
-                    ).add_data()
+                if file_infos := find_data_files(storm_script, data_files):
+                    for file_info in file_infos:
+                        fpath, ftype = file_info
+                        await Importer(
+                            core,
+                            [fpath],
+                            ftype,
+                            text,
+                            stormopts=stormopts,
+                            header=args.csv_header,
+                            debug=args.debug,
+                            logfd=logfd,
+                        ).add_data()
                 else:
                     if storm_script.endswith(".storml"):
-                        # TODO - This will wind up opening and closing the file twice.
+                        # NOTE - This will wind up opening and closing the file twice.
                         # Do we want that? Maybe we do because we won't get here much?
-                        await import_storml_file(core, storm_script, stormopts, print_skips)
+                        await import_storml_file(
+                            core, storm_script, stormopts, print_skips, logfd=logfd
+                        )
                     else:
-                       await import_storm_text(core, text, stormopts, print_skips)
+                        await import_storm_text(
+                            core, text, stormopts, print_skips, logfd=logfd
+                        )
 
             if args.cli:
                 await start_storm_cli(core, outp=OUTP, opts=args)
+
+    if logfd is not None:
+        logfd.close()
 
 
 if __name__ == "__main__":
