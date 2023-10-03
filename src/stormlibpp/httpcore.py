@@ -110,9 +110,8 @@ class HttpCortex:
         self.usr = usr
         self.pwd = pwd
 
-        self.timeout = aiohttp.ClientTimeout(60.0, 10.0)
         self.sess = aiohttp.ClientSession(
-            self.url, timeout=self.timeout, raise_for_status=True
+            self.url, raise_for_status=True, read_timeout=0
         )
 
     async def __aenter__(self):
