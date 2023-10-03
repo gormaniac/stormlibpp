@@ -5,6 +5,11 @@ exportable methods for reuse in other code. I have copied the relevant code
 from the Storm CLI and modified it to work in standalone methods.
 """
 
+
+import io
+import json
+
+import synapse.common as s_common
 import synapse.lib.node as s_node
 import synapse.lib.output as s_output
 
@@ -12,6 +17,12 @@ from .errors import StormRaiseError
 
 
 OUTP = s_output.stdout
+
+
+def log_storm_msg(logfd, mesg):
+    if logfd is not None:
+        byts = json.dumps(mesg).encode('utf8')
+        logfd.write(byts + b'\n')
 
 
 def print_node_prop(name, valu):
@@ -54,7 +65,8 @@ def handle_msg(
     hideprops: bool = False,
     hidetags: bool = False,
     print_skips: list[str] = [],
-    print_fini: bool = True
+    print_fini: bool = True,
+    logfd: io.BufferedRandom = None,
 ):
     mtyp = mesg[0]
 
@@ -146,3 +158,5 @@ def handle_msg(
 
     elif mtyp == "err":
         handle_err(mesg)
+
+    log_storm_msg(logfd, mesg)
