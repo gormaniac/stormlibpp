@@ -47,6 +47,7 @@
 <li class="toctree-l2"><a class="reference internal" href="#submodules">Submodules</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#module-stormlibpp.errors">stormlibpp.errors module</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#stormlibpp.errors.HttpCortexError"><code class="docutils literal notranslate"><span class="pre">HttpCortexError</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#stormlibpp.errors.HttpCortexJsonError"><code class="docutils literal notranslate"><span class="pre">HttpCortexJsonError</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#stormlibpp.errors.HttpCortexLoginError"><code class="docutils literal notranslate"><span class="pre">HttpCortexLoginError</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#stormlibpp.errors.HttpCortexNotImplementedError"><code class="docutils literal notranslate"><span class="pre">HttpCortexNotImplementedError</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#stormlibpp.errors.StormPkgBadDefError"><code class="docutils literal notranslate"><span class="pre">StormPkgBadDefError</span></code></a></li>
@@ -242,6 +243,13 @@
 <em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">stormlibpp.errors.</span></span><span class="sig-name descname"><span class="pre">HttpCortexError</span></span><a class="headerlink" href="#stormlibpp.errors.HttpCortexError" title="Permalink to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Exception</span></code></p>
 <p>An error occurred in HttpCortex.</p>
+</dd></dl>
+
+<dl class="py exception">
+<dt class="sig sig-object py" id="stormlibpp.errors.HttpCortexJsonError">
+<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">stormlibpp.errors.</span></span><span class="sig-name descname"><span class="pre">HttpCortexJsonError</span></span><a class="headerlink" href="#stormlibpp.errors.HttpCortexJsonError" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#stormlibpp.errors.HttpCortexError" title="stormlibpp.errors.HttpCortexError"><code class="xref py py-class docutils literal notranslate"><span class="pre">HttpCortexError</span></code></a></p>
+<p>Unable to parse JSON response from Synapse with HttpCortex.</p>
 </dd></dl>
 
 <dl class="py exception">

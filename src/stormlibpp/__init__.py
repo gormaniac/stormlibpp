@@ -46,7 +46,7 @@ that can be used for testing other tools. It creates a user (``test``) with pass
 script will support custom Cortex configuration.
 """
 
-__version__ = "0.6.3"
+__version__ = "0.6.4"
 
 # TODO - Do we want to change this to only import submods, or do we even need that?
 from . import errors
