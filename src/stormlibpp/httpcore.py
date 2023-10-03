@@ -13,6 +13,7 @@ import synapse.lib.msgpack as s_msgpack
 
 from .errors import (
     HttpCortexError,
+    HttpCortexJsonError,
     HttpCortexLoginError,
     HttpCortexNotImplementedError,
 )
@@ -248,17 +249,41 @@ class HttpCortex:
 
         try:
             async with self.sess.get(url, json=data, ssl=self.ssl_verify) as resp:
-                async for byts, _ in resp.content.iter_chunks():
+                buf = b""
+                async for byts, chunkend in resp.content.iter_chunks():
                     if not byts:
                         break
 
-                    data = json.loads(byts)
+                    buf += byts
+                    if not chunkend:
+                        continue
+
+                    try:
+                        data = json.loads(byts)
+                    except json.JSONDecodeError as err:
+                        # HACK - This is the only way I found to fix a bug - may require reworking.
+                        # TODO - Add a retry count here or something to not get stuck in loop?
+                        # Since we're chunking the response, occasionally we get part of a JSON
+                        # doc instead of all of it, which will cause this error. Try reading more
+                        # chunks until there's a readable JSON doc.
+                        if "Unterminated string starting at" in str(err):
+                            continue
+                        else:
+                            raise err
+
                     if tuplify:
                         yield s_msgpack.deepcopy(data)
                     else:
                         yield data
 
+        except json.JSONDecodeError as err:
+            raise HttpCortexJsonError(
+                f"Malformed JSON response from {self.url}: {err}\nDoc:\n{err.doc}", err
+            ) from err
+
         except Exception as err:
+            if isinstance(err, KeyboardInterrupt) or isinstance(err, SystemExit):
+                raise err
             raise HttpCortexError(
                 f"Unable to execute storm on {self.url}: {err}", err
             ) from err

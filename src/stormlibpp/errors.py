@@ -27,6 +27,7 @@ class StormPkgResolveError(StormPkgError):
 class StormPkgBadDefError(StormPkgError):
     """The package proto's directory for a StormPkg could not be resolved."""
 
+
 class StormPkgSyntaxError(StormPkgError, StormSyntaxError):
     """The Storm code defined in a StormPkg has a syntax error."""
 
@@ -44,3 +45,7 @@ class HttpCortexNotImplementedError(s_exc.SynErr, NotImplementedError):
 
     Wraps ``synapse.exc.SynErr`` so this can be caught by builtin Synapse tools.
     """
+
+
+class HttpCortexJsonError(HttpCortexError):
+    """Unable to parse JSON response from Synapse with HttpCortex."""
