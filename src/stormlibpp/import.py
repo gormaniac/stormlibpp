@@ -247,6 +247,8 @@ def get_args(argv: list[str]):
             "this file. 'repr' is always set to True regardless of this file's contents."
         ),
     )
+    # TODO - Add --quiet mode
+    # TODO - support hidetags/hideprops
 
     return parser.parse_args(argv)
 
