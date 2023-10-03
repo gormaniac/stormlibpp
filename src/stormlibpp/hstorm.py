@@ -23,9 +23,6 @@ import argparse
 import getpass
 import sys
 
-import synapse.lib.output as s_output
-import synapse.tools.storm as s_storm
-
 from .httpcore import HttpCortex
 from .output import OUTP
 from .stormcli import start_storm_cli
