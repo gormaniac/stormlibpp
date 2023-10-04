@@ -1,4 +1,8 @@
-"""Recursively execute all Storm scripts in a given folder on a given Synapse Cortex over HTTP."""
+"""Recursively execute all Storm scripts in a given folder on a given Synapse Cortex over HTTP.
+
+If using the --http argument, a password will be prompted for. The CORTEX_PASS environment
+variable may be used to avoid the prompt.
+"""
 
 
 import argparse
@@ -22,6 +26,7 @@ import yaml
 from .httpcore import HttpCortex
 from .output import handle_msg, log_storm_msg, OUTP
 from .stormcli import start_storm_cli
+from .utils import get_cortex_creds
 
 
 def endswith(text, items):
@@ -218,10 +223,14 @@ def get_args(argv: list[str]):
     )
     parser.add_argument(
         "--user",
+        # FIXME - This explanation is backwards - --user overrides CORTEX_USER
         help=(
-            "The Synapse user to authenticate with -"
-            " by default the return of getpass.getuser()"
+            "The Cortex user to authenticate with - by default the return of"
+            " getpass.getuser(). May override this with the CORTEX_USER env var."
+            " If neither --user or CORTEX_USER are passed, a prompt will appear"
+            " to either input a value or accept the default. Only works with --http."
         ),
+        # FIXME - I don't think we actually want this default
         default=getpass.getuser(),
     )
     parser.add_argument(
@@ -274,10 +283,9 @@ async def main(argv: list[str]):
         return "Can't use both --cortex and --local!"
     elif args.cortex:
         if args.http:
-            synuser = args.user
-            synpass = getpass.getpass()
+            user, passwd = get_cortex_creds(args.user)
             core_obj = functools.partial(
-                HttpCortex, args.cortex, synuser, synpass, ssl_verify=not args.no_verify
+                HttpCortex, args.cortex, user, passwd, ssl_verify=not args.no_verify
             )
         else:
             core_obj = functools.partial(cortex_proxy_contextmanager, args.cortex)
