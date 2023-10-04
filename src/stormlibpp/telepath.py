@@ -30,21 +30,25 @@ class TelepathRetn(TypedDict):
 
 class BoolRetn(TelepathRetn):
     """A TelepathRetn where ``data`` is a boolean value."""
+
     data: bool
 
 
 class ListRetn(TelepathRetn):
     """A TelepathRetn where ``data`` is a list value."""
+
     data: list
 
 
 class DictRetn(TelepathRetn):
     """A TelepathRetn where ``data`` is a dict value."""
+
     data: dict
 
 
 class StrRetn(TelepathRetn):
     """A TelepathRetn where ``data`` is a str value."""
+
     data: str
 
 

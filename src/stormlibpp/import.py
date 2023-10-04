@@ -7,7 +7,6 @@ import contextlib
 import copy
 import csv
 import functools
-import getpass
 import json
 import os
 import pathlib
@@ -60,7 +59,7 @@ def txt_genr(fd):
 async def import_storm_text(core, text, stormopts, print_skips, logfd):
     async for msg in core.storm(text, opts=stormopts):
         handle_msg(msg, print_skips=print_skips, logfd=logfd)
-    
+
 
 async def import_storml_file(core, storm_script, stormopts, print_skips, logfd):
     with open(storm_script, "r") as fd:
@@ -247,6 +246,95 @@ def get_args(argv: list[str]):
     return parser.parse_args(argv)
 
 
+async def get_cortex_obj(cortex, local, http, no_verify, user):
+    if cortex and local:
+        raise ValueError("Can't use both --cortex and --local!")
+    elif cortex:
+        if http:
+            username, password = get_cortex_creds(user)
+            core_obj = functools.partial(
+                HttpCortex, cortex, username, password, ssl_verify=not no_verify
+            )
+        else:
+            core_obj = functools.partial(cortex_proxy_contextmanager, cortex)
+    elif local:
+        core_obj = s_cortex.getTempCortex
+    else:
+        raise ValueError(
+            "Must provide a Cortex URL (--cortex) or use a temp Cortex (--local)!"
+        )
+
+    return core_obj
+
+
+def collect_files(folders):
+    storm_scripts = []
+    data_files = []
+    for folder in folders:
+        path = pathlib.Path(folder).expanduser().resolve()
+        if path.exists() and path.is_dir():
+            for dir, dirs, files in os.walk(path):
+                dirs.sort()  # NOTE - Ensures the next iteration of dirs is in order.
+                for file in sorted(files):
+                    fullpath = os.path.join(dir, file)
+                    if endswith(file, (".storm", ".storml")):
+                        storm_scripts.append(fullpath)
+                    elif endswith(file, (".json", ".txt", ".csv")):
+                        data_files.append(fullpath)
+        else:
+            print(f"{path} doesn't exist!")
+
+    return storm_scripts, data_files
+
+
+async def import_data(
+    core_obj,
+    storm_scripts,
+    data_files,
+    stormopts,
+    csv_header,
+    debug,
+    print_skips,
+    cli,
+    logfd,
+    args,
+):
+    async with core_obj() as core:
+        # TODO - Perhaps use an asyncio.map here or something similar to parallelize
+        # NOTE - Don't use sorted here - it will put folders ahead of files
+        for storm_script in storm_scripts:
+            with open(storm_script, "r") as fd:
+                text = fd.read()
+
+            if file_infos := find_data_files(storm_script, data_files):
+                for file_info in file_infos:
+                    fpath, ftype = file_info
+                    await Importer(
+                        core,
+                        [fpath],
+                        ftype,
+                        text,
+                        stormopts=stormopts,
+                        header=csv_header,
+                        debug=debug,
+                        logfd=logfd,
+                    ).add_data()
+            else:
+                if storm_script.endswith(".storml"):
+                    # NOTE - This will wind up opening and closing the file twice.
+                    # Do we want that? Maybe we do because we won't get here much?
+                    await import_storml_file(
+                        core, storm_script, stormopts, print_skips, logfd=logfd
+                    )
+                else:
+                    await import_storm_text(
+                        core, text, stormopts, print_skips, logfd=logfd
+                    )
+
+        if cli:
+            await start_storm_cli(core, outp=OUTP, opts=args)
+
+
 async def main(argv: list[str]):
     args = get_args(argv)
 
@@ -264,75 +352,39 @@ async def main(argv: list[str]):
         print_skips = args.print_skips
 
     # TODO - Break the loading and then importing code out into methods
-    if args.cortex and args.local:
-        return "Can't use both --cortex and --local!"
-    elif args.cortex:
-        if args.http:
-            username, password = get_cortex_creds(args.user)
-            core_obj = functools.partial(
-                HttpCortex, args.cortex, username, password, ssl_verify=not args.no_verify
-            )
-        else:
-            core_obj = functools.partial(cortex_proxy_contextmanager, args.cortex)
-    elif args.local:
-        core_obj = s_cortex.getTempCortex
-    else:
-        return "Must provide a Cortex URL (--cortex) or use a temp Cortex (--local)!"
+    try:
+        core_obj = await get_cortex_obj(
+            args.cortex, args.local, args.http, args.no_verify, args.user
+        )
+    except ValueError as err:
+        return str(err)
 
-    storm_scripts = []
-    data_files = []
-    for folder in args.folders:
-        path = pathlib.Path(folder).expanduser().resolve()
-        if path.exists() and path.is_dir():
-            for dir, dirs, files in os.walk(path):
-                dirs.sort()  # NOTE - Ensures the next iteration of dirs is in order.
-                for file in sorted(files):
-                    fullpath = os.path.join(dir, file)
-                    if endswith(file, (".storm", ".storml")):
-                        storm_scripts.append(fullpath)
-                    elif endswith(file, (".json", ".txt", ".csv")):
-                        data_files.append(fullpath)
-        else:
-            print(f"{path} doesn't exist!")
+    storm_scripts, data_files = collect_files(args.folders)
 
     logfd = None
     if args.logfile is not None:
         logfd = s_common.genfile(args.logfile)
         logfd.seek(0, 2)
 
-    async with s_telepath.withTeleEnv():  # NOTE - We only need this for Telepath connections but still have to run it each time
-        async with core_obj() as core:
-            for storm_script in storm_scripts:  # NOTE - Don't use sorted here - it will put folders ahead of files
-                with open(storm_script, "r") as fd:
-                    text = fd.read()
+    import_call = functools.partial(
+        import_data,
+        core_obj,
+        storm_scripts,
+        data_files,
+        stormopts,
+        args.csv_header,
+        args.debug,
+        print_skips,
+        args.cli,
+        logfd,
+        args,
+    )
 
-                if file_infos := find_data_files(storm_script, data_files):
-                    for file_info in file_infos:
-                        fpath, ftype = file_info
-                        await Importer(
-                            core,
-                            [fpath],
-                            ftype,
-                            text,
-                            stormopts=stormopts,
-                            header=args.csv_header,
-                            debug=args.debug,
-                            logfd=logfd,
-                        ).add_data()
-                else:
-                    if storm_script.endswith(".storml"):
-                        # NOTE - This will wind up opening and closing the file twice.
-                        # Do we want that? Maybe we do because we won't get here much?
-                        await import_storml_file(
-                            core, storm_script, stormopts, print_skips, logfd=logfd
-                        )
-                    else:
-                        await import_storm_text(
-                            core, text, stormopts, print_skips, logfd=logfd
-                        )
-
-            if args.cli:
-                await start_storm_cli(core, outp=OUTP, opts=args)
+    if isinstance(core_obj, s_telepath.Proxy):
+        async with s_telepath.withTeleEnv():
+            await import_call()
+    else:
+        await import_call()
 
     if logfd is not None:
         logfd.close()

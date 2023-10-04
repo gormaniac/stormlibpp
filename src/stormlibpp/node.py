@@ -49,7 +49,7 @@ class ItemContainer:
 
     Implements only magic methods, and all of them operate on the underlying
     SimpleNamespace.
-    
+
     To convert this object to a ``dict`` of the items it holds,
     call ``vars`` on an instance.
     """
@@ -57,7 +57,7 @@ class ItemContainer:
     def __init__(self, /, **kwargs) -> None:
         # TODO - Is SimpleNamespace really the best option for this?
         self.__ns = SimpleNamespace(**kwargs)
-    
+
     def __contains__(self, __name: str) -> bool:
         return __name in dir(self)
 
@@ -118,7 +118,6 @@ class StormNode:
         tagprops: dict = {},
         **kwargs,
     ) -> None:
-
         self._form = form
         self._value = value
 
@@ -169,21 +168,21 @@ class StormNode:
         )
 
     @classmethod
-    def unpack(cls, packedtup: NodeTuple) -> 'StormNode':
+    def unpack(cls, packedtup: NodeTuple) -> "StormNode":
         form, name = packedtup[0]
         vals = NodeVals(**packedtup[1])
-        return cls(
-            form,
-            name,
-            **vals
-        )
+        return cls(form, name, **vals)
 
     def pack(self) -> NodeTuple:
         return ((self.form, self.value), self.nodevals)
 
     # TODO - Support tag properties
     def addTag(self, tag, timestamps: tuple = (None, None)) -> None:
-        if tag in self._tags and timestamps != (None, None) and self._tags[tag] != timestamps:
+        if (
+            tag in self._tags
+            and timestamps != (None, None)
+            and self._tags[tag] != timestamps
+        ):
             self._tags[tag] = timestamps
         elif tag not in self._tags:
             self._tags[tag] = timestamps

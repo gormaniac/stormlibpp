@@ -54,4 +54,4 @@ from . import utils
 from .httpcore import HttpCortex
 from .node import StormNode
 from .stormpkg import StormPkg
-from .telepath import (genDefaultTelepathRetn, TelepathRetn)
+from .telepath import genDefaultTelepathRetn, TelepathRetn

@@ -56,7 +56,7 @@ class StormPkg:
     - If ``check_syntax`` is True, all Storm code that is loaded in the ``pkdef``
       is passed to Synapse's Storm parser to check for Storm syntax errors.
       Any errors are raised as a ``StormPkgSyntaxError`` exception.
- 
+
     Examples::
 
         # Just subclass StormPkg with a name that matches the Yaml definition.

@@ -29,7 +29,7 @@ def absjoin(*paths: str) -> str:
 
 def chk_storm_syntax(storm: str) -> None:
     """Check if the given Storm code has valid syntax, raise exception if not.
-    
+
     Raises
     ------
     StormSyntaxError
@@ -68,14 +68,14 @@ def normver(ver: str | tuple) -> tuple[str, tuple]:
 def get_cortex_creds(_user):
     if _user:
         username = _user
-    elif (envusr := os.environ.get("CORTEX_USER")):
+    elif envusr := os.environ.get("CORTEX_USER"):
         username = envusr
     else:
         gpusr = getpass.getuser()
         inusr = input(f"Username [{gpusr}]: ")
         username = inusr if inusr else gpusr
 
-    if (envpw := os.environ.get("CORTEX_PASS")):
+    if envpw := os.environ.get("CORTEX_PASS"):
         password = envpw
     else:
         password = getpass.getpass()
