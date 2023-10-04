@@ -1,6 +1,7 @@
 """Miscellaneous functions that are helpful for working with Storm/Synapse."""
 
 
+import getpass
 import os
 
 import synapse.exc as s_exc
@@ -62,3 +63,21 @@ def normver(ver: str | tuple) -> tuple[str, tuple]:
         raise TypeError("Can only use a str or tuple as a Storm pkg version")
 
     return (verstr, vertup)
+
+
+def get_cortex_creds(_user):
+    if _user:
+        username = _user
+    elif (envusr := os.environ.get("CORTEX_USER")):
+        username = envusr
+    else:
+        gpusr = getpass.getuser()
+        inusr = input(f"Username [{gpusr}]: ")
+        username = inusr if inusr else gpusr
+
+    if (envpw := os.environ.get("CORTEX_PASS")):
+        password = envpw
+    else:
+        password = getpass.getpass()
+
+    return username, password

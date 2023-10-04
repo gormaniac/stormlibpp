@@ -19,9 +19,11 @@ import synapse.common as s_common
 import synapse.telepath as s_telepath
 import yaml
 
+from ._args import USER_PARSER
 from .httpcore import HttpCortex
 from .output import handle_msg, log_storm_msg, OUTP
 from .stormcli import start_storm_cli
+from .utils import get_cortex_creds
 
 
 def endswith(text, items):
@@ -171,7 +173,7 @@ def cortex_proxy_contextmanager(cortex_url):
 
 
 def get_args(argv: list[str]):
-    parser = argparse.ArgumentParser(description=__doc__)
+    parser = argparse.ArgumentParser(description=__doc__, parents=[USER_PARSER])
     parser.add_argument(
         "folders", help="The folder(s) containing Storm scripts to execute", nargs="+"
     )
@@ -215,14 +217,6 @@ def get_args(argv: list[str]):
         "--no-verify",
         help="Skips verification of the Cortex's certificate when using --http",
         action="store_true",
-    )
-    parser.add_argument(
-        "--user",
-        help=(
-            "The Synapse user to authenticate with -"
-            " by default the return of getpass.getuser()"
-        ),
-        default=getpass.getuser(),
     )
     parser.add_argument(
         "--view",
@@ -274,10 +268,9 @@ async def main(argv: list[str]):
         return "Can't use both --cortex and --local!"
     elif args.cortex:
         if args.http:
-            synuser = args.user
-            synpass = getpass.getpass()
+            username, password = get_cortex_creds(args.user)
             core_obj = functools.partial(
-                HttpCortex, args.cortex, synuser, synpass, ssl_verify=not args.no_verify
+                HttpCortex, args.cortex, username, password, ssl_verify=not args.no_verify
             )
         else:
             core_obj = functools.partial(cortex_proxy_contextmanager, args.cortex)
