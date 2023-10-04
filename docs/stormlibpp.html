@@ -86,16 +86,14 @@
 <li class="toctree-l4"><a class="reference internal" href="#stormlibpp.import.Importer.iterrows"><code class="docutils literal notranslate"><span class="pre">Importer.iterrows()</span></code></a></li>
 </ul>
 </li>
-<li class="toctree-l3"><a class="reference internal" href="#stormlibpp.import.cortex_proxy_contextmanager"><code class="docutils literal notranslate"><span class="pre">cortex_proxy_contextmanager()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="#stormlibpp.import.csv_genr"><code class="docutils literal notranslate"><span class="pre">csv_genr()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="#stormlibpp.import.endswith"><code class="docutils literal notranslate"><span class="pre">endswith()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#stormlibpp.import.collect_files"><code class="docutils literal notranslate"><span class="pre">collect_files()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#stormlibpp.import.find_data_files"><code class="docutils literal notranslate"><span class="pre">find_data_files()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#stormlibpp.import.get_args"><code class="docutils literal notranslate"><span class="pre">get_args()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#stormlibpp.import.get_cortex_obj"><code class="docutils literal notranslate"><span class="pre">get_cortex_obj()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#stormlibpp.import.import_data"><code class="docutils literal notranslate"><span class="pre">import_data()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#stormlibpp.import.import_storm_text"><code class="docutils literal notranslate"><span class="pre">import_storm_text()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#stormlibpp.import.import_storml_file"><code class="docutils literal notranslate"><span class="pre">import_storml_file()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="#stormlibpp.import.json_genr"><code class="docutils literal notranslate"><span class="pre">json_genr()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#stormlibpp.import.main"><code class="docutils literal notranslate"><span class="pre">main()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="#stormlibpp.import.txt_genr"><code class="docutils literal notranslate"><span class="pre">txt_genr()</span></code></a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="#module-stormlibpp.node">stormlibpp.node module</a><ul>
@@ -190,6 +188,7 @@
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="#stormlibpp.telepath.genDefaultTelepathRetn"><code class="docutils literal notranslate"><span class="pre">genDefaultTelepathRetn()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#stormlibpp.telepath.tpath_proxy_contextmanager"><code class="docutils literal notranslate"><span class="pre">tpath_proxy_contextmanager()</span></code></a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="#module-stormlibpp.tmpcortex">stormlibpp.tmpcortex module</a><ul>
@@ -200,7 +199,12 @@
 <li class="toctree-l2"><a class="reference internal" href="#module-stormlibpp.utils">stormlibpp.utils module</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#stormlibpp.utils.absjoin"><code class="docutils literal notranslate"><span class="pre">absjoin()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#stormlibpp.utils.chk_storm_syntax"><code class="docutils literal notranslate"><span class="pre">chk_storm_syntax()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#stormlibpp.utils.csv_genr"><code class="docutils literal notranslate"><span class="pre">csv_genr()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#stormlibpp.utils.endswith"><code class="docutils literal notranslate"><span class="pre">endswith()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#stormlibpp.utils.get_cortex_creds"><code class="docutils literal notranslate"><span class="pre">get_cortex_creds()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#stormlibpp.utils.json_genr"><code class="docutils literal notranslate"><span class="pre">json_genr()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#stormlibpp.utils.normver"><code class="docutils literal notranslate"><span class="pre">normver()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#stormlibpp.utils.txt_genr"><code class="docutils literal notranslate"><span class="pre">txt_genr()</span></code></a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="#module-stormlibpp">Module contents</a></li>
@@ -329,9 +333,10 @@ methods, so the builtin commands that do not rely on Storm (Axon-related command
 do not work. <code class="docutils literal notranslate"><span class="pre">HttpCortex</span></code> raises a <cite>synapse.exc.SynErr`</cite> when these unsupported
 CLI commands are used, so the commands fail cleanly from the user’s perspective.</p>
 <p>The script, like <code class="docutils literal notranslate"><span class="pre">HttpCortex</span></code>, requires a user and password to communicate
-with the Synapse Cortex. A user can be passed via the command-line, otherwise
-<code class="docutils literal notranslate"><span class="pre">getpass</span></code> is used to select the current user. A password is always prompted for.
-Future versions will allow for further user/pass customization options.</p>
+with the Synapse Cortex. A user can be passed via the command-line, the <code class="docutils literal notranslate"><span class="pre">CORTEX_USER</span></code>
+environment variable, or will be prompted for (<code class="docutils literal notranslate"><span class="pre">getpass</span></code> is used as a default).
+The <code class="docutils literal notranslate"><span class="pre">CORTEX_PASS</span></code> environment variable may be used to give <code class="docutils literal notranslate"><span class="pre">hstorm</span></code> a password
+at runtime, otherwise one will be prompted for.</p>
 <p>The <code class="docutils literal notranslate"><span class="pre">--no-verify</span></code> option tells the script to not check the Cortex’s HTTPS cert.
 This is needed to connect to any test Cortex or a Cortex that otherwise doesn’t
 use a trusted CA to sign HTTPS certificates.</p>
@@ -574,29 +579,29 @@ or an error decoding the JSON response.</p>
 </dd></dl>
 
 <dl class="py function">
-<dt class="sig sig-object py" id="stormlibpp.import.cortex_proxy_contextmanager">
-<span class="sig-prename descclassname"><span class="pre">stormlibpp.import.</span></span><span class="sig-name descname"><span class="pre">cortex_proxy_contextmanager</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cortex_url</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#stormlibpp.import.cortex_proxy_contextmanager" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="stormlibpp.import.csv_genr">
-<span class="sig-prename descclassname"><span class="pre">stormlibpp.import.</span></span><span class="sig-name descname"><span class="pre">csv_genr</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fd</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#stormlibpp.import.csv_genr" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="stormlibpp.import.endswith">
-<span class="sig-prename descclassname"><span class="pre">stormlibpp.import.</span></span><span class="sig-name descname"><span class="pre">endswith</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">text</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">items</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#stormlibpp.import.endswith" title="Permalink to this definition"></a></dt>
+<dt class="sig sig-object py" id="stormlibpp.import.collect_files">
+<span class="sig-prename descclassname"><span class="pre">stormlibpp.import.</span></span><span class="sig-name descname"><span class="pre">collect_files</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">folders</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#stormlibpp.import.collect_files" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="stormlibpp.import.find_data_files">
-<span class="sig-prename descclassname"><span class="pre">stormlibpp.import.</span></span><span class="sig-name descname"><span class="pre">find_data_files</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">orig</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">files</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#stormlibpp.import.find_data_files" title="Permalink to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">stormlibpp.import.</span></span><span class="sig-name descname"><span class="pre">find_data_files</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">orig</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">files</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#stormlibpp.import.find_data_files" title="Permalink to this definition"></a></dt>
 <dd><p>Find all data files in a list of files that have the same name (and path) as the original file.</p>
 </dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="stormlibpp.import.get_args">
 <span class="sig-prename descclassname"><span class="pre">stormlibpp.import.</span></span><span class="sig-name descname"><span class="pre">get_args</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">argv</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#stormlibpp.import.get_args" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="stormlibpp.import.get_cortex_obj">
+<em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">stormlibpp.import.</span></span><span class="sig-name descname"><span class="pre">get_cortex_obj</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cortex</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">local</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">http</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">no_verify</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">user</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#stormlibpp.import.get_cortex_obj" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="stormlibpp.import.import_data">
+<em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">stormlibpp.import.</span></span><span class="sig-name descname"><span class="pre">import_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">core_obj</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">storm_scripts</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data_files</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stormopts</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">csv_header</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">debug</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">print_skips</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cli</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">logfd</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#stormlibpp.import.import_data" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py function">
@@ -610,18 +615,8 @@ or an error decoding the JSON response.</p>
 <dd></dd></dl>
 
 <dl class="py function">
-<dt class="sig sig-object py" id="stormlibpp.import.json_genr">
-<span class="sig-prename descclassname"><span class="pre">stormlibpp.import.</span></span><span class="sig-name descname"><span class="pre">json_genr</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fd</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#stormlibpp.import.json_genr" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py function">
 <dt class="sig sig-object py" id="stormlibpp.import.main">
 <em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">stormlibpp.import.</span></span><span class="sig-name descname"><span class="pre">main</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">argv</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#stormlibpp.import.main" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="stormlibpp.import.txt_genr">
-<span class="sig-prename descclassname"><span class="pre">stormlibpp.import.</span></span><span class="sig-name descname"><span class="pre">txt_genr</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fd</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#stormlibpp.import.txt_genr" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
 
 </section>
@@ -1165,13 +1160,19 @@ may be empty, but <code class="docutils literal notranslate"><span class="pre">d
 <code class="docutils literal notranslate"><span class="pre">data</span></code> is set to the <code class="docutils literal notranslate"><span class="pre">default_data</span></code> arg - which defaults to <code class="docutils literal notranslate"><span class="pre">None</span></code>.</p>
 </dd></dl>
 
+<dl class="py function">
+<dt class="sig sig-object py" id="stormlibpp.telepath.tpath_proxy_contextmanager">
+<span class="sig-prename descclassname"><span class="pre">stormlibpp.telepath.</span></span><span class="sig-name descname"><span class="pre">tpath_proxy_contextmanager</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cortex_url</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Proxy</span></span></span><a class="headerlink" href="#stormlibpp.telepath.tpath_proxy_contextmanager" title="Permalink to this definition"></a></dt>
+<dd><p>Context manager that yields a telepath proxy object connected to cortex_url.</p>
+</dd></dl>
+
 </section>
 <section id="module-stormlibpp.tmpcortex">
 <span id="stormlibpp-tmpcortex-module"></span><h2>stormlibpp.tmpcortex module<a class="headerlink" href="#module-stormlibpp.tmpcortex" title="Permalink to this heading"></a></h2>
 <p>Start a temporary Synapse Cortex for testing purposes.</p>
 <dl class="py function">
 <dt class="sig sig-object py" id="stormlibpp.tmpcortex.getTempCortexWithArgs">
-<span class="sig-prename descclassname"><span class="pre">stormlibpp.tmpcortex.</span></span><span class="sig-name descname"><span class="pre">getTempCortexWithArgs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mods</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">conf</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">user</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'test'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">password</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'test'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#stormlibpp.tmpcortex.getTempCortexWithArgs" title="Permalink to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">stormlibpp.tmpcortex.</span></span><span class="sig-name descname"><span class="pre">getTempCortexWithArgs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mods</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Iterable</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">conf</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">user</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'test'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">password</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'test'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">print_dir</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#stormlibpp.tmpcortex.getTempCortexWithArgs" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py function">
@@ -1217,6 +1218,36 @@ may be empty, but <code class="docutils literal notranslate"><span class="pre">d
 </dd></dl>
 
 <dl class="py function">
+<dt class="sig sig-object py" id="stormlibpp.utils.csv_genr">
+<span class="sig-prename descclassname"><span class="pre">stormlibpp.utils.</span></span><span class="sig-name descname"><span class="pre">csv_genr</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fd</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">list</span></span></span><a class="headerlink" href="#stormlibpp.utils.csv_genr" title="Permalink to this definition"></a></dt>
+<dd><p>Read a CSV from fd and yield each row.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="stormlibpp.utils.endswith">
+<span class="sig-prename descclassname"><span class="pre">stormlibpp.utils.</span></span><span class="sig-name descname"><span class="pre">endswith</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">text</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">items</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="headerlink" href="#stormlibpp.utils.endswith" title="Permalink to this definition"></a></dt>
+<dd><p>Check if text ends with any of items.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="stormlibpp.utils.get_cortex_creds">
+<span class="sig-prename descclassname"><span class="pre">stormlibpp.utils.</span></span><span class="sig-name descname"><span class="pre">get_cortex_creds</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">_user</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#stormlibpp.utils.get_cortex_creds" title="Permalink to this definition"></a></dt>
+<dd><p>Get credentials to use when connecting to a Cortex over HTTP.</p>
+<p>If <code class="docutils literal notranslate"><span class="pre">_user</span></code> is set, it overrides any other options to get a username.
+Otherwise use the value of the <code class="docutils literal notranslate"><span class="pre">CORTEX_USER</span></code> environment variable. If that
+is also empty, prompt for a username. A default option is given to the user
+at the prompt, it is the return of <code class="docutils literal notranslate"><span class="pre">getpass.getuser()</span></code>.</p>
+<p>The password is read from the <code class="docutils literal notranslate"><span class="pre">CORTEX_PASS</span></code> environment variable and the
+user is prompted if this is empty.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="stormlibpp.utils.json_genr">
+<span class="sig-prename descclassname"><span class="pre">stormlibpp.utils.</span></span><span class="sig-name descname"><span class="pre">json_genr</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fd</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#stormlibpp.utils.json_genr" title="Permalink to this definition"></a></dt>
+<dd><p>Read a JSON file from fd, and yield each top-level item within it.</p>
+</dd></dl>
+
+<dl class="py function">
 <dt class="sig sig-object py" id="stormlibpp.utils.normver">
 <span class="sig-prename descclassname"><span class="pre">stormlibpp.utils.</span></span><span class="sig-name descname"><span class="pre">normver</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ver</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">tuple</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">tuple</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#stormlibpp.utils.normver" title="Permalink to this definition"></a></dt>
 <dd><p>Take either a version str “x.x.x” or tuple (x, x, x) and return both.</p>
@@ -1227,6 +1258,12 @@ may be empty, but <code class="docutils literal notranslate"><span class="pre">d
 </dd>
 </dl>
 </section>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="stormlibpp.utils.txt_genr">
+<span class="sig-prename descclassname"><span class="pre">stormlibpp.utils.</span></span><span class="sig-name descname"><span class="pre">txt_genr</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fd</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#stormlibpp.utils.txt_genr" title="Permalink to this definition"></a></dt>
+<dd><p>Read a raw text file from fd and yield each line.</p>
 </dd></dl>
 
 </section>
