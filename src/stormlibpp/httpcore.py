@@ -270,7 +270,12 @@ class HttpCortex:
                         # Since we're chunking the response, occasionally we get part of a JSON
                         # doc instead of all of it, which will cause this error. Try reading more
                         # chunks until there's a readable JSON doc.
-                        if "Unterminated string starting at" in str(err):
+                        # This happens most often when very large nodes are returned by a Cortex.
+                        err_str = str(err)
+                        if (
+                            "Unterminated string starting at" in err_str
+                            or err_str.startswith("Expecting")
+                        ):
                             continue
                         else:
                             raise err
