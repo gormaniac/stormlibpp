@@ -258,7 +258,7 @@ class HttpCortex:
                         continue
 
                     try:
-                        data = json.loads(byts)
+                        data = json.loads(buf)
                     except json.JSONDecodeError as err:
                         # HACK - This is the only way I found to fix a bug - may require reworking.
                         # TODO - Add a retry count here or something to not get stuck in loop?
