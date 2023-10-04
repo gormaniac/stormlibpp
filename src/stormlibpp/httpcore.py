@@ -250,18 +250,23 @@ class HttpCortex:
             async with self.sess.get(url, json=data, ssl=self.ssl_verify) as resp:
                 buf = b""
                 async for byts, chunkend in resp.content.iter_chunks():
+                    # If there's no byts in the response, we've read everything.
                     if not byts:
                         break
 
+                    # Add the response chunk to the buffer.
                     buf += byts
+
+                    # If we're not at the end of a chunk, keep filling the buffer.
                     if not chunkend:
                         continue
 
+                    # If we're here, we're at the end of a chunk and ready to load it.
                     try:
                         data = json.loads(buf)
                     except json.JSONDecodeError as err:
-                        # HACK - This is the only way I found to fix a bug - may require reworking.
                         # TODO - Add a retry count here or something to not get stuck in loop?
+                        # HACK - This is the only way I found to fix a bug - may require reworking.
                         # Since we're chunking the response, occasionally we get part of a JSON
                         # doc instead of all of it, which will cause this error. Try reading more
                         # chunks until there's a readable JSON doc.
@@ -270,6 +275,10 @@ class HttpCortex:
                         else:
                             raise err
 
+                    # Reset the buffer so it can be reused for the next group of chunks.
+                    buf = b""
+
+                    # Yield each deserialized JSON response.
                     if tuplify:
                         yield s_msgpack.deepcopy(data)
                     else:
