@@ -30,8 +30,19 @@ from .stormcli import start_storm_cli
 from .utils import get_cortex_creds
 
 
-def get_args(argv: list[str]):
-    """Build an argument parser for this script and parse the passed in args."""
+def get_args(argv: list[str]) -> argparse.Namespace:
+    """Build an argument parser for this script and parse the passed in args.
+
+    Parameters
+    ----------
+    argv : list[str]
+        The unparsed CLI arguments for this script.
+
+    Returns
+    -------
+    argparse.Namespace
+        The parsed arguments used by this script.
+    """
 
     args = argparse.ArgumentParser(
         prog="stormlibpp.hstorm",
@@ -54,7 +65,7 @@ def get_args(argv: list[str]):
     return args.parse_args(argv)
 
 
-async def main(argv: list[str]):
+async def main(argv: list[str]) -> None:
     """The main functionality of the HTTP Storm CLI.
 
     Parameters

@@ -8,6 +8,7 @@ HTTP. For example, the ``hstorm`` CLI replaces a ``Cortex`` object with an
 
 import aiohttp
 import json
+from typing import Self
 
 import synapse.lib.msgpack as s_msgpack
 
@@ -114,19 +115,35 @@ class HttpCortex:
             self.url, raise_for_status=True, read_timeout=0
         )
 
-    async def __aenter__(self):
+    async def __aenter__(self) -> Self:
         await self.login()
         return self
 
-    async def __aexit__(self, *args, **kwargs):
+    async def __aexit__(self, *args, **kwargs) -> None:
         await self.stop()
 
-    def _prep_payload(self, text: str, opts: dict | None = None):
+    def _prep_payload(self, text: str, opts: dict | None = None) -> dict:
+        """Get a Storm payload dict, using this class' default opts if none passed.
+
+        Parameters
+        ----------
+        text : str
+            The Storm code to send in the payload.
+        opts : dict | None, optional
+            Storm options to send in the payload. Uses the class' ``default_opts``
+            property if None. By default None.
+
+        Returns
+        -------
+        dict
+            The prepped payload contain the Storm code and options.
+        """
+
         if not opts:
             opts = self.default_opts
         return {"query": text, "opts": opts}
 
-    async def callStorm(self, text: str, opts: dict | None = None):
+    async def callStorm(self, text: str, opts: dict | None = None) -> dict:
         """Execute a Storm query and return the value passed to a Storm return() call.
 
         Parameters
@@ -202,7 +219,7 @@ class HttpCortex:
 
         self.sess.cookie_jar.update_cookies({"sess": session_cookie.value})
 
-    async def stop(self):
+    async def stop(self) -> None:
         """Stop this instance by closing its HTTP session."""
 
         await self.sess.close()
