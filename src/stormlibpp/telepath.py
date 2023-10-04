@@ -1,7 +1,10 @@
 """Python objects for working with Synapse Telepath endpoints."""
 
 
+import contextlib
 from typing import Any, TypedDict
+
+import synapse.telepath as s_telepath
 
 
 class TelepathRetn(TypedDict):
@@ -60,3 +63,10 @@ def genDefaultTelepathRetn(obj=TelepathRetn, /, default_data=None) -> TelepathRe
     """
 
     return obj(status=True, mesg="", data=default_data)
+
+
+@contextlib.contextmanager
+def tpath_proxy_contextmanager(cortex_url: str) -> s_telepath.Proxy:
+    """Context manager that yields a telepath proxy object connected to cortex_url."""
+
+    yield s_telepath.openurl(cortex_url)
