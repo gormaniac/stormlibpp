@@ -3,11 +3,8 @@
 
 import argparse
 import asyncio
-import contextlib
 import copy
-import csv
 import functools
-import json
 import os
 import pathlib
 import re
@@ -22,38 +19,8 @@ from ._args import USER_PARSER
 from .httpcore import HttpCortex
 from .output import handle_msg, log_storm_msg, OUTP
 from .stormcli import start_storm_cli
-from .utils import get_cortex_creds
-
-
-def endswith(text, items):
-    for item in items:
-        if text.endswith(item):
-            return True
-    return False
-
-
-def csv_genr(fd):
-    for row in csv.reader(fd):
-        yield row
-
-
-def json_genr(fd):
-    # TODO - Support nested key to start with
-    data = json.load(fd)
-
-    if type(data, dict):
-        for key, row in data.items():
-            yield [key, row]
-    else:
-        count = 0
-        for row in data:
-            yield [count, row]
-            count += 1
-
-
-def txt_genr(fd):
-    for row in fd.readlines():
-        yield row.strip()
+from .telepath import tpath_proxy_contextmanager
+from .utils import csv_genr, endswith, json_genr, get_cortex_creds, txt_genr
 
 
 async def import_storm_text(core, text, stormopts, print_skips, logfd):
@@ -135,7 +102,7 @@ class Importer:
         return nodecount
 
 
-def find_data_files(orig: str, files: list[str]):
+def find_data_files(orig: str, files: list[str]) -> tuple[str, str]:
     """
     Find all data files in a list of files that have the same name (and path) as the original file.
     """
@@ -162,13 +129,6 @@ def find_data_files(orig: str, files: list[str]):
             data_files.append((fname, extension_map[fpath.suffix]))
 
     return data_files
-
-
-# TODO - Keep this in this file?
-# Maybe put in teletpath.py and rename to tpath_proxy_contextmanager
-@contextlib.contextmanager
-def cortex_proxy_contextmanager(cortex_url):
-    yield s_telepath.openurl(cortex_url)
 
 
 def get_args(argv: list[str]):
@@ -256,7 +216,7 @@ async def get_cortex_obj(cortex, local, http, no_verify, user):
                 HttpCortex, cortex, username, password, ssl_verify=not no_verify
             )
         else:
-            core_obj = functools.partial(cortex_proxy_contextmanager, cortex)
+            core_obj = functools.partial(tpath_proxy_contextmanager, cortex)
     elif local:
         core_obj = s_cortex.getTempCortex
     else:
