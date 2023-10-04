@@ -9,10 +9,8 @@ import synapse.cortex as s_cortex
 
 
 @contextlib.asynccontextmanager
-async def getTempCortexWithArgs(mods = None, conf = None, user="test", password="test"):
-
+async def getTempCortexWithArgs(mods=None, conf=None, user="test", password="test"):
     with s_common.getTempDir() as dirn:
-
         async with await s_cortex.Cortex.anit(dirn, conf=conf) as core:
             if mods:
                 for mod in mods:

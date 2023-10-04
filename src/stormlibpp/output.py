@@ -21,8 +21,8 @@ OUTP = s_output.stdout
 
 def log_storm_msg(logfd, mesg):
     if logfd is not None:
-        byts = json.dumps(mesg).encode('utf8')
-        logfd.write(byts + b'\n')
+        byts = json.dumps(mesg).encode("utf8")
+        logfd.write(byts + b"\n")
 
 
 def print_node_prop(name, valu):

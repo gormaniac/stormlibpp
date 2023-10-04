@@ -33,7 +33,12 @@ from .utils import get_cortex_creds
 def get_args(argv: list[str]):
     """Build an argument parser for this script and parse the passed in args."""
 
-    args = argparse.ArgumentParser(prog="stormlibpp.hstorm", parents=[USER_PARSER,])
+    args = argparse.ArgumentParser(
+        prog="stormlibpp.hstorm",
+        parents=[
+            USER_PARSER,
+        ],
+    )
     args.add_argument("cortex", help="An HTTP URL for the Cortex.")
     args.add_argument("onecmd", nargs="?", help="A Storm command to run and exit.")
     args.add_argument(
@@ -62,8 +67,9 @@ async def main(argv: list[str]):
 
     username, password = get_cortex_creds(args.user)
 
-    async with HttpCortex(args.cortex, username, password, ssl_verify=not args.no_verify) as hcore:
-
+    async with HttpCortex(
+        args.cortex, username, password, ssl_verify=not args.no_verify
+    ) as hcore:
         await start_storm_cli(hcore, outp=OUTP, opts=args, onecmd=args.onecmd)
 
 
