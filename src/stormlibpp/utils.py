@@ -97,7 +97,7 @@ def json_genr(fd):
     # TODO - Support nested key to start with
     data = json.load(fd)
 
-    if type(data, dict):
+    if isinstance(data, dict):
         for key, row in data.items():
             yield [key, row]
     else:
