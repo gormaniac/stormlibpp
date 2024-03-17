@@ -1,9 +1,65 @@
-"""Recursively execute all Storm scripts in a given folder on a given Synapse Cortex over HTTP."""
+"""
+Recursively execute all Storm scripts in a folder (or folders) on a Synapse Cortex.
 
+All sub-folders of the given folder(s) are imported. Sub-folders, and their files,
+are imported in alphabetical order. Each folder passed to this script is imported
+in the order it is passed. This allows users to build large nested folders of importable
+data, like a grouping of an organization's "static" nodes, and keep them in source
+control. Groupings of like Storm scripts can be stored in the same folder, and the
+order of execution, if it matters, can be manipulated by prepending numbers to the
+folder/file names.
+
+Storm scripts can import ``.csv``, ``.json``, and ``.txt`` files. These are referred
+to as "data files." Data files are recognized by name, they must have the same name
+as the Storm script, but with the appropriate extension. Multiple data files
+can be specified for a Storm script by appending an underscore and a number to
+the file name of the data file. The following regex is used to find data files,
+where ``scriptname`` is the name of the Storm script minus the ``.storm`` extension:
+``scriptname(_\d+)?``.
+
+Just like with the out of the box csvtool, a ``$rows`` variable is injected into
+the Storm runtime that can be iterated over to do something with each row of the
+data file. 
+
+For JSON data files, a "row" is a tuple with an identifier and the top-level
+object within the JSON object. If the JSON file defines a list, each item in the list
+is a the top-level object in the row. If the JSON file defines a standard object, each
+key of the JSON object is passed as the identifier, and the object the key references
+is the top-level object. See ``utils.json_genr`` for implementation details. For CSV
+and TXT files, each line is a "row" in the ``$rows`` variable. A JSON lines file should
+use the ``.txt`` extension and each line of JSON will be a "row" in the Storm script's
+``$rows`` variable.
+
+Storm scripts that do not have data files associated with them will be executed as is
+on the Cortex.
+
+A special Storm script extension is recognized by this tool - ``.storml``. Rather than
+running these Storm scripts all in one. Each line in the ``.storml`` file is executed
+on the Cortex in its own runtime. Data files are not supported for ``.storml`` scripts.
+
+This script attempts to support the same thing as the out of the box csvtool.
+A local test Cortex can be spun up to test imports. A CLI can be dropped into
+to support this testing, or observe the newly imported nodes. A specific view
+can be given, instead of using the Cortex's default view. A log file is supported
+so that a script's messages can be viewed. All prints, or other output, from the
+Storm scripts is printed to the console.
+
+There are some differences though:
+
+* By default, ``node`` and ``node:edits`` messages are not printed.
+* HTTP communication with the Cortex is supported along with Telepath.
+
+    * The same authentication rules as the ``hstorm`` tool apply.
+
+* Specific Storm message types can be skipped from output.
+* A YAML file with custom ``stormopts`` used by every script can be supplied.
+
+"""
 
 import argparse
 import asyncio
 import copy
+import io
 import functools
 import os
 import pathlib
@@ -23,12 +79,47 @@ from .telepath import tpath_proxy_contextmanager
 from .utils import csv_genr, endswith, json_genr, get_cortex_creds, txt_genr
 
 
-async def import_storm_text(core, text, stormopts, print_skips, logfd):
+DESCRIPTION = """
+Recursively execute all Storm scripts in a folder (or folders) on a Synapse Cortex.
+
+Data can optionally be imported from .csv, .json, and .txt files, like with csvtool.
+
+If no data is given for a Storm script, it is executed as is.
+
+See the stormlibpp.import docs for feature specifics:
+https://gormo.co/stormlibpp/stormlibpp.html#module-stormlibpp.import
+"""
+
+
+Cortex = HttpCortex | s_cortex.CoreApi
+StormCode = str
+"""A string containing valid Storm code to run on a Cortex."""
+StormOpts = dict
+"""
+Storm Options to pass to a Storm runtime.
+
+https://synapse.docs.vertex.link/en/latest/synapse/devguides/storm_api.html#storm-opts
+"""
+
+
+async def import_storm_text(
+    core: Cortex,
+    text: StormCode,
+    stormopts: StormOpts,
+    print_skips: list,
+    logfd: io.BufferedRandom,
+):
     async for msg in core.storm(text, opts=stormopts):
         handle_msg(msg, print_skips=print_skips, logfd=logfd)
 
 
-async def import_storml_file(core, storm_script, stormopts, print_skips, logfd):
+async def import_storml_file(
+    core: Cortex,
+    storm_script: StormCode,
+    stormopts: StormOpts,
+    print_skips: list,
+    logfd: io.BufferedRandom,
+):
     with open(storm_script, "r") as fd:
         for line in txt_genr(fd):
             await import_storm_text(core, line, stormopts, print_skips, logfd)
@@ -63,7 +154,6 @@ class Importer:
         self.debug = debug
         self.logfd = logfd
 
-        
         if splices:
             self.edit_format = "splices"
         else:
@@ -139,7 +229,11 @@ def find_data_files(orig: str, files: list[str]) -> tuple[str, str]:
 
 
 def get_args(argv: list[str]):
-    parser = argparse.ArgumentParser(description=__doc__, parents=[USER_PARSER])
+    parser = argparse.ArgumentParser(
+        description=DESCRIPTION,
+        parents=[USER_PARSER],
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+    )
     parser.add_argument(
         "folders", help="The folder(s) containing Storm scripts to execute", nargs="+"
     )

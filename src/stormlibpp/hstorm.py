@@ -38,6 +38,9 @@ def get_args(argv: list[str]):
         parents=[
             USER_PARSER,
         ],
+        description="An HTTP based Storm CLI.",
+        epilog=__doc__,
+        formatter_class=argparse.RawDescriptionHelpFormatter,
     )
     args.add_argument("cortex", help="An HTTP URL for the Cortex.")
     args.add_argument("onecmd", nargs="?", help="A Storm command to run and exit.")
