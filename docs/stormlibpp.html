@@ -86,6 +86,8 @@
 <li class="toctree-l4"><a class="reference internal" href="#stormlibpp.import.Importer.iterrows"><code class="docutils literal notranslate"><span class="pre">Importer.iterrows()</span></code></a></li>
 </ul>
 </li>
+<li class="toctree-l3"><a class="reference internal" href="#stormlibpp.import.StormCode"><code class="docutils literal notranslate"><span class="pre">StormCode</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#stormlibpp.import.StormOpts"><code class="docutils literal notranslate"><span class="pre">StormOpts</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#stormlibpp.import.collect_files"><code class="docutils literal notranslate"><span class="pre">collect_files()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#stormlibpp.import.find_data_files"><code class="docutils literal notranslate"><span class="pre">find_data_files()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#stormlibpp.import.get_args"><code class="docutils literal notranslate"><span class="pre">get_args()</span></code></a></li>
@@ -556,10 +558,59 @@ or an error decoding the JSON response.</p>
 </section>
 <section id="module-stormlibpp.import">
 <span id="stormlibpp-import-module"></span><h2>stormlibpp.import module<a class="headerlink" href="#module-stormlibpp.import" title="Link to this heading"></a></h2>
-<p>Recursively execute all Storm scripts in a given folder on a given Synapse Cortex over HTTP.</p>
+<p>Recursively execute all Storm scripts in a folder (or folders) on a Synapse Cortex.</p>
+<p>All sub-folders of the given folder(s) are imported. Sub-folders, and their files,
+are imported in alphabetical order. Each folder passed to this script is imported
+in the order it is passed. This allows users to build large nested folders of importable
+data, like a grouping of an organization’s “static” nodes, and keep them in source
+control. Groupings of like Storm scripts can be stored in the same folder, and the
+order of execution, if it matters, can be manipulated by prepending numbers to the
+folder/file names.</p>
+<p>Storm scripts can import <code class="docutils literal notranslate"><span class="pre">.csv</span></code>, <code class="docutils literal notranslate"><span class="pre">.json</span></code>, and <code class="docutils literal notranslate"><span class="pre">.txt</span></code> files. These are referred
+to as “data files.” Data files are recognized by name, they must have the same name
+as the Storm script, but with the appropriate extension. Multiple data files
+can be specified for a Storm script by appending an underscore and a number to
+the file name of the data file. The following regex is used to find data files,
+where <code class="docutils literal notranslate"><span class="pre">scriptname</span></code> is the name of the Storm script minus the <code class="docutils literal notranslate"><span class="pre">.storm</span></code> extension:
+<code class="docutils literal notranslate"><span class="pre">scriptname(_\d+)?</span></code>.</p>
+<p>Just like with the out of the box csvtool, a <code class="docutils literal notranslate"><span class="pre">$rows</span></code> variable is injected into
+the Storm runtime that can be iterated over to do something with each row of the
+data file.</p>
+<p>For JSON data files, a “row” is a tuple with an identifier and the top-level
+object within the JSON object. If the JSON file defines a list, each item in the list
+is a the top-level object in the row. If the JSON file defines a standard object, each
+key of the JSON object is passed as the identifier, and the object the key references
+is the top-level object. See <code class="docutils literal notranslate"><span class="pre">utils.json_genr</span></code> for implementation details. For CSV
+and TXT files, each line is a “row” in the <code class="docutils literal notranslate"><span class="pre">$rows</span></code> variable. A JSON lines file should
+use the <code class="docutils literal notranslate"><span class="pre">.txt</span></code> extension and each line of JSON will be a “row” in the Storm script’s
+<code class="docutils literal notranslate"><span class="pre">$rows</span></code> variable.</p>
+<p>Storm scripts that do not have data files associated with them will be executed as is
+on the Cortex.</p>
+<p>A special Storm script extension is recognized by this tool - <code class="docutils literal notranslate"><span class="pre">.storml</span></code>. Rather than
+running these Storm scripts all in one. Each line in the <code class="docutils literal notranslate"><span class="pre">.storml</span></code> file is executed
+on the Cortex in its own runtime. Data files are not supported for <code class="docutils literal notranslate"><span class="pre">.storml</span></code> scripts.</p>
+<p>This script attempts to support the same thing as the out of the box csvtool.
+A local test Cortex can be spun up to test imports. A CLI can be dropped into
+to support this testing, or observe the newly imported nodes. A specific view
+can be given, instead of using the Cortex’s default view. A log file is supported
+so that a script’s messages can be viewed. All prints, or other output, from the
+Storm scripts is printed to the console.</p>
+<p>There are some differences though:</p>
+<ul>
+<li><p>By default, <code class="docutils literal notranslate"><span class="pre">node</span></code> and <code class="docutils literal notranslate"><span class="pre">node:edits</span></code> messages are not printed.</p></li>
+<li><p>HTTP communication with the Cortex is supported along with Telepath.</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>The same authentication rules as the <code class="docutils literal notranslate"><span class="pre">hstorm</span></code> tool apply.</p></li>
+</ul>
+</div></blockquote>
+</li>
+<li><p>Specific Storm message types can be skipped from output.</p></li>
+<li><p>A YAML file with custom <code class="docutils literal notranslate"><span class="pre">stormopts</span></code> used by every script can be supplied.</p></li>
+</ul>
 <dl class="py class">
 <dt class="sig sig-object py" id="stormlibpp.import.Importer">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">stormlibpp.import.</span></span><span class="sig-name descname"><span class="pre">Importer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">core</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">files</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ftype</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">text</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stormopts={}</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">outp=&lt;synapse.lib.output.OutPut</span> <span class="pre">object&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">header=False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">debug=False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">logfd=None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#stormlibpp.import.Importer" title="Link to this definition"></a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">stormlibpp.import.</span></span><span class="sig-name descname"><span class="pre">Importer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">core</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">files</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ftype</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">text</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stormopts={}</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">outp=&lt;synapse.lib.output.OutPut</span> <span class="pre">object&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">header=False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">debug=False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">logfd=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">splices=False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#stormlibpp.import.Importer" title="Link to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <dl class="py method">
 <dt class="sig sig-object py" id="stormlibpp.import.Importer.add_data">
@@ -576,6 +627,19 @@ or an error decoding the JSON response.</p>
 <span class="sig-name descname"><span class="pre">iterrows</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#stormlibpp.import.Importer.iterrows" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="stormlibpp.import.StormCode">
+<span class="sig-prename descclassname"><span class="pre">stormlibpp.import.</span></span><span class="sig-name descname"><span class="pre">StormCode</span></span><a class="headerlink" href="#stormlibpp.import.StormCode" title="Link to this definition"></a></dt>
+<dd><p>A string containing valid Storm code to run on a Cortex.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="stormlibpp.import.StormOpts">
+<span class="sig-prename descclassname"><span class="pre">stormlibpp.import.</span></span><span class="sig-name descname"><span class="pre">StormOpts</span></span><a class="headerlink" href="#stormlibpp.import.StormOpts" title="Link to this definition"></a></dt>
+<dd><p>Storm Options to pass to a Storm runtime.</p>
+<p><a class="reference external" href="https://synapse.docs.vertex.link/en/latest/synapse/devguides/storm_api.html#storm-opts">https://synapse.docs.vertex.link/en/latest/synapse/devguides/storm_api.html#storm-opts</a></p>
 </dd></dl>
 
 <dl class="py function">
@@ -601,17 +665,17 @@ or an error decoding the JSON response.</p>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="stormlibpp.import.import_data">
-<em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">stormlibpp.import.</span></span><span class="sig-name descname"><span class="pre">import_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">core_obj</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">storm_scripts</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data_files</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stormopts</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">csv_header</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">debug</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">print_skips</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cli</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">logfd</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#stormlibpp.import.import_data" title="Link to this definition"></a></dt>
+<em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">stormlibpp.import.</span></span><span class="sig-name descname"><span class="pre">import_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">core_obj</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">storm_scripts</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data_files</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stormopts</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">csv_header</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">debug</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">print_skips</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cli</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">logfd</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">splices</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#stormlibpp.import.import_data" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="stormlibpp.import.import_storm_text">
-<em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">stormlibpp.import.</span></span><span class="sig-name descname"><span class="pre">import_storm_text</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">core</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">text</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stormopts</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">print_skips</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">logfd</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#stormlibpp.import.import_storm_text" title="Link to this definition"></a></dt>
+<em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">stormlibpp.import.</span></span><span class="sig-name descname"><span class="pre">import_storm_text</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">core</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#stormlibpp.httpcore.HttpCortex" title="stormlibpp.httpcore.HttpCortex"><span class="pre">HttpCortex</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">CoreApi</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">text</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stormopts</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">print_skips</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">logfd</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">BufferedRandom</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#stormlibpp.import.import_storm_text" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="stormlibpp.import.import_storml_file">
-<em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">stormlibpp.import.</span></span><span class="sig-name descname"><span class="pre">import_storml_file</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">core</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">storm_script</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stormopts</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">print_skips</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">logfd</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#stormlibpp.import.import_storml_file" title="Link to this definition"></a></dt>
+<em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">stormlibpp.import.</span></span><span class="sig-name descname"><span class="pre">import_storml_file</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">core</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#stormlibpp.httpcore.HttpCortex" title="stormlibpp.httpcore.HttpCortex"><span class="pre">HttpCortex</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">CoreApi</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">storm_script</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stormopts</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">print_skips</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">logfd</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">BufferedRandom</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#stormlibpp.import.import_storml_file" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py function">
