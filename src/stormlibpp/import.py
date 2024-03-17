@@ -52,6 +52,7 @@ class Importer:
         header=False,
         debug=False,
         logfd=None,
+        splices=False,
     ) -> None:
         self.file_type = ftype
         self.text = text
@@ -61,6 +62,12 @@ class Importer:
         self.header = header
         self.debug = debug
         self.logfd = logfd
+
+        
+        if splices:
+            self.edit_format = "splices"
+        else:
+            self.edit_format = "nodeedits"
 
         # TODO - Make sure this is actually necessary - or if just copy suffices
         self.stormopts = copy.deepcopy(stormopts)
@@ -77,7 +84,7 @@ class Importer:
     async def add_data(self):
         nodecount = 0
 
-        self.stormopts["editformat"] = "splices"
+        self.stormopts["editformat"] = self.edit_format
         vars = self.stormopts.setdefault("vars", {})
 
         for rows in self.iterrows():
@@ -200,6 +207,14 @@ def get_args(argv: list[str]):
             "this file. 'repr' is always set to True regardless of this file's contents."
         ),
     )
+    parser.add_argument(
+        "--splices",
+        help=(
+            "Use the legacy 'splices' editformat while importing. Use while"
+            " importing data to a Cortex that is running a version <2.156.0."
+        ),
+        action="store_true",
+    )
     # TODO - Add --quiet mode
     # TODO - support hidetags/hideprops
 
@@ -258,6 +273,7 @@ async def import_data(
     cli,
     logfd,
     args,
+    splices,
 ):
     async with core_obj() as core:
         # TODO - Perhaps use an asyncio.map here or something similar to parallelize
@@ -278,6 +294,7 @@ async def import_data(
                         header=csv_header,
                         debug=debug,
                         logfd=logfd,
+                        splices=splices,
                     ).add_data()
             else:
                 if storm_script.endswith(".storml"):
@@ -338,6 +355,7 @@ async def main(argv: list[str]):
         args.cli,
         logfd,
         args,
+        args.splices,
     )
 
     if isinstance(core_obj, s_telepath.Proxy):
