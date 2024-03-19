@@ -1,0 +1,23 @@
+$guid = $lib.guid(stix, indicator, $object.id)
+switch $object.pattern_type {
+
+    yara: {[ it:app:yara:rule=$guid
+                :name?=$object.name
+                :text?=$object.pattern
+    ]}
+
+    snort: {[ it:app:snort:rule=$guid
+                :name?=$object.name
+                :text?=$object.pattern
+    ]}
+
+    *: {[ it:sec:stix:indicator=$guid
+            :name?=$object.name
+            :pattern?=$object.pattern
+            :created?=$object.created
+            :updated?=$object.modified]
+       | scrape --refs :pattern
+       }
+}
+$node.data.set(stix:object, $object)
+return($node)

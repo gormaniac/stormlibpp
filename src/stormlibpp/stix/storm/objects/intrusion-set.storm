@@ -1,0 +1,11 @@
+($ok, $name) = $lib.trycast(ou:name, $object.name)
+if $ok {
+
+    ou:name=$name -> ou:org
+    { for $alias in $object.aliases { [ :names?+=$alias ] } }
+    return($node)
+
+    [ ou:org=* :name=$name ]
+    { for $alias in $object.aliases { [ :names?+=$alias ] } }
+    return($node)
+}

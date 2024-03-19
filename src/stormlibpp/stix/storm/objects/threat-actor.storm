@@ -1,0 +1,7 @@
+[ ps:contact=(stix, threat-actor, $object.id)
+    :name?=$object.name
+    :desc?=$object.description
+    :names?=$object.aliases
+]
+$node.data.set(stix:object, $object)
+return($node)

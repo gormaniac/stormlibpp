@@ -1,0 +1,4 @@
+it:sec:stix:bundle:id=$bundle.id
+return($node)
+[ it:sec:stix:bundle=* :id=$bundle.id ]
+return($node)

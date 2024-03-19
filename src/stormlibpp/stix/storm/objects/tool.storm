@@ -1,0 +1,7 @@
+($ok, $name) = $lib.trycast(it:prod:softname, $object.name)
+if $ok {
+    it:prod:softname=$name -> it:prod:soft
+    return($node)
+    [ it:prod:soft=* :name=$name ]
+    return($node)
+}
