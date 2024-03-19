@@ -1,0 +1,77 @@
+{
+    "addbundle": true,
+    "bundle": {
+        "storm": "\n            it:sec:stix:bundle:id=$bundle.id\n            return($node)\n            [ it:sec:stix:bundle=* :id=$bundle.id ]\n            return($node)\n        "
+    },
+    "objects": {
+        "intrusion-set": {
+            "storm": "\n                ($ok, $name) = $lib.trycast(ou:name, $object.name)\n                if $ok {\n\n                    ou:name=$name -> ou:org\n                    { for $alias in $object.aliases { [ :names?+=$alias ] } }\n                    return($node)\n\n                    [ ou:org=* :name=$name ]\n                    { for $alias in $object.aliases { [ :names?+=$alias ] } }\n                    return($node)\n                }\n            "
+        },
+        "identity": {
+            "storm": "\n                switch $object.identity_class {\n                    group: {[ ps:contact=(stix, identity, $object.id) :orgname?=$object.name ]}\n                    organization: {[ ps:contact=(stix, identity, $object.id) :orgname?=$object.name ]}\n                    individual: {[ ps:contact=(stix, identity, $object.id) :name?=$object.name ]}\n                    system: {[ it:host=(stix, identity, $object.id) :name?=$object.name ]}\n                }\n            "
+        },
+        "tool": {
+            "storm": "\n                ($ok, $name) = $lib.trycast(it:prod:softname, $object.name)\n                if $ok {\n                    it:prod:softname=$name -> it:prod:soft\n                    return($node)\n                    [ it:prod:soft=* :name=$name ]\n                    return($node)\n                }\n            "
+        },
+        "threat-actor": {
+            "storm": "\n                [ ps:contact=(stix, threat-actor, $object.id)\n                    :name?=$object.name\n                    :desc?=$object.description\n                    :names?=$object.aliases\n                ]\n                $node.data.set(stix:object, $object)\n                return($node)\n            "
+        },
+        "course-of-action": {
+            "storm": "\n                [ risk:mitigation=(stix, course-of-action, $object.id)\n                    :name?=$object.name\n                    :desc?=$object.description\n                ]\n                $node.data.set(stix:object, $object)\n                return($node)\n            "
+        },
+        "campaign": {
+            "storm": "\n                [ ou:campaign=(stix, campaign, $object.id)\n                    :name?=$object.name\n                    :desc?=$object.description\n                    .seen?=$object.last_seen\n                    .seen?=$object.first_seen\n                ]\n                $node.data.set(stix:object, $object)\n                return($node)\n            "
+        },
+        "malware": {
+            "storm": "\n                ($ok, $name) = $lib.trycast(it:prod:softname, $object.name)\n                if $ok {\n                    it:prod:softname=$name -> it:prod:soft\n                    return($node)\n                    [ it:prod:soft=* :name=$name ]\n                    return($node)\n                }\n            "
+        },
+        "indicator": {
+            "storm": "\n                $guid = $lib.guid(stix, indicator, $object.id)\n                switch $object.pattern_type {\n\n                    yara: {[ it:app:yara:rule=$guid\n                                :name?=$object.name\n                                :text?=$object.pattern\n                    ]}\n\n                    snort: {[ it:app:snort:rule=$guid\n                                :name?=$object.name\n                                :text?=$object.pattern\n                    ]}\n\n                    *: {[ it:sec:stix:indicator=$guid\n                            :name?=$object.name\n                            :pattern?=$object.pattern\n                            :created?=$object.created\n                            :updated?=$object.modified]\n                       | scrape --refs :pattern\n                       }\n                }\n                $node.data.set(stix:object, $object)\n                return($node)\n            "
+        },
+        "report": {
+            "storm": "\n                [ media:news=(stix, report, $object.id)\n                    :title?=$object.name\n                    :summary?=$object.description\n                    :published?=$object.published\n                ]\n                $node.data.set(stix:object, $object)\n                return($node)\n            "
+        }
+    },
+    "relationships": [
+        {
+            "type": [
+                "campaign",
+                "attributed-to",
+                "intrusion-set"
+            ],
+            "storm": "\n            $n1node.props.org = $n2node\n        "
+        },
+        {
+            "type": [
+                "intrusion-set",
+                "attributed-to",
+                "threat-actor"
+            ],
+            "storm": "\n            $n2node.props.org = $n1node\n        "
+        },
+        {
+            "type": [
+                null,
+                "uses",
+                null
+            ],
+            "storm": "yield $n1node [ +(uses)> { yield $n2node } ]"
+        },
+        {
+            "type": [
+                null,
+                "indicates",
+                null
+            ],
+            "storm": "yield $n1node [ +(indicates)> { yield $n2node } ]"
+        },
+        {
+            "type": [
+                "threat-actor",
+                "attributed-to",
+                "identity"
+            ],
+            "storm": ""
+        }
+    ]
+}
