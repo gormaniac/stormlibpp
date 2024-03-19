@@ -165,6 +165,7 @@ class HttpCortex:
                 f"Unable to call storm on {self.url}: {err}", err
             ) from err
 
+    # TODO - Support API key base authentication
     async def login(self):
         """Login to the Cortex with the user/pass supplied at instantiation.
 
