@@ -1,4 +1,5 @@
 it:sec:stix:bundle:id=$bundle.id
 return($node)
 [ it:sec:stix:bundle=* :id=$bundle.id ]
+$node.data.set(stix:bundle, $object)
 return($node)

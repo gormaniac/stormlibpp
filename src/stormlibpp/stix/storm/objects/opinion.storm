@@ -1,0 +1,10 @@
+// TODO - Figure out if content is the right key here.
+[
+    meta:note=(stix, note, $object.id)
+    :type=stix.opinion
+    :text=$object.content
+    :created=$object.created
+    :updated=$object.modified
+]
+[ <(refs)+ { it:sec:stix:bundle:id=$bundle.id } ]
+return($node)

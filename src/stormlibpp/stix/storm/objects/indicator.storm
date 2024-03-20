@@ -19,5 +19,6 @@ switch $object.pattern_type {
        | scrape --refs :pattern
        }
 }
+[ <(refs)+ { it:sec:stix:bundle:id=$bundle.id } ]
 $node.data.set(stix:object, $object)
 return($node)

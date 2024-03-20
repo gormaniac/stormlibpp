@@ -3,9 +3,12 @@ if $ok {
 
     ou:name=$name -> ou:org
     { for $alias in $object.aliases { [ :names?+=$alias ] } }
+    [ <(refs)+ { it:sec:stix:bundle:id=$bundle.id } ]
     return($node)
 
     [ ou:org=* :name=$name ]
     { for $alias in $object.aliases { [ :names?+=$alias ] } }
+    [ <(refs)+ { it:sec:stix:bundle:id=$bundle.id } ]
+    $node.data.set(stix:object, $object)
     return($node)
 }

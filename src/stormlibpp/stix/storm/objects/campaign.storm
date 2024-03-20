@@ -4,5 +4,6 @@
     .seen?=$object.last_seen
     .seen?=$object.first_seen
 ]
+[ <(refs)+ { it:sec:stix:bundle:id=$bundle.id } ]
 $node.data.set(stix:object, $object)
 return($node)

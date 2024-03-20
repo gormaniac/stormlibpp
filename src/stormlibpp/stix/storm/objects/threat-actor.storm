@@ -3,5 +3,6 @@
     :desc?=$object.description
     :names?=$object.aliases
 ]
+[ <(refs)+ { it:sec:stix:bundle:id=$bundle.id } ]
 $node.data.set(stix:object, $object)
 return($node)

@@ -1,0 +1,5 @@
+// TODO - Make sure value is the right key for this
+[inet:fqdn=$object.value]
+[ <(refs)+ { it:sec:stix:bundle:id=$bundle.id } ]
+$node.data.set(stix:object, $object)
+return($node)
