@@ -10,15 +10,45 @@ from .. import utils
 MAP = {
     "bundle": "bundle.storm",
     "objects": {
+        "artifact": "artifact.storm",
+        "attack-pattern": "attack-pattern.storm",
+        "autonomous-system": "autonomous-system.storm",
         "campaign": "campaign.storm",
         "course-of-action": "course-of-action.storm",
+        "directory": "directory.storm",
+        "domain-name": "domain-name.storm",
+        "email-addr": "email-addr.storm",
+        "email-message": "email-message.storm",
+        "file": "file.storm",
+        "grouping": "grouping.storm",
         "identity": "identity.storm",
+        "incident": "incident.storm",
         "indicator": "indicator.storm",
+        "infrastructure": "infrastructure.storm",
         "intrusion-set": "intrusion-set.storm",
+        "ipv4-addr": "ipv4-addr.storm",
+        "ipv6-addr": "ipv6-addr.storm",
+        "location": "location.storm",
+        "mac-addr": "mac-addr.storm",
+        "malware-analysis": "malware-analysis.storm",
         "malware": "malware.storm",
+        "mutex": "mutex.storm",
+        "network-traffic": "network-traffic.storm",
+        "note": "note.storm",
+        "observed-data": "observed-data.storm",
+        "opinion": "opinion.storm",
+        "process": "process.storm",
+        "relationship": "relationship.storm",
         "report": "report.storm",
+        "sighting": "sighting.storm",
+        "software": "software.storm",
         "threat-actor": "threat-actor.storm",
         "tool": "tool.storm",
+        "url": "url.storm",
+        "user-account": "user-account.storm",
+        "vulnerability": "vulnerability.storm",
+        "windows-registry-key": "windows-registry-key.storm",
+        "x509-certificate": "x509-certificate.storm",
     },
     "relationships": [
         {
@@ -111,13 +141,11 @@ class BundleConf:
     ----------
     storm_path : str, optional
         The path the to folder containing Storm code, by default "storm".
-    storm_rel : bool, optional
-        Whether ``storm_path`` is relative to the file that this object is declared
-        in, by default True.
+    default : bool, optional
+        Whether to build the default import config dict packaged with stormlibpp.
+        Ignores the ``storm_path`` object if True. By default True.
     out : str, optional
-        The path to save output in, by default ``bundle_conf.json``.
-    dot_storm : bool, optional
-        Whether storm files in ``map`` end with a ``.storm`` extension, by default True.
+        The path to save output in, by default "bundle_conf.json".
     map : dict, optional
         A custom mapping of ``$lib.stix.import.config()`` to Storm files. By
         default ``MAP``. See ``MAP`` docstrings for details.
@@ -126,37 +154,37 @@ class BundleConf:
     def __init__(
         self,
         storm_path: str = "storm",
-        storm_rel: bool = True,
+        default: bool = True,
         out: str = "bundle_conf.json",
-        dot_storm: bool = True,
         map: dict = MAP,
     ) -> None:
-        if storm_rel:
-            self.path = (pathlib.Path(__file__).parent / storm_path).expanduser().resolve()
+        self.default = default
+
+        if self.default:
+            self.path = (pathlib.Path(__file__).parent / "storm").expanduser().resolve()
         else:
             self.path = pathlib.Path(storm_path).expanduser().resolve()
 
         self.out = pathlib.Path(out).expanduser().resolve()
-        self.dot_storm = dot_storm
 
         self.map = map
 
         self.bundle_conf = BLANK_CONF
 
     def __repr__(self):
-        return "BundleConf(storm_path='{p}', out='{o}', dot_storm={d})".format(
+        return (
+            "BundleConf(storm_path='{p}', out='{o}', default={d}, map={m})"
+        ).format(
             p=self.path,
             o=self.out,
-            d=self.dot_storm,
+            d=self.default,
+            m="{Default Map}" if self.map == MAP else "{Custom Map}"
         )
 
     def __str__(self) -> str:
         return json.dumps(self.bundle_conf)
     
     def _load_storm(self, key: str, rel_path: str):
-        # TODO - figureout .storm extension stuff
-        # ext = ".storm" if self.dot_storm else ""
-        # path = str(self.path / key / f"{rel_path}{ext}")
         path = str(self.path / key / rel_path)
 
         try:
