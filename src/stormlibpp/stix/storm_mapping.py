@@ -1,3 +1,5 @@
+"""Stores the default file mapping used in ``stormlibpp.stix.BundleConf``."""
+
 MAP = {
     "bundle": "bundle.storm",
     "objects": {
@@ -82,21 +84,52 @@ The ``relationships`` values are almost exactly the same as those found in a
 ``$lib.stix.import.config()``. Except that the ``storm`` key points to a file
 with Storm code.
 
-Expects a file structure like this::
+The default mapping represents a file structure like this::
+
     storm/
-    ├── bundle/
+    ├── bundle
     │   └── bundle.storm
-    ├── objects/
+    ├── objects
+    │   ├── artifact.storm
+    │   ├── attack-pattern.storm
+    │   ├── autonomous-system.storm
     │   ├── campaign.storm
     │   ├── course-of-action.storm
+    │   ├── directory.storm
+    │   ├── domain-name.storm
+    │   ├── email-addr.storm
+    │   ├── email-message.storm
+    │   ├── file.storm
+    │   ├── grouping.storm
     │   ├── identity.storm
+    │   ├── incident.storm
     │   ├── indicator.storm
+    │   ├── infrastructure.storm
     │   ├── intrusion-set.storm
+    │   ├── ipv4-addr.storm
+    │   ├── ipv6-addr.storm
+    │   ├── location.storm
+    │   ├── mac-addr.storm
+    │   ├── malware-analysis.storm
     │   ├── malware.storm
+    │   ├── mutex.storm
+    │   ├── network-traffic.storm
+    │   ├── note.storm
+    │   ├── observed-data.storm
+    │   ├── opinion.storm
+    │   ├── process.storm
+    │   ├── relationship.storm
     │   ├── report.storm
+    │   ├── sighting.storm
+    │   ├── software.storm
     │   ├── threat-actor.storm
-    │   └── tool.storm
-    └── relationships/
+    │   ├── tool.storm
+    │   ├── url.storm
+    │   ├── user-account.storm
+    │   ├── vulnerability.storm
+    │   ├── windows-registry-key.storm
+    │   └── x509-certificate.storm
+    └── relationships
         ├── camp_to_intset.storm
         ├── indicates.storm
         ├── intset_to_ta.storm
