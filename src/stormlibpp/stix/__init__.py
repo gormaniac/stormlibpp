@@ -122,18 +122,6 @@ BLANK_CONF = {
 """A blank ``$lib.stix.import.config()``."""
 
 
-class BundleConfError(RuntimeError):
-    """An error raised by BundleConf."""
-
-
-class BundleConfSaveError(BundleConfError):
-    """Raise when a BundleConf can't be saved."""
-
-
-class BundleConfLoadStormError(BundleConfError):
-    """Raise when a BundleConf can't load a Storm file."""
-
-
 class BundleConf:
     """Create a ``$lib.stix.import.config()`` compatible config from storm files.
 
@@ -192,11 +180,11 @@ class BundleConf:
                 storm = fd.read()
                 utils.chk_storm_syntax(storm)
         except OSError as err:
-            raise BundleConfLoadStormError(
+            raise errors.BundleConfLoadStormError(
                 f"Unable to load the Storm code from {path}: {err}"
             ) from err
         except errors.StormSyntaxError as err:
-            raise BundleConfLoadStormError(
+            raise errors.BundleConfLoadStormError(
                 f"Storm syntax error in {path}: {err}"
             ) from err
         
@@ -219,6 +207,6 @@ class BundleConf:
             with open(path, "w") as fd:
                 json.dump(self.bundle_conf, fd, indent=2)
         except (TypeError, OSError) as err:
-            raise BundleConfSaveError(
+            raise errors.BundleConfSaveError(
                 f"Unable to save the Storm Stix bundle config to {path}: {err}"
             ) from err
