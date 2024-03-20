@@ -12,6 +12,7 @@ change-version: # Change the version of this project (requires VERSION=#.#.#)
 .PHONY: build
 build: # Build the package tarball and wheel
 	pipenv run python3 -m build .
+	pipenv run python3 scripts/build_stix_conf.py
 
 .PHONY: setup
 setup: # Setup this project's pipenv environment

@@ -27,3 +27,5 @@ Documentation = "https://gormo.co/stormlibpp/"
 [tool.setuptools.packages.find]
 namespaces = true
 where = ["src"]
+
+# TODO - Package the storm files for stormlibpp.stix
