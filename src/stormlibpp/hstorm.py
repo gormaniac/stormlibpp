@@ -23,7 +23,7 @@ import asyncio
 import argparse
 import sys
 
-from ._args import USER_PARSER
+from ._args import USER_PARSER, VERIFY_PARSER
 from .httpcore import HttpCortex
 from .output import OUTP
 from .stormcli import start_storm_cli
@@ -37,6 +37,7 @@ def get_args(argv: list[str]):
         prog="stormlibpp.hstorm",
         parents=[
             USER_PARSER,
+            VERIFY_PARSER,
         ],
         description="An HTTP based Storm CLI.",
         epilog=__doc__,
@@ -46,12 +47,6 @@ def get_args(argv: list[str]):
     args.add_argument("onecmd", nargs="?", help="A Storm command to run and exit.")
     args.add_argument(
         "-v", "--view", default=None, help="The iden of the Synapse View to use."
-    )
-    args.add_argument(
-        "-n",
-        "--no-verify",
-        action="store_true",
-        help="Whether to verify the HTTPS certificate of the Cortex.",
     )
 
     return args.parse_args(argv)
