@@ -1,4 +1,4 @@
 [inet:ipv4=$object.value]
 [ <(refs)+ { it:sec:stix:bundle:id=$bundle.id } ]
-$node.data.set(stix:object, $object)
+$node.data.set(`stix:object:bundle:{$bundle.id}`, $object)
 return($node)

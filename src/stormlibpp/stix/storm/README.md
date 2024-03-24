@@ -31,22 +31,25 @@ CHANGES:
     - Refs edge to the stix bundle
 - `objects/identity.storm`
     - Refs edge to the stix bundle
-    - Include the stix object in nodedata
+    - Include the stix object in nodedata - with the bundle ID
 - `objects/indicator.storm`
     - Refs edge to the stix bundle
 - `objects/intrusion-set.storm`
     - Refs edge to the stix bundle
-    - Include the stix object in nodedata for new nodes only
+    - Include the stix object in nodedata - with the bundle ID
 - `objects/malware.storm`
     - Refs edge to the stix bundle
-    - Include the stix object in nodedata for new nodes only
+    - Include the stix object in nodedata for new nodes only - with the bundle ID
     - Save malware objects without a name as meta:note nodes
 - `objects/report.storm`
     - Refs edge to the stix bundle
+    - Include the bundle ID in stix object nodedata
 - `objects/threat-actor.storm`
     - Refs edge to the stix bundle
+    - Include the bundle ID in stix object nodedata
 - `objects/tool.storm`
     - Refs edge to the stix bundle
+    - Include the stix object in nodedata for new nodes only - with the bundle ID
 - `relationships/camp_to_intset.storm`
     - None
 - `relationships/indicates.storm`

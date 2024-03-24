@@ -2,8 +2,10 @@
 if $ok {
     it:prod:softname=$name -> it:prod:soft
     [ <(refs)+ { it:sec:stix:bundle:id=$bundle.id } ]
+    $node.data.set(`stix:object:bundle:{$bundle.id}`, $object)
     return($node)
     [ it:prod:soft=* :name=$name ]
     [ <(refs)+ { it:sec:stix:bundle:id=$bundle.id } ]
+    $node.data.set(`stix:object:bundle:{$bundle.id}`, $object)
     return($node)
 }
