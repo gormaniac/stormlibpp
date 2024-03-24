@@ -7,6 +7,7 @@ HTTP. For example, the ``hstorm`` CLI replaces a ``Cortex`` object with an
 
 
 import aiohttp
+import collections.abc
 import json
 
 import synapse.lib.msgpack as s_msgpack
@@ -17,6 +18,8 @@ from .errors import (
     HttpCortexLoginError,
     HttpCortexNotImplementedError,
 )
+
+from .node import NodeTuple
 
 
 StormMsgType = str
@@ -36,6 +39,7 @@ See `Storm Message Types`_.
 """
 
 
+# TODO - Make sure that raised errors subclass `synapse.exc.SynErr` for compatability
 class HttpCortex:
     """A class with some methods from synapse.cortex.Cortex but over HTTP.
 
@@ -100,6 +104,7 @@ class HttpCortex:
         url: str = "https://localhost:4443",
         usr: str = "",
         pwd: str = "",
+        token: str = "",
         default_opts: dict = {"repr": True},
         ssl_verify: bool = True,
     ) -> None:
@@ -109,6 +114,7 @@ class HttpCortex:
 
         self.usr = usr
         self.pwd = pwd
+        self.token = token
 
         self.sess = aiohttp.ClientSession(
             self.url, raise_for_status=True, read_timeout=0
@@ -125,6 +131,56 @@ class HttpCortex:
         if not opts:
             opts = self.default_opts
         return {"query": text, "opts": opts}
+
+    async def addFeedData(
+        self,
+        name: str | None,
+        items: list[NodeTuple],
+        *,
+        viewiden: str | None = None
+    ):
+        """Feed node tuples to the Cortex.
+
+        Parameters
+        ----------
+        name : str | None
+            An "optional" name to give the import
+        items : list[NodeTuple]
+            A list of NodeTuples that will be imported into the Cortex.
+        viewiden : str | None, optional
+            A specific view to import data to, the default view is used if None,
+            by default None.
+
+        Returns
+        -------
+        dict
+            The return from the ``/api/v1/feed`` endpoint.
+
+        Raises
+        ------
+        HttpCortexError
+            If an exception is raised when making an HTTP request to the Cortex.
+            This will likely either be from an HTTP error, a connection error,
+            or an error decoding the JSON response.
+        """
+        url = "/api/v1/feed"
+
+        data = {"items": items}
+
+        if viewiden is not None:
+            data["view"] = viewiden
+
+        if name:
+            data = {"name": name}
+
+        try:
+            async with self.sess.post(url, json=data, ssl=self.ssl_verify) as resp:
+                data = await resp.json()
+                return data
+        except Exception as err:
+            raise HttpCortexError(
+                f"Unable to feed nodes to {self.url}: {err}", err
+            ) from err
 
     async def callStorm(self, text: str, opts: dict | None = None):
         """Execute a Storm query and return the value passed to a Storm return() call.
@@ -165,9 +221,50 @@ class HttpCortex:
                 f"Unable to call storm on {self.url}: {err}", err
             ) from err
 
+    async def exportStorm(
+            self, text: str, opts: dict | None = None
+        ) -> collections.abc.AsyncGenerator[bytes, None]:
+        """Export packed nodes returned by a given query using ``/api/v1/storm/export``.
+
+        Parameters
+        ----------
+        text : str
+            A Storm query that returns nodes to export.
+        opts : dict | None, optional
+            The Storm options to use for the export - see
+            ``synapse.tools.storm.ExportCmd`` for some export specific options
+            to use, by default None.
+
+        Yields
+        ------
+        bytes
+            The packed nodes returned by the query. Yielded in chunks for
+            large sets of nodes.
+
+        Raises
+        ------
+        HttpCortexError
+            If an exception is raised when making an HTTP request to the Cortex.
+            This will likely either be from an HTTP error, a connection error,
+            or an error reading the response.
+        """
+
+        url = "/api/v1/storm/export"
+
+        payload = self._prep_payload(text, opts=opts)
+
+        try:
+            async with self.sess.get(url, json=payload, ssl=self.ssl_verify) as resp:
+                data = await resp.read()
+                yield data
+        except Exception as err:
+            raise HttpCortexError(f"Unable to export nodes: {err}", err) from err
+
     # TODO - Support API key base authentication
     async def login(self):
-        """Login to the Cortex with the user/pass supplied at instantiation.
+        """Login to the Cortex with the user/pass (or API key) supplied at instantiation.
+
+        If a user/pass is supplied, cookie based authentication is used.
 
         Sets the cookie returned by the Cortex in the underlying ``ClientSession``.
         Ignores the expiration date because there was errors adding the
@@ -176,32 +273,43 @@ class HttpCortex:
 
         Cortex cookies expire after 2 weeks. So this object shouldn't live
         longer than that without calling this method again.
+
+        If an API key is passed at instantiation, the user/pass combo is ignored 
+        and the ``ClientSession`` is configured to send the API key value in the
+        ``X-API-KEY`` header with every request.
         """
 
-        info = {"user": self.usr, "passwd": self.pwd}
-        url = "/api/v1/login"
+        if self.token:
+            self.sess.headers.add("X-API-KEY", self.token)
 
-        try:
-            async with self.sess.post(url, json=info, ssl=self.ssl_verify) as resp:
-                item = await resp.json()
-        except Exception as err:
-            raise HttpCortexLoginError(
-                f"Error making login request to {self.url}: {err}", err
-            ) from err
+        elif self.usr and self.pwd:
+            info = {"user": self.usr, "passwd": self.pwd}
+            url = "/api/v1/login"
 
-        if item.get("status") != "ok":
-            code = item.get("code")
-            mesg = item.get("mesg")
-            raise HttpCortexLoginError(f"Login error ({code}): {mesg}")
+            try:
+                async with self.sess.post(url, json=info, ssl=self.ssl_verify) as resp:
+                    item = await resp.json()
+            except Exception as err:
+                raise HttpCortexLoginError(
+                    f"Error making login request to {self.url}: {err}", err
+                ) from err
 
-        session_cookie = resp.cookies.get("sess")
+            if item.get("status") != "ok":
+                code = item.get("code")
+                mesg = item.get("mesg")
+                raise HttpCortexLoginError(f"Login error ({code}): {mesg}")
 
-        if session_cookie is None:
-            raise HttpCortexLoginError(
-                "Successfully authenticated but Synapse did not send session cookie"
-            )
+            session_cookie = resp.cookies.get("sess")
 
-        self.sess.cookie_jar.update_cookies({"sess": session_cookie.value})
+            if session_cookie is None:
+                raise HttpCortexLoginError(
+                    "Successfully authenticated but Synapse did not send session cookie"
+                )
+
+            self.sess.cookie_jar.update_cookies({"sess": session_cookie.value})
+
+        else:
+            raise HttpCortexLoginError(f"No user/pass or API key passed to HTTPCortex!")
 
     async def stop(self):
         """Stop this instance by closing its HTTP session."""
@@ -210,7 +318,7 @@ class HttpCortex:
 
     async def storm(
         self, text: str, opts: dict | None = None, tuplify: bool = True
-    ) -> StormMsg:
+    ) -> collections.abc.AsyncGenerator[StormMsg, None]:
         """Evaulate a Storm query and yield the streamed Storm messages.
 
         Parameters
@@ -302,11 +410,14 @@ class HttpCortex:
                 f"Unable to execute storm on {self.url}: {err}", err
             ) from err
 
-    # TODO - Implement these methods so we can fully support Storm CLI features.
-    async def exportStorm(self, *args, **kwargs):
-        """Not implemented - here to support an HTTP Storm CLI."""
-        raise HttpCortexNotImplementedError("HttpCortex doesn't implement exportStorm!")
+    async def stormlist(
+        self, text: str, opts: dict | None = None, tuplify: bool = True
+    ) -> list[StormMsg]:
+        return [msg async for msg in self.storm(text, opts=opts, tuplify=tuplify)]
 
+    # TODO - Implement these methods so we can fully support Storm CLI features.
+    # NOTE - It's going to be tough to do these over HTTP until the Axon APIs
+    #        are proxied by the Cortex API.
     async def getAxonBytes(self, *args, **kwargs):
         """Not implemented - here to support an HTTP Storm CLI."""
         raise HttpCortexNotImplementedError(
