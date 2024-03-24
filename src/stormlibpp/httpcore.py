@@ -168,12 +168,6 @@ class HttpCortex:
 
         url = "/api/v1/feed"
 
-        # Convert bytes items to NodeTuples for JSON compatibility.
-        items = list(items)
-        for index in range(len(items)):
-            if isinstance(items[index], bytes):
-                items[index] = s_msgpack.un(items[index])
-
         data = {"items": items}
 
         if viewiden is not None:
@@ -265,7 +259,7 @@ class HttpCortex:
         try:
             async with self.sess.get(url, json=payload, ssl=self.ssl_verify) as resp:
                 data = await resp.read()
-                yield data
+                yield s_msgpack.un(data)
         except Exception as err:
             raise HttpCortexError(f"Unable to export nodes: {err}", err) from err
 
