@@ -92,6 +92,8 @@ class HttpCortex:
         The username to authenticate with, by default `""`.
     pwd : str, optional
         The password to authenticate with, by default `""`.
+    token : str, optional
+        A token to authenticate with, instead of usr/pwd, by default `""`.
     default_opts : dict, optional
         The default Storm options to pass with every request made by this instance.
         Set this to an empty dict to disable. By default `{"repr": True}`.
@@ -163,6 +165,7 @@ class HttpCortex:
             This will likely either be from an HTTP error, a connection error,
             or an error decoding the JSON response.
         """
+
         url = "/api/v1/feed"
 
         data = {"items": items}
@@ -171,7 +174,7 @@ class HttpCortex:
             data["view"] = viewiden
 
         if name:
-            data = {"name": name}
+            data["name"] = name
 
         try:
             async with self.sess.post(url, json=data, ssl=self.ssl_verify) as resp:
@@ -256,7 +259,7 @@ class HttpCortex:
         try:
             async with self.sess.get(url, json=payload, ssl=self.ssl_verify) as resp:
                 data = await resp.read()
-                yield data
+                yield s_msgpack.un(data)
         except Exception as err:
             raise HttpCortexError(f"Unable to export nodes: {err}", err) from err
 

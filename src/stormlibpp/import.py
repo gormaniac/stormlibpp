@@ -73,12 +73,18 @@ import synapse.common as s_common
 import synapse.telepath as s_telepath
 import yaml
 
-from ._args import USER_PARSER
+from ._args import USER_PARSER, VERIFY_PARSER
 from .httpcore import HttpCortex
 from .output import handle_msg, log_storm_msg, OUTP
 from .stormcli import start_storm_cli
-from .telepath import tpath_proxy_contextmanager
-from .utils import csv_genr, endswith, json_genr, get_cortex_creds, txt_genr
+from .utils import (
+    csv_genr,
+    endswith,
+    get_cortex_creds,
+    get_cortex_obj,
+    json_genr,
+    txt_genr,
+)
 
 
 DESCRIPTION = """
@@ -233,7 +239,7 @@ def find_data_files(orig: str, files: list[str]) -> tuple[str, str]:
 def get_args(argv: list[str]):
     parser = argparse.ArgumentParser(
         description=DESCRIPTION,
-        parents=[USER_PARSER],
+        parents=[USER_PARSER, VERIFY_PARSER],
         formatter_class=argparse.RawDescriptionHelpFormatter,
     )
     parser.add_argument(
@@ -276,11 +282,6 @@ def get_args(argv: list[str]):
         action="store_true",
     )
     parser.add_argument(
-        "--no-verify",
-        help="Skips verification of the Cortex's certificate when using --http",
-        action="store_true",
-    )
-    parser.add_argument(
         "--view",
         help="An optional view to work in - otherwise the Cortex's default is chosen",
         default=None,
@@ -315,27 +316,6 @@ def get_args(argv: list[str]):
     # TODO - support hidetags/hideprops
 
     return parser.parse_args(argv)
-
-
-async def get_cortex_obj(cortex, local, http, no_verify, user):
-    if cortex and local:
-        raise ValueError("Can't use both --cortex and --local!")
-    elif cortex:
-        if http:
-            username, password = get_cortex_creds(user)
-            core_obj = functools.partial(
-                HttpCortex, cortex, username, password, ssl_verify=not no_verify
-            )
-        else:
-            core_obj = functools.partial(tpath_proxy_contextmanager, cortex)
-    elif local:
-        core_obj = s_cortex.getTempCortex
-    else:
-        raise ValueError(
-            "Must provide a Cortex URL (--cortex) or use a temp Cortex (--local)!"
-        )
-
-    return core_obj
 
 
 def collect_files(folders):
@@ -426,8 +406,15 @@ async def main(argv: list[str]):
 
     # TODO - Break the loading and then importing code out into methods
     try:
+        # TODO - Support tokens here
+        username, password = get_cortex_creds(args.user)
         core_obj = await get_cortex_obj(
-            args.cortex, args.local, args.http, args.no_verify, args.user
+            cortex=args.cortex,
+            local=args.local,
+            http=args.http,
+            no_verify=not args.no_verify,
+            username=username,
+            password=password,
         )
     except ValueError as err:
         return str(err)
