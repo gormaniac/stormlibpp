@@ -168,6 +168,45 @@ class HttpCortex:
                 f"Unable to call storm on {self.url}: {err}", err
             ) from err
 
+    async def exportStorm(
+            self, text: str, opts: dict | None = None
+        ) -> collections.abc.AsyncGenerator[bytes, None]:
+        """Export packed nodes returned by a given query using ``/api/v1/storm/export``.
+
+        Parameters
+        ----------
+        text : str
+            A Storm query that returns nodes to export.
+        opts : dict | None, optional
+            The Storm options to use for the export - see
+            ``synapse.tools.storm.ExportCmd`` for some export specific options
+            to use, by default None.
+
+        Yields
+        ------
+        bytes
+            The packed nodes returned by the query. Yielded in chunks for
+            large sets of nodes.
+
+        Raises
+        ------
+        HttpCortexError
+            If an exception is raised when making an HTTP request to the Cortex.
+            This will likely either be from an HTTP error, a connection error,
+            or an error reading the response.
+        """
+
+        url = "/api/v1/storm/export"
+
+        payload = self._prep_payload(text, opts=opts)
+
+        try:
+            async with self.sess.get(url, json=payload, ssl=self.ssl_verify) as resp:
+                data = await resp.read()
+                yield data
+        except Exception as err:
+            raise HttpCortexError(f"Unable to export nodes: {err}", err) from err
+
     # TODO - Support API key base authentication
     async def login(self):
         """Login to the Cortex with the user/pass (or API key) supplied at instantiation.
@@ -319,10 +358,6 @@ class HttpCortex:
             ) from err
 
     # TODO - Implement these methods so we can fully support Storm CLI features.
-    async def exportStorm(self, *args, **kwargs):
-        """Not implemented - here to support an HTTP Storm CLI."""
-        raise HttpCortexNotImplementedError("HttpCortex doesn't implement exportStorm!")
-
     async def getAxonBytes(self, *args, **kwargs):
         """Not implemented - here to support an HTTP Storm CLI."""
         raise HttpCortexNotImplementedError(
