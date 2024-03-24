@@ -77,8 +77,14 @@ from ._args import USER_PARSER
 from .httpcore import HttpCortex
 from .output import handle_msg, log_storm_msg, OUTP
 from .stormcli import start_storm_cli
-from .telepath import tpath_proxy_contextmanager
-from .utils import csv_genr, endswith, json_genr, get_cortex_creds, txt_genr
+from .utils import (
+    csv_genr,
+    endswith,
+    get_cortex_creds,
+    get_cortex_obj,
+    json_genr,
+    txt_genr,
+)
 
 
 DESCRIPTION = """
@@ -317,27 +323,6 @@ def get_args(argv: list[str]):
     return parser.parse_args(argv)
 
 
-async def get_cortex_obj(cortex, local, http, no_verify, user):
-    if cortex and local:
-        raise ValueError("Can't use both --cortex and --local!")
-    elif cortex:
-        if http:
-            username, password = get_cortex_creds(user)
-            core_obj = functools.partial(
-                HttpCortex, cortex, username, password, ssl_verify=not no_verify
-            )
-        else:
-            core_obj = functools.partial(tpath_proxy_contextmanager, cortex)
-    elif local:
-        core_obj = s_cortex.getTempCortex
-    else:
-        raise ValueError(
-            "Must provide a Cortex URL (--cortex) or use a temp Cortex (--local)!"
-        )
-
-    return core_obj
-
-
 def collect_files(folders):
     storm_scripts = []
     data_files = []
@@ -426,8 +411,15 @@ async def main(argv: list[str]):
 
     # TODO - Break the loading and then importing code out into methods
     try:
+        # TODO - Support tokens here
+        username, password = get_cortex_creds(args.user)
         core_obj = await get_cortex_obj(
-            args.cortex, args.local, args.http, args.no_verify, args.user
+            cortex=args.cortex,
+            local=args.local,
+            http=args.http,
+            no_verify=not args.no_verify,
+            username=username,
+            password=password,
         )
     except ValueError as err:
         return str(err)
