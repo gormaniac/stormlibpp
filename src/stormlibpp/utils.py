@@ -1,5 +1,7 @@
 """Miscellaneous functions that are helpful for working with Storm/Synapse."""
 
+
+import argparse
 import csv
 import getpass
 import json
@@ -30,6 +32,26 @@ def absjoin(*paths: str) -> str:
     """
 
     return os.path.abspath(os.path.join(*paths))
+
+
+def add_parser_parents(
+    parser: argparse.ArgumentParser, parents: argparse.ArgumentParser
+) -> argparse.ArgumentParser:
+    """Add parent parsers to an ArgumentParser after it is created.
+
+    Implementation borrowed from the init of ``argparse.ArgumentParser``.
+    """
+
+    for parent in parents:
+        parser._add_container_actions(parent)
+        try:
+            defaults = parent._defaults
+        except AttributeError:
+            pass
+        else:
+            parser._defaults.update(defaults)
+    
+    return parser
 
 
 def chk_storm_syntax(storm: str) -> None:
@@ -94,9 +116,19 @@ def get_cortex_creds(_user: str | None = None) -> tuple[str, str]:
     return username, password
 
 
+def get_cortex_token(prompt: bool = False) -> str:
+    if envtoken := os.environ.get("CORTEX_TOKEN"):
+        token = envtoken
+    elif prompt:
+        token = getpass.getpass("API Key: ")
+    else:
+        token = ""
+    return token
+
+
 async def get_cortex_obj(
+    cortex: str = "",
     http: bool = True,
-    cortex: bool = False,
     local: bool = False,
     ssl_verify: bool = True,
     username: str = "",
@@ -105,6 +137,8 @@ async def get_cortex_obj(
 ):
     if cortex and local:
         raise ValueError("Can't use both cortex and local in get_cortex_obj!")
+    elif local:
+        core_obj = s_cortex.getTempCortex
     elif cortex:
         if http:
             core_obj = functools.partial(
@@ -117,11 +151,9 @@ async def get_cortex_obj(
             )
         else:
             core_obj = functools.partial(tpath_proxy_contextmanager, cortex)
-    elif local:
-        core_obj = s_cortex.getTempCortex
     else:
         raise ValueError(
-            "Must provide a Cortex URL (--cortex) or use a temp Cortex (--local)!"
+            "Must provide a Cortex URL (cortex) or use a temp Cortex (local/test)!"
         )
 
     return core_obj
