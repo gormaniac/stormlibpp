@@ -165,7 +165,14 @@ class HttpCortex:
             This will likely either be from an HTTP error, a connection error,
             or an error decoding the JSON response.
         """
+
         url = "/api/v1/feed"
+
+        # Convert bytes items to NodeTuples for JSON compatibility.
+        items = list(items)
+        for index in range(len(items)):
+            if isinstance(items[index], bytes):
+                items[index] = s_msgpack.un(items[index])
 
         data = {"items": items}
 
@@ -173,7 +180,7 @@ class HttpCortex:
             data["view"] = viewiden
 
         if name:
-            data = {"name": name}
+            data["name"] = name
 
         try:
             async with self.sess.post(url, json=data, ssl=self.ssl_verify) as resp:
