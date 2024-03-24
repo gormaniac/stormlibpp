@@ -73,7 +73,7 @@ import synapse.common as s_common
 import synapse.telepath as s_telepath
 import yaml
 
-from ._args import USER_PARSER
+from ._args import USER_PARSER, VERIFY_PARSER
 from .httpcore import HttpCortex
 from .output import handle_msg, log_storm_msg, OUTP
 from .stormcli import start_storm_cli
@@ -239,7 +239,7 @@ def find_data_files(orig: str, files: list[str]) -> tuple[str, str]:
 def get_args(argv: list[str]):
     parser = argparse.ArgumentParser(
         description=DESCRIPTION,
-        parents=[USER_PARSER],
+        parents=[USER_PARSER, VERIFY_PARSER],
         formatter_class=argparse.RawDescriptionHelpFormatter,
     )
     parser.add_argument(
@@ -279,11 +279,6 @@ def get_args(argv: list[str]):
             "Start a temp Cortex locally to execute the Storm scripts"
             " on and enter a CLI for afterwards"
         ),
-        action="store_true",
-    )
-    parser.add_argument(
-        "--no-verify",
-        help="Skips verification of the Cortex's certificate when using --http",
         action="store_true",
     )
     parser.add_argument(
