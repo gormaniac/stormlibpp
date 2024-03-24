@@ -7,6 +7,7 @@ HTTP. For example, the ``hstorm`` CLI replaces a ``Cortex`` object with an
 
 
 import aiohttp
+import collections.abc
 import json
 
 import synapse.lib.msgpack as s_msgpack
@@ -100,6 +101,7 @@ class HttpCortex:
         url: str = "https://localhost:4443",
         usr: str = "",
         pwd: str = "",
+        token: str = "",
         default_opts: dict = {"repr": True},
         ssl_verify: bool = True,
     ) -> None:
@@ -109,6 +111,7 @@ class HttpCortex:
 
         self.usr = usr
         self.pwd = pwd
+        self.token = token
 
         self.sess = aiohttp.ClientSession(
             self.url, raise_for_status=True, read_timeout=0
@@ -167,7 +170,9 @@ class HttpCortex:
 
     # TODO - Support API key base authentication
     async def login(self):
-        """Login to the Cortex with the user/pass supplied at instantiation.
+        """Login to the Cortex with the user/pass (or API key) supplied at instantiation.
+
+        If a user/pass is supplied, cookie based authentication is used.
 
         Sets the cookie returned by the Cortex in the underlying ``ClientSession``.
         Ignores the expiration date because there was errors adding the
@@ -176,32 +181,43 @@ class HttpCortex:
 
         Cortex cookies expire after 2 weeks. So this object shouldn't live
         longer than that without calling this method again.
+
+        If an API key is passed at instantiation, the user/pass combo is ignored 
+        and the ``ClientSession`` is configured to send the API key value in the
+        ``X-API-KEY`` header with every request.
         """
 
-        info = {"user": self.usr, "passwd": self.pwd}
-        url = "/api/v1/login"
+        if self.token:
+            self.sess.headers.add("X-API-KEY", self.token)
 
-        try:
-            async with self.sess.post(url, json=info, ssl=self.ssl_verify) as resp:
-                item = await resp.json()
-        except Exception as err:
-            raise HttpCortexLoginError(
-                f"Error making login request to {self.url}: {err}", err
-            ) from err
+        elif self.usr and self.pwd:
+            info = {"user": self.usr, "passwd": self.pwd}
+            url = "/api/v1/login"
 
-        if item.get("status") != "ok":
-            code = item.get("code")
-            mesg = item.get("mesg")
-            raise HttpCortexLoginError(f"Login error ({code}): {mesg}")
+            try:
+                async with self.sess.post(url, json=info, ssl=self.ssl_verify) as resp:
+                    item = await resp.json()
+            except Exception as err:
+                raise HttpCortexLoginError(
+                    f"Error making login request to {self.url}: {err}", err
+                ) from err
 
-        session_cookie = resp.cookies.get("sess")
+            if item.get("status") != "ok":
+                code = item.get("code")
+                mesg = item.get("mesg")
+                raise HttpCortexLoginError(f"Login error ({code}): {mesg}")
 
-        if session_cookie is None:
-            raise HttpCortexLoginError(
-                "Successfully authenticated but Synapse did not send session cookie"
-            )
+            session_cookie = resp.cookies.get("sess")
 
-        self.sess.cookie_jar.update_cookies({"sess": session_cookie.value})
+            if session_cookie is None:
+                raise HttpCortexLoginError(
+                    "Successfully authenticated but Synapse did not send session cookie"
+                )
+
+            self.sess.cookie_jar.update_cookies({"sess": session_cookie.value})
+
+        else:
+            raise HttpCortexLoginError(f"No user/pass or API key passed to HTTPCortex!")
 
     async def stop(self):
         """Stop this instance by closing its HTTP session."""
@@ -210,7 +226,7 @@ class HttpCortex:
 
     async def storm(
         self, text: str, opts: dict | None = None, tuplify: bool = True
-    ) -> StormMsg:
+    ) -> collections.abc.AsyncGenerator[StormMsg, None]:
         """Evaulate a Storm query and yield the streamed Storm messages.
 
         Parameters
