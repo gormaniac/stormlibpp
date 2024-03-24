@@ -410,6 +410,11 @@ class HttpCortex:
                 f"Unable to execute storm on {self.url}: {err}", err
             ) from err
 
+    async def stormlist(
+        self, text: str, opts: dict | None = None, tuplify: bool = True
+    ) -> list[StormMsg]:
+        return [msg async for msg in self.storm(text, opts=opts, tuplify=tuplify)]
+
     # TODO - Implement these methods so we can fully support Storm CLI features.
     # NOTE - It's going to be tough to do these over HTTP until the Axon APIs
     #        are proxied by the Cortex API.
