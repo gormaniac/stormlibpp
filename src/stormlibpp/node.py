@@ -1,7 +1,6 @@
 """Work with storm:node objects in Python."""
 
 
-from types import SimpleNamespace
 from typing import Any, TypedDict
 
 
@@ -67,8 +66,8 @@ class ItemContainer:
     To convert this object to a ``dict`` of the items it holds,
     call ``vars`` on an instance.
 
-    Arguments
-    ---------
+    Parameters
+    ----------
     All keyword args passed at instantiation are added to the container as initial
     values. These are not required and no args passed just creates an empty container.
     """

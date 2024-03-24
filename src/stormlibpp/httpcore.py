@@ -92,6 +92,8 @@ class HttpCortex:
         The username to authenticate with, by default `""`.
     pwd : str, optional
         The password to authenticate with, by default `""`.
+    token : str, optional
+        A token to authenticate with, instead of usr/pwd, by default `""`.
     default_opts : dict, optional
         The default Storm options to pass with every request made by this instance.
         Set this to an empty dict to disable. By default `{"repr": True}`.
