@@ -19,6 +19,8 @@ from .errors import (
     HttpCortexNotImplementedError,
 )
 
+from .node import NodeTuple
+
 
 StormMsgType = str
 """The type of a Storm message.
@@ -37,6 +39,7 @@ See `Storm Message Types`_.
 """
 
 
+# TODO - Make sure that raised errors subclass `synapse.exc.SynErr` for compatability
 class HttpCortex:
     """A class with some methods from synapse.cortex.Cortex but over HTTP.
 
@@ -128,6 +131,56 @@ class HttpCortex:
         if not opts:
             opts = self.default_opts
         return {"query": text, "opts": opts}
+
+    async def addFeedData(
+        self,
+        name: str | None,
+        items: list[NodeTuple],
+        *,
+        viewiden: str | None = None
+    ):
+        """Feed node tuples to the Cortex.
+
+        Parameters
+        ----------
+        name : str | None
+            An "optional" name to give the import
+        items : list[NodeTuple]
+            A list of NodeTuples that will be imported into the Cortex.
+        viewiden : str | None, optional
+            A specific view to import data to, the default view is used if None,
+            by default None.
+
+        Returns
+        -------
+        dict
+            The return from the ``/api/v1/feed`` endpoint.
+
+        Raises
+        ------
+        HttpCortexError
+            If an exception is raised when making an HTTP request to the Cortex.
+            This will likely either be from an HTTP error, a connection error,
+            or an error decoding the JSON response.
+        """
+        url = "/api/v1/feed"
+
+        data = {"items": items}
+
+        if viewiden is not None:
+            data["view"] = viewiden
+
+        if name:
+            data = {"name": name}
+
+        try:
+            async with self.sess.post(url, json=data, ssl=self.ssl_verify) as resp:
+                data = await resp.json()
+                return data
+        except Exception as err:
+            raise HttpCortexError(
+                f"Unable to feed nodes to {self.url}: {err}", err
+            ) from err
 
     async def callStorm(self, text: str, opts: dict | None = None):
         """Execute a Storm query and return the value passed to a Storm return() call.
@@ -358,6 +411,8 @@ class HttpCortex:
             ) from err
 
     # TODO - Implement these methods so we can fully support Storm CLI features.
+    # NOTE - It's going to be tough to do these over HTTP until the Axon APIs
+    #        are proxied by the Cortex API.
     async def getAxonBytes(self, *args, **kwargs):
         """Not implemented - here to support an HTTP Storm CLI."""
         raise HttpCortexNotImplementedError(
