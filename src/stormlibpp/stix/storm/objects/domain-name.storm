@@ -1,5 +1,38 @@
-// TODO - Make sure value is the right key for this
+function id_from_bundle(bun, obj_id) {
+    for $obj in $bun {
+        if ($obj.id = $obj_id) {
+            return ($obj)
+        }
+    }
+}
+
+function find_resolves(refs) {
+    for $ref in $refs {
+        $resolves_obj = $id_from_bundle($bundle, $ref)
+        ($ok, $val) = $lib.trycast(inet:ipv4, $resolves_obj.value)
+        if $ok {
+            [(inet:dns:a=($object.value, $val))]
+        }
+        ($ok, $val) = $lib.trycast(inet:ipv6, $resolves_obj.value)
+        if $ok {
+            [(inet:dns:aaaa=($object.value, $val))]
+        }
+        ($ok, $val) = $lib.trycast(inet:fqdn, $resolves_obj.value)
+        if $ok {
+            [(inet:dns:cname=($object.value, $val))]
+        }
+        [ <(refs)+ { it:sec:stix:bundle:id=$bundle.id } ]
+        | spin |
+    }
+    fini { return() }
+}
+
 [inet:fqdn=$object.value]
+
+if $object.resolves_to_refs {
+    $find_resolves($object.resolves_to_refs)
+}
+
 [ <(refs)+ { it:sec:stix:bundle:id=$bundle.id } ]
 $node.data.set(`stix:object:bundle:{$bundle.id}`, $object)
 return($node)

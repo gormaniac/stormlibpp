@@ -1,1 +1,15 @@
-// TODO - Figure out what these look like.
+($ok, $name) = $lib.trycast(it:prod:softname, $object.name)
+if $ok {
+    it:prod:softname=$name -> it:prod:soft
+    [ <(refs)+ { it:sec:stix:bundle:id=$bundle.id } ]
+    return($node)
+    [ 
+        it:prod:soft=*
+        :name=$name
+        :cpe?=$object.cpe
+    ]
+    // TODO - Resolve software vendor
+    [ <(refs)+ { it:sec:stix:bundle:id=$bundle.id } ]
+    $node.data.set(`stix:object:bundle:{$bundle.id}`, $object)
+    return($node)
+}

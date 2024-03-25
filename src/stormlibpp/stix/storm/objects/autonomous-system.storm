@@ -1,5 +1,7 @@
-// TODO - Make sure value is the right key for this
-[inet:as=$object.value]
+[
+    inet:as=$object.number
+    :name?=$object.name
+]
 [ <(refs)+ { it:sec:stix:bundle:id=$bundle.id } ]
 $node.data.set(`stix:object:bundle:{$bundle.id}`, $object)
 return($node)

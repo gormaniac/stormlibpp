@@ -1,5 +1,4 @@
-// TODO - Make sure value is the right key for this
-[inet:url=`{$object.value}`]
+[inet:url=$object.value]
 [ <(refs)+ { it:sec:stix:bundle:id=$bundle.id } ]
 $node.data.set(`stix:object:bundle:{$bundle.id}`, $object)
 return($node)

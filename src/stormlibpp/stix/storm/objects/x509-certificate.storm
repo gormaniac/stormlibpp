@@ -1,1 +1,55 @@
-// TODO - Figure out what these look like.
+function resolve_file_bytes(hashes) {
+    if (hashes."MD5" != $lib.null) {
+        file:bytes:md5=hashes."MD5"
+    }
+    elif (hashes."SHA-1" != $lib.null) {
+        file:bytes:sha1=hashes."SHA-1"
+    }
+    elif (hashes."SHA-256" != $lib.null) {
+        file:bytes:sha256=hashes."SHA-256"
+    }
+    elif (hashes."SHA-512" != $lib.null) {
+        file:bytes:sha512=hashes."SHA-512"
+    }
+    return($node)
+}
+
+function gen_cert() {
+    if ($object.hashes != $lib.null) {
+        crypto:x509:cert:file={yield $resolve_file_bytes($object.hashes)}
+        return($node)
+        file:bytes:md5?=$object.hashes."MD5"
+        file:bytes:sha1?=$object.hashes."SHA-1"
+        file:bytes:sha256?=$object.hashes."SHA-256"
+        return($node)
+    }
+    if ($object.serial_number != $lib.null) {
+        crypto:x509:cert:serial=$object.serial_number
+        return($node)
+    }
+    [crypto:x509:cert=(stix, "x509-certificate", $object.id)]
+    return($node)
+}
+
+
+yield $gen_cert()
+[
+    :serial?=$object.serial
+    :file?={yield $resolve_file_bytes($object.hashes)}
+    :version?=$object.version
+    :algo?=$object.signature_algorithm
+    :issuer?=$object.issuer
+    :subject?=$object.subject
+    :validity:notbefore?=$object.validity_not_before
+    :validity:notafter?=$object.validity_not_after
+]
+
+if ($object.hashes != $lib.null) {
+    :md5?=$object.hashes."MD5"
+    :sha1?=$object.hashes."SHA-1"
+    :sha256?=$object.hashes."SHA-256"
+}
+
+[ <(refs)+ { it:sec:stix:bundle:id=$bundle.id } ]
+$node.data.set(`stix:object:bundle:{$bundle.id}`, $object)
+return($node)
