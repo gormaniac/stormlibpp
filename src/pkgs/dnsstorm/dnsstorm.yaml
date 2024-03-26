@@ -1,5 +1,5 @@
 name: dns-storm
-version: 1.0.0
+version: 1.1.0
 guid: 55d397b5e6b5042077105ec0c803ab5e
 
 synapse_minversion: [2, 127, 0]
@@ -14,7 +14,7 @@ author:
 desc: A Rapid Power-Up that provides DNS over HTTPS using Cloudflare's 1.1.1.1 service.
 
 modules:
-  - name: dns.request.lib
+  - name: slib.dns.request.lib
 
 commands:
   - name: dns.request
