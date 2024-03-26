@@ -11,7 +11,7 @@ author:
   url: https://github.com/gormaniac
   name: John Gorman
 
-desc: A StormLib++ Synapse Rapid Power-Up for ingesting threat intel reports from the web.
+desc: A StormLib++ Synapse Rapid Power-Up for ingesting threat intel reports, and other articles, from the web.
 
 modules:
   - name: slib.report.ingest.lib
