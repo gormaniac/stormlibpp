@@ -4,7 +4,7 @@
     "url": "https://github.com/gormaniac"
   },
   "build": {
-    "time": 1711478737831
+    "time": 1711492520948
   },
   "commands": [
     {
@@ -59,7 +59,7 @@
       "storm": "init {\n    if $cmdopts.debug { $lib.debug = $lib.true }\n    $reportLib = $lib.import(slib.report.ingest.lib)\n}\n\n+inet:url\n\ndivert $cmdopts.yield $reportLib.ingestReport($node, scrape=$cmdopts.scrape, refs=$cmdopts.refs)"
     }
   ],
-  "desc": "A StormLib++ Synapse Rapid Power-Up for ingesting threat intel reports from the web.",
+  "desc": "A StormLib++ Synapse Rapid Power-Up for ingesting threat intel reports, and other articles, from the web.",
   "guid": "410ee625af02311e67a73e4db025e3d1",
   "modules": [
     {

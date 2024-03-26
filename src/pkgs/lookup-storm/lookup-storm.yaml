@@ -1,5 +1,5 @@
-name: stormlibpp-lookup-storm
-version: 0.2.0
+name: lookup-storm
+version: 1.0.0
 guid: c11ed838aeda991409415059e3b5beb2
 
 synapse_minversion: [2, 127, 0]
