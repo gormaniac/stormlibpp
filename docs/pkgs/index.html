@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Storm Packages &mdash; stormlibpp  documentation</title>
+  <title>Power-Ups &mdash; stormlibpp  documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css" />
 
@@ -21,7 +21,7 @@
     <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="lookup-storm" href="lookup-storm.html" />
+    <link rel="next" title="dnsstorm" href="dnsstorm.html" />
     <link rel="prev" title="Contribution Guide" href="../contributing.html" /> 
 </head>
 
@@ -48,9 +48,10 @@
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="../stormlibpp.html">stormlibpp package</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../contributing.html">Contribution Guide</a></li>
-<li class="toctree-l1 current"><a class="current reference internal" href="#">Storm Packages</a><ul>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Power-Ups</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#installation">Installation</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#package-docs">Package Docs</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#power-up-docs">Power-Up Docs</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="dnsstorm.html">dnsstorm</a></li>
 <li class="toctree-l3"><a class="reference internal" href="lookup-storm.html">lookup-storm</a></li>
 <li class="toctree-l3"><a class="reference internal" href="report-ingest.html">report-ingest</a></li>
 <li class="toctree-l3"><a class="reference internal" href="stix.html">stix</a></li>
@@ -74,7 +75,7 @@
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
       <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
-      <li class="breadcrumb-item active">Storm Packages</li>
+      <li class="breadcrumb-item active">Power-Ups</li>
       <li class="wy-breadcrumbs-aside">
             <a href="../_sources/pkgs/index.md.txt" rel="nofollow"> View page source</a>
       </li>
@@ -84,20 +85,25 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
              
-  <section id="storm-packages">
-<h1>Storm Packages<a class="headerlink" href="#storm-packages" title="Permalink to this heading"></a></h1>
-<p>StormLib++ comes with many helpful Storm Packages.</p>
+  <section id="power-ups">
+<h1>Power-Ups<a class="headerlink" href="#power-ups" title="Permalink to this heading"></a></h1>
+<p>StormLib++ comes with many helpful Storm Rapid Power-Ups.</p>
 <section id="installation">
 <h2>Installation<a class="headerlink" href="#installation" title="Permalink to this heading"></a></h2>
-<p>A shortcut for the above using the <code class="docutils literal notranslate"><span class="pre">Makefile</span></code>:</p>
+<p>To install ALL Power-Ups in StormLib++, you can use the following <code class="docutils literal notranslate"><span class="pre">make</span></code> commands:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>make<span class="w"> </span>build-storm<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span>make<span class="w"> </span>push-storm<span class="w"> </span><span class="nv">CORTEX</span><span class="o">=</span><span class="s2">&quot;&lt;Cortex Telepath URL&gt;&quot;</span>
 </pre></div>
 </div>
+<p>To pick and choose which packages you want, you may use the prebuilt package JSON files included in this repo along with the <code class="docutils literal notranslate"><span class="pre">pkg.load</span></code> Storm command. Or, build and push them yourself. See indivudual Power-Up installation instructions for more info.</p>
 </section>
-<section id="package-docs">
-<h2>Package Docs<a class="headerlink" href="#package-docs" title="Permalink to this heading"></a></h2>
+<section id="power-up-docs">
+<h2>Power-Up Docs<a class="headerlink" href="#power-up-docs" title="Permalink to this heading"></a></h2>
 <div class="toctree-wrapper compound">
 <ul>
+<li class="toctree-l1"><a class="reference internal" href="dnsstorm.html">dnsstorm</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="dnsstorm.html#examples">Examples</a></li>
+</ul>
+</li>
 <li class="toctree-l1"><a class="reference internal" href="lookup-storm.html">lookup-storm</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="lookup-storm.html#examples">Examples</a></li>
 <li class="toctree-l2"><a class="reference internal" href="lookup-storm.html#installation">Installation</a></li>
@@ -115,7 +121,7 @@
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
         <a href="../contributing.html" class="btn btn-neutral float-left" title="Contribution Guide" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
-        <a href="lookup-storm.html" class="btn btn-neutral float-right" title="lookup-storm" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="dnsstorm.html" class="btn btn-neutral float-right" title="dnsstorm" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>

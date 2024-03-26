@@ -1,0 +1,207 @@
+interactions:
+- request:
+    body: null
+    headers:
+      Accept:
+      - application/dns-json
+    method: GET
+    uri: https://cloudflare-dns.com/dns-query?name=google.com&type=1
+  response:
+    body:
+      string: '{"Status":0,"TC":false,"RD":true,"RA":true,"AD":false,"CD":false,"Question":[{"name":"google.com","type":1}],"Answer":[{"name":"google.com","type":1,"TTL":241,"data":"142.250.72.78"}]}'
+    headers:
+      Access-Control-Allow-Origin:
+      - '*'
+      CF-RAY:
+      - 7f3d9f3bbef21f3d-DEN
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '184'
+      Content-Type:
+      - application/dns-json
+      Date:
+      - Wed, 09 Aug 2023 05:33:02 GMT
+      Server:
+      - cloudflare
+    status:
+      code: 200
+      message: OK
+    url: https://cloudflare-dns.com/dns-query?name=google.com&type=1
+- request:
+    body: null
+    headers:
+      Accept:
+      - application/dns-json
+    method: GET
+    uri: https://cloudflare-dns.com/dns-query?name=google.com&type=2
+  response:
+    body:
+      string: '{"Status":0,"TC":false,"RD":true,"RA":true,"AD":false,"CD":false,"Question":[{"name":"google.com","type":2}],"Answer":[{"name":"google.com","type":2,"TTL":334148,"data":"ns1.google.com."},{"name":"google.com","type":2,"TTL":334148,"data":"ns3.google.com."},{"name":"google.com","type":2,"TTL":334148,"data":"ns4.google.com."},{"name":"google.com","type":2,"TTL":334148,"data":"ns2.google.com."}]}'
+    headers:
+      Access-Control-Allow-Origin:
+      - '*'
+      CF-RAY:
+      - 7f3d9f3c5d921f35-DEN
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '396'
+      Content-Type:
+      - application/dns-json
+      Date:
+      - Wed, 09 Aug 2023 05:33:02 GMT
+      Server:
+      - cloudflare
+    status:
+      code: 200
+      message: OK
+    url: https://cloudflare-dns.com/dns-query?name=google.com&type=2
+- request:
+    body: null
+    headers:
+      Accept:
+      - application/dns-json
+    method: GET
+    uri: https://cloudflare-dns.com/dns-query?name=google.com&type=15
+  response:
+    body:
+      string: '{"Status":0,"TC":false,"RD":true,"RA":true,"AD":false,"CD":false,"Question":[{"name":"google.com","type":15}],"Answer":[{"name":"google.com","type":15,"TTL":36,"data":"10
+        smtp.google.com."}]}'
+    headers:
+      Access-Control-Allow-Origin:
+      - '*'
+      CF-RAY:
+      - 7f3d9f3d1bfd1f9a-DEN
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '191'
+      Content-Type:
+      - application/dns-json
+      Date:
+      - Wed, 09 Aug 2023 05:33:02 GMT
+      Server:
+      - cloudflare
+    status:
+      code: 200
+      message: OK
+    url: https://cloudflare-dns.com/dns-query?name=google.com&type=15
+- request:
+    body: null
+    headers:
+      Accept:
+      - application/dns-json
+    method: GET
+    uri: https://cloudflare-dns.com/dns-query?name=google.com&type=16
+  response:
+    body:
+      string: '{"Status":0,"TC":false,"RD":true,"RA":true,"AD":false,"CD":false,"Question":[{"name":"google.com","type":16}],"Answer":[{"name":"google.com","type":16,"TTL":1213,"data":"\"atlassian-domain-verification=5YjTmWmjI92ewqkx2oXmBaD60Td9zWon9r6eakvHX6B77zzkFQto8PQ9QsKnbf4I\""},{"name":"google.com","type":16,"TTL":1213,"data":"\"onetrust-domain-verification=de01ed21f2fa4d8781cbc3ffb89cf4ef\""},{"name":"google.com","type":16,"TTL":1213,"data":"\"docusign=05958488-4752-4ef2-95eb-aa7ba8a3bd0e\""},{"name":"google.com","type":16,"TTL":1213,"data":"\"globalsign-smime-dv=CDYX+XFHUw2wml6/Gb8+59BsH31KzUr6c1l2BPvqKX8=\""},{"name":"google.com","type":16,"TTL":1213,"data":"\"google-site-verification=TV9-DBe4R80X4v0M4U_bd_J9cpOJM0nikft0jAgjmsQ\""},{"name":"google.com","type":16,"TTL":1213,"data":"\"docusign=1b0a6754-49b1-4db5-8540-d2c12664b289\""},{"name":"google.com","type":16,"TTL":1213,"data":"\"apple-domain-verification=30afIBcvSuDV2PLX\""},{"name":"google.com","type":16,"TTL":1213,"data":"\"webexdomainverification.8YX6G=6e6922db-e3e6-4a36-904e-a805c28087fa\""},{"name":"google.com","type":16,"TTL":1213,"data":"\"v=spf1
+        include:_spf.google.com ~all\""},{"name":"google.com","type":16,"TTL":1213,"data":"\"google-site-verification=wD8N7i1JTNTkezJ49swvWW48f8_9xveREV4oB-0Hf5o\""},{"name":"google.com","type":16,"TTL":1213,"data":"\"facebook-domain-verification=22rm551cu4k0ab0bxsw536tlds4h95\""},{"name":"google.com","type":16,"TTL":1213,"data":"\"MS=E4A68B9AB2BB9670BCE15412F62916164C0B20BB\""}]}'
+    headers:
+      Access-Control-Allow-Origin:
+      - '*'
+      CF-RAY:
+      - 7f3d9f3daa3c1f25-DEN
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '1495'
+      Content-Type:
+      - application/dns-json
+      Date:
+      - Wed, 09 Aug 2023 05:33:02 GMT
+      Server:
+      - cloudflare
+    status:
+      code: 200
+      message: OK
+    url: https://cloudflare-dns.com/dns-query?name=google.com&type=16
+- request:
+    body: null
+    headers:
+      Accept:
+      - application/dns-json
+    method: GET
+    uri: https://cloudflare-dns.com/dns-query?name=google.com&type=28
+  response:
+    body:
+      string: '{"Status":0,"TC":false,"RD":true,"RA":true,"AD":false,"CD":false,"Question":[{"name":"google.com","type":28}],"Answer":[{"name":"google.com","type":28,"TTL":136,"data":"2607:f8b0:400f:807::200e"}]}'
+    headers:
+      Access-Control-Allow-Origin:
+      - '*'
+      CF-RAY:
+      - 7f3d9f3e98ad1f4a-DEN
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '197'
+      Content-Type:
+      - application/dns-json
+      Date:
+      - Wed, 09 Aug 2023 05:33:03 GMT
+      Server:
+      - cloudflare
+    status:
+      code: 200
+      message: OK
+    url: https://cloudflare-dns.com/dns-query?name=google.com&type=28
+- request:
+    body: null
+    headers:
+      Accept:
+      - application/dns-json
+    method: GET
+    uri: https://cloudflare-dns.com/dns-query?name=1.1.1.1.in-addr.arpa&type=12
+  response:
+    body:
+      string: '{"Status":0,"TC":false,"RD":true,"RA":true,"AD":false,"CD":false,"Question":[{"name":"1.1.1.1.in-addr.arpa","type":12}],"Answer":[{"name":"1.1.1.1.in-addr.arpa","type":12,"TTL":280,"data":"one.one.one.one."}]}'
+    headers:
+      Access-Control-Allow-Origin:
+      - '*'
+      CF-RAY:
+      - 7f3d9f3f2fe31f46-DEN
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '209'
+      Content-Type:
+      - application/dns-json
+      Date:
+      - Wed, 09 Aug 2023 05:33:03 GMT
+      Server:
+      - cloudflare
+    status:
+      code: 200
+      message: OK
+    url: https://cloudflare-dns.com/dns-query?name=1.1.1.1.in-addr.arpa&type=12
+- request:
+    body: null
+    headers:
+      Accept:
+      - application/dns-json
+    method: GET
+    uri: https://cloudflare-dns.com/dns-query?name=8.8.8.8.in-addr.arpa&type=12
+  response:
+    body:
+      string: '{"Status":0,"TC":false,"RD":true,"RA":true,"AD":false,"CD":false,"Question":[{"name":"8.8.8.8.in-addr.arpa","type":12}],"Answer":[{"name":"8.8.8.8.in-addr.arpa","type":12,"TTL":83586,"data":"dns.google."}]}'
+    headers:
+      Access-Control-Allow-Origin:
+      - '*'
+      CF-RAY:
+      - 7f3d9f3fcd0b1f25-DEN
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '206'
+      Content-Type:
+      - application/dns-json
+      Date:
+      - Wed, 09 Aug 2023 05:33:03 GMT
+      Server:
+      - cloudflare
+    status:
+      code: 200
+      message: OK
+    url: https://cloudflare-dns.com/dns-query?name=8.8.8.8.in-addr.arpa&type=12
+version: 1
