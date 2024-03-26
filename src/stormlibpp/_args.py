@@ -30,7 +30,7 @@ USER_PARSER.add_argument(
 VERIFY_PARSER = argparse.ArgumentParser(add_help=False)
 VERIFY_PARSER.add_argument(
     "-n",
-    "",
+    "--no-verify",
     help="Skips verification of the Cortex's SSL certificate when using the HTTP API.",
     action="store_true",
 )
