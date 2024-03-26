@@ -1,0 +1,72 @@
+// Return a node from the input item, creating it if it doesn't already exist.
+// Not all nodes are supported, ?= notation is used to set the value based on the input,
+// the first node that winds up created will be returned. The following forms are supported
+// in this order:
+//
+//      hash:md5
+//      hash:sha1
+//      hash:sha256
+//      inet:cidr4
+//      inet:ipv4
+//      inet:ipv6
+//      inet:fqdn
+//      inet:email
+//      inet:server
+//      inet:url
+//      file:path
+//
+// Because both inet:server and inet:urlfile are supported, and in that order, it is
+// impossible for this function to return an inet:urlfile with the protocol tcp.
+//
+// Args
+//   - $item (str or comp): The item to use as a primary value when creating a node.
+// Returns: The first node created when passing $item to the above forms with ?= notation.
+function lookupOrCreate(item) {
+    [
+        // All our common hashes - we'll skip file:bytes
+        hash:md5?=$item
+        hash:sha1?=$item
+        hash:sha256?=$item
+
+        // IPv4 CIDRs have to go before normal IPs because 'inet:ipv4?="1.1.1.0/24"'
+        // lifts all nodes in that CIDR.
+        inet:cidr4?=$item
+        inet:ipv4?=$item
+
+        // We don't support cidr6 because Synapse accepts them as valid ipv6 nodes,
+        // and vice versa, so we only support ipv6.
+        inet:ipv6?=$item
+
+        // Some more common atomic indicators
+        inet:fqdn?=$item
+        inet:email?=$item
+
+        // Server has to go before url because tcp is valid for urls but http is not valid
+        // for servers.
+        inet:server?=$item
+        inet:url?=$item
+
+        // File paths may be an interesting atomic indicator
+        // file:bases were getting picked up as fqdns... so we'll skip those
+        file:path?=$item
+    ]
+
+    return ( $node )
+}
+
+// A version of lookupOrCreate that doesn't create nodes
+function lookupOnly(item) {
+    hash:md5?=$item
+    hash:sha1?=$item
+    hash:sha256?=$item
+    inet:cidr4?=$item
+    inet:ipv4?=$item
+    inet:ipv6?=$item
+    inet:fqdn?=$item
+    inet:email?=$item
+    inet:server?=$item
+    inet:url?=$item
+    file:path?=$item
+
+    return ( $node )
+}

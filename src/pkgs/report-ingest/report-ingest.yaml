@@ -1,0 +1,61 @@
+name: stormlibpp-report-ingest
+version: 0.1.0
+guid: 410ee625af02311e67a73e4db025e3d1
+
+synapse_minversion: [2, 127, 0]
+
+genopts:
+    dotstorm: true
+
+author:
+  url: https://github.com/gormaniac
+  name: John Gorman
+
+desc: A StormLib++ Synapse Rapid Power-Up for ingesting threat intel reports from the web.
+
+modules:
+  - name: slib.report.ingest.lib
+
+commands:
+  - name: slib.report.ingest
+    descr: |
+      Ingest a threat intel report - or other article - from the web.
+
+      Examples:
+  
+        // Ingest from a node and scrape the report text for new nodes, yielding them.
+        inet:url="https://example.com/APT-9000.html" | stix.ingest --scrape --yield
+
+        // Ingest+scrape the report and add refs edges between the media:news and new nodes.
+        inet:url="https://example.com/APT-9000.html" | stix.ingest --scrape --refs
+
+    cmdargs:
+      - - --scrape
+        - type: bool
+          default: false
+          action: store_true
+          help: Scrape the report text for IOCs.
+
+      - - --refs
+        - type: bool
+          default: false
+          action: store_true
+          help: Add a refs edge between the media:news node and the scrape nodes.
+
+      - - --yield
+        - type: bool
+          default: false
+          action: store_true
+          help: Yield the newly created nodes.
+
+      - - --debug
+        - type: bool
+          default: false
+          action: store_true
+          help: Enable debug output.
+  
+    forms:
+      input:
+        - inet:url
+      output:
+        - media:news

@@ -1,0 +1,62 @@
+function doReportRequest(url) {
+    $resp = $lib.inet.http.get($url)
+    if ($resp.code != 200) {
+        $lib.warn(`Error requesting the report URL "{$url}"\nHTTP Status Code: {$resp.code}`)
+        $lib.debug(`HTTP Error: {$resp.err}`)
+        $lib.raise(Error, "Could not get the report URL!")
+    } else {
+        return($resp.body)
+    }
+    return()
+}
+
+function createMediaNews(urlNode, fileNode) {
+    [
+        media:news=("report.ingest", $urlNode.value())
+        :url={yield $urlNode}
+        :url:fqdn?={yield $urlNode +inet:url :fqdn -> *}
+        :file={yield $fileNode}
+    ]
+    return($node)
+}
+
+function createFileBytes(respBody) {
+    try {
+        ($size, $sha256) = $lib.axon.put($respBody)
+    }
+    catch Error as err {
+        $size=$lib.null
+        $sha256=$lib.crypto.hashes.sha256($respBody)
+    }
+    file:bytes:sha256=$sha256
+    return($node)
+    [
+        file:bytes=`sha256:{$sha256}`
+        :size?=$size
+        :sha256=$sha256
+    ]
+    return($node)
+}
+
+function scrapeRespBody(respBody) {
+    $text = $respBody.decode()
+    for ($form, $valu, $info) in $lib.scrape.context($text) {
+        [ ( *$form ?= $valu ) ]
+    }
+    | uniq
+}
+
+function ingestReport(urlNode, scrape=$lib.false, refs=$lib.false) {
+    $respBody = $doReportRequest($urlNode.value())
+    $fileBytes = $createFileBytes($respBody)
+    $mediaNews = $createMediaNews($urlNode, $fileBytes)
+    if $scrape {
+        yield $scrapeRespBody($respBody)
+        if $refs {
+            { [<(refs)+ {yield $mediaNews}] }
+        }
+    }
+    fini {
+        yield $mediaNews
+    }
+}

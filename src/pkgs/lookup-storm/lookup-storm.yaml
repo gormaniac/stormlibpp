@@ -1,0 +1,73 @@
+name: stormlibpp-lookup-storm
+version: 0.2.0
+guid: c11ed838aeda991409415059e3b5beb2
+
+synapse_minversion: [2, 127, 0]
+
+genopts:
+    dotstorm: true
+
+author:
+  url: https://github.com/gormaniac
+  name: John Gorman
+
+desc: A StormLib++ Rapid Power-Up that provides a simple string lookup interface to yield nodes without a form.
+
+modules:
+  - name: slib.lookup.lib
+
+commands:
+  - name: lookup
+    descr: |
+      Lookup a string value (or values) in a Synapse instance, creating new nodes as appropriate.
+
+      A form is not needed, each input value is passed to the supported forms with ?= until
+      a node is successfully created. The following input forms are supported, in this order:
+
+        hash:md5
+        hash:sha1
+        hash:sha256
+        inet:cidr4
+        inet:ipv4
+        inet:ipv6
+        inet:fqdn
+        inet:email
+        inet:server
+        inet:url
+        file:path
+
+      Examples:
+
+        // Lookup a single IP address by string
+        lookup 1.1.1.1
+
+        // Lookup a hash, an IP address, and a file path in one command
+        lookup "d41d8cd98f00b204e9800998ecf8427e" "1.1.1.1" "C:\Windows\System32\calc.exe"
+
+    cmdargs:
+      - - items
+        - type: str
+          nargs: +
+          help: |
+            The items to lookup.
+
+      - - --read-only
+        - type: bool
+          default: false
+          action: store_true
+          help: Don't create nodes if they don't already exist.
+    
+    forms:
+      input: []
+      output:
+        - hash:md5
+        - hash:sha1
+        - hash:sha256
+        - inet:cidr4
+        - inet:ipv4
+        - inet:ipv6
+        - inet:fqdn
+        - inet:email
+        - inet:server
+        - inet:url
+        - file:path

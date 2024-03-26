@@ -1,0 +1,8 @@
+init {
+    if $cmdopts.debug { $lib.debug = $lib.true }
+    $reportLib = $lib.import(slib.report.ingest.lib)
+}
+
++inet:url
+
+divert $cmdopts.yield $reportLib.ingestReport($node, scrape=$cmdopts.scrape, refs=$cmdopts.refs)

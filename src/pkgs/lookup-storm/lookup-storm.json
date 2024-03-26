@@ -1,0 +1,66 @@
+{
+  "author": {
+    "name": "John Gorman",
+    "url": "https://github.com/gormaniac"
+  },
+  "build": {
+    "time": 1711478737182
+  },
+  "commands": [
+    {
+      "cmdargs": [
+        [
+          "items",
+          {
+            "help": "The items to lookup.\n",
+            "nargs": "+",
+            "type": "str"
+          }
+        ],
+        [
+          "--read-only",
+          {
+            "action": "store_true",
+            "default": false,
+            "help": "Don't create nodes if they don't already exist.",
+            "type": "bool"
+          }
+        ]
+      ],
+      "descr": "Lookup a string value (or values) in a Synapse instance, creating new nodes as appropriate.\n\nA form is not needed, each input value is passed to the supported forms with ?= until\na node is successfully created. The following input forms are supported, in this order:\n\n  hash:md5\n  hash:sha1\n  hash:sha256\n  inet:cidr4\n  inet:ipv4\n  inet:ipv6\n  inet:fqdn\n  inet:email\n  inet:server\n  inet:url\n  file:path\n\nExamples:\n\n  // Lookup a single IP address by string\n  lookup 1.1.1.1\n\n  // Lookup a hash, an IP address, and a file path in one command\n  lookup \"d41d8cd98f00b204e9800998ecf8427e\" \"1.1.1.1\" \"C:\\Windows\\System32\\calc.exe\"\n",
+      "forms": {
+        "input": [],
+        "output": [
+          "hash:md5",
+          "hash:sha1",
+          "hash:sha256",
+          "inet:cidr4",
+          "inet:ipv4",
+          "inet:ipv6",
+          "inet:fqdn",
+          "inet:email",
+          "inet:server",
+          "inet:url",
+          "file:path"
+        ]
+      },
+      "name": "lookup",
+      "storm": "init {\n    $lookupLib = $lib.import(slib.lookup.lib)\n    $inputItems = $cmdopts.items\n    $readOnly = $cmdopts.read_only\n}\n\nfor $item in $inputItems {\n    if $readOnly {\n        yield $lookupLib.lookupOnly($item)\n    }\n    else {\n        yield $lookupLib.lookupOrCreate($item)\n    }\n}\n"
+    }
+  ],
+  "desc": "A StormLib++ Rapid Power-Up that provides a simple string lookup interface to yield nodes without a form.",
+  "guid": "c11ed838aeda991409415059e3b5beb2",
+  "modules": [
+    {
+      "name": "slib.lookup.lib",
+      "storm": "// Return a node from the input item, creating it if it doesn't already exist.\n// Not all nodes are supported, ?= notation is used to set the value based on the input,\n// the first node that winds up created will be returned. The following forms are supported\n// in this order:\n//\n//      hash:md5\n//      hash:sha1\n//      hash:sha256\n//      inet:cidr4\n//      inet:ipv4\n//      inet:ipv6\n//      inet:fqdn\n//      inet:email\n//      inet:server\n//      inet:url\n//      file:path\n//\n// Because both inet:server and inet:urlfile are supported, and in that order, it is\n// impossible for this function to return an inet:urlfile with the protocol tcp.\n//\n// Args\n//   - $item (str or comp): The item to use as a primary value when creating a node.\n// Returns: The first node created when passing $item to the above forms with ?= notation.\nfunction lookupOrCreate(item) {\n    [\n        // All our common hashes - we'll skip file:bytes\n        hash:md5?=$item\n        hash:sha1?=$item\n        hash:sha256?=$item\n\n        // IPv4 CIDRs have to go before normal IPs because 'inet:ipv4?=\"1.1.1.0/24\"'\n        // lifts all nodes in that CIDR.\n        inet:cidr4?=$item\n        inet:ipv4?=$item\n\n        // We don't support cidr6 because Synapse accepts them as valid ipv6 nodes,\n        // and vice versa, so we only support ipv6.\n        inet:ipv6?=$item\n\n        // Some more common atomic indicators\n        inet:fqdn?=$item\n        inet:email?=$item\n\n        // Server has to go before url because tcp is valid for urls but http is not valid\n        // for servers.\n        inet:server?=$item\n        inet:url?=$item\n\n        // File paths may be an interesting atomic indicator\n        // file:bases were getting picked up as fqdns... so we'll skip those\n        file:path?=$item\n    ]\n\n    return ( $node )\n}\n\n// A version of lookupOrCreate that doesn't create nodes\nfunction lookupOnly(item) {\n    hash:md5?=$item\n    hash:sha1?=$item\n    hash:sha256?=$item\n    inet:cidr4?=$item\n    inet:ipv4?=$item\n    inet:ipv6?=$item\n    inet:fqdn?=$item\n    inet:email?=$item\n    inet:server?=$item\n    inet:url?=$item\n    file:path?=$item\n\n    return ( $node )\n}\n"
+    }
+  ],
+  "name": "stormlibpp-lookup-storm",
+  "synapse_minversion": [
+    2,
+    127,
+    0
+  ],
+  "version": "0.2.0"
+}

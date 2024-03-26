@@ -1,0 +1,36 @@
+init {
+    if $cmdopts.debug { $lib.debug = $lib.true }
+    $stixLib = $lib.import(slib.stix.lib)
+    $bundleURL = $cmdopts.url
+    $bundleObj = $cmdopts.obj
+
+    $bundleArgsPassed = (($bundleURL != "") or ($bundleObj != $lib.dict()))
+
+    if (($bundleURL != "") and ($bundleObj != $lib.dict())) {
+        $lib.raise(Error, "Cannot use both --url and --obj!")
+    }
+
+    $bundle = $lib.null
+}
+
+if (($node.form() = it:sec:stix:bundle) and ($bundleArgsPassed = $lib.false)) {
+    $bundle = $node.data.get(stix:bundle)
+}
+elif ($bundleURL != "") {
+    $resp = $lib.inet.http.get($bundleURL)
+    if ($resp.code != 200) {
+        $lib.print(`Error requesting the remote STIX bundle from "{$bundleURL}"\nHTTP Status Code: {$resp.code}`)
+        $lib.debug(`HTTP Error: {$resp.err}`)
+    } else {
+        $bundle = $lib.json.load($resp.body)
+    }
+}
+elif ($bundleObj != $lib.dict()) {
+    $bundle=$bundleObj
+}
+
+if ($bundle = $lib.null) {
+    $lib.raise(Error, "No bundle found!")
+}
+
+divert $cmdopts.yield $stixLib.ingest($bundle, yieldNodes=$cmdopts.yield)
