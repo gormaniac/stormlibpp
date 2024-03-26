@@ -1,0 +1,77 @@
+{
+  "author": {
+    "name": "John Gorman",
+    "url": "https://github.com/gormaniac"
+  },
+  "build": {
+    "time": 1711493042682
+  },
+  "commands": [
+    {
+      "cmdargs": [
+        [
+          "--scrape",
+          {
+            "action": "store_true",
+            "default": false,
+            "help": "Scrape the report text for IOCs.",
+            "type": "bool"
+          }
+        ],
+        [
+          "--refs",
+          {
+            "action": "store_true",
+            "default": false,
+            "help": "Add a refs edge between the media:news node and the scrape nodes.",
+            "type": "bool"
+          }
+        ],
+        [
+          "--yield",
+          {
+            "action": "store_true",
+            "default": false,
+            "help": "Yield the newly created nodes.",
+            "type": "bool"
+          }
+        ],
+        [
+          "--debug",
+          {
+            "action": "store_true",
+            "default": false,
+            "help": "Enable debug output.",
+            "type": "bool"
+          }
+        ]
+      ],
+      "descr": "Ingest a threat intel report - or other article - from the web.\n\nExamples:\n\n  // Ingest from a node and scrape the report text for new nodes, yielding them.\n  inet:url=\"https://example.com/APT-9000.html\" | stix.ingest --scrape --yield\n\n  // Ingest+scrape the report and add refs edges between the media:news and new nodes.\n  inet:url=\"https://example.com/APT-9000.html\" | stix.ingest --scrape --refs\n",
+      "forms": {
+        "input": [
+          "inet:url"
+        ],
+        "output": [
+          "media:news"
+        ]
+      },
+      "name": "slib.report.ingest",
+      "storm": "init {\n    if $cmdopts.debug { $lib.debug = $lib.true }\n    $reportLib = $lib.import(slib.report.ingest.lib)\n}\n\n+inet:url\n\ndivert $cmdopts.yield $reportLib.ingestReport($node, scrape=$cmdopts.scrape, refs=$cmdopts.refs)"
+    }
+  ],
+  "desc": "A StormLib++ Synapse Rapid Power-Up for ingesting threat intel reports, and other articles, from the web.",
+  "guid": "410ee625af02311e67a73e4db025e3d1",
+  "modules": [
+    {
+      "name": "slib.report.ingest.lib",
+      "storm": "function doReportRequest(url) {\n    $resp = $lib.inet.http.get($url)\n    if ($resp.code != 200) {\n        $lib.warn(`Error requesting the report URL \"{$url}\"\\nHTTP Status Code: {$resp.code}`)\n        $lib.debug(`HTTP Error: {$resp.err}`)\n        $lib.raise(Error, \"Could not get the report URL!\")\n    } else {\n        return($resp.body)\n    }\n    return()\n}\n\nfunction createMediaNews(urlNode, fileNode) {\n    [\n        media:news=(\"report.ingest\", $urlNode.value())\n        :url={yield $urlNode}\n        :url:fqdn?={yield $urlNode +inet:url :fqdn -> *}\n        :file={yield $fileNode}\n    ]\n    return($node)\n}\n\nfunction createFileBytes(respBody) {\n    try {\n        ($size, $sha256) = $lib.axon.put($respBody)\n    }\n    catch Error as err {\n        $size=$lib.null\n        $sha256=$lib.crypto.hashes.sha256($respBody)\n    }\n    file:bytes:sha256=$sha256\n    return($node)\n    [\n        file:bytes=`sha256:{$sha256}`\n        :size?=$size\n        :sha256=$sha256\n    ]\n    return($node)\n}\n\nfunction scrapeRespBody(respBody) {\n    $text = $respBody.decode()\n    for ($form, $valu, $info) in $lib.scrape.context($text) {\n        [ ( *$form ?= $valu ) ]\n    }\n    | uniq\n}\n\nfunction ingestReport(urlNode, scrape=$lib.false, refs=$lib.false) {\n    $respBody = $doReportRequest($urlNode.value())\n    $fileBytes = $createFileBytes($respBody)\n    $mediaNews = $createMediaNews($urlNode, $fileBytes)\n    if $scrape {\n        yield $scrapeRespBody($respBody)\n        if $refs {\n            { [<(refs)+ {yield $mediaNews}] }\n        }\n    }\n    fini {\n        yield $mediaNews\n    }\n}\n"
+    }
+  ],
+  "name": "stormlibpp-report-ingest",
+  "synapse_minversion": [
+    2,
+    127,
+    0
+  ],
+  "version": "0.1.0"
+}

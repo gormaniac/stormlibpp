@@ -1,0 +1,57 @@
+name: dns-storm
+version: 1.0.0
+guid: 55d397b5e6b5042077105ec0c803ab5e
+
+synapse_minversion: [2, 127, 0]
+
+genopts:
+    dotstorm: true
+
+author:
+  url: https://github.com/gormaniac
+  name: John Gorman
+
+desc: A Rapid Power-Up that provides DNS over HTTPS using Cloudflare's 1.1.1.1 service.
+
+modules:
+  - name: dns.request.lib
+
+commands:
+  - name: dns.request
+    descr: |
+      Query Cloudflare's DNS over HTTPS service for the input FQDNs.
+
+      Yields inet:dns:answer nodes.
+
+      Examples:
+
+        // Lift some inet:fqdn nodes and query their AAAA records
+        inet:fqdn | limit 5 | dns.request --type AAAA
+
+        // Make a DNS query using string input and then pivot to the inet:ipv4
+        // nodes corresponding to the DNS A records in the query's response
+        dns.request --query google.com | :a -> inet:dns:a :ipv4 -> inet:ipv4
+
+        // Lift an inet:ipv4 and make a reverse DNS query
+        inet:ipv4=1.1.1.1 | dns.request --type PTR
+
+    cmdargs:
+      - - --query
+        - type: str
+          default: ''
+          help: |
+            An FQDN string to query for.
+
+            Ignores any nodes in the pipeline and uses the string passed to this arg.
+
+      - - --type
+        - type: str
+          default: A
+          help: |
+            The type of DNS query to make (A, TXT, NS, etc.).
+
+            Defaults to DNS A records. See the mapping of supported query
+            types in the `dns.request.lib.storm` file.
+            
+            See the following link for further information on DNS query types:
+            https://en.wikipedia.org/wiki/List_of_DNS_record_types

@@ -1,0 +1,76 @@
+{
+  "author": {
+    "name": "John Gorman",
+    "url": "https://github.com/gormaniac"
+  },
+  "build": {
+    "time": 1711493043389
+  },
+  "commands": [
+    {
+      "cmdargs": [
+        [
+          "--url",
+          {
+            "default": "",
+            "help": "A URL pointing to a STIX bundle JSON.",
+            "type": "str"
+          }
+        ],
+        [
+          "--obj",
+          {
+            "default": {},
+            "help": "A data object containing a STIX bundle.",
+            "type": "data"
+          }
+        ],
+        [
+          "--yield",
+          {
+            "action": "store_true",
+            "default": false,
+            "help": "Yield the newly created nodes.",
+            "type": "bool"
+          }
+        ],
+        [
+          "--debug",
+          {
+            "action": "store_true",
+            "default": false,
+            "help": "Enable debug output.",
+            "type": "bool"
+          }
+        ]
+      ],
+      "descr": "Ingest a stix bundle.\n\nExamples:\n\n  // Ingest a remote STIX bundle\n  stix.ingest --url \"https://127.0.0.1/stix.json\"\n\n  // Ingest a STIX bundle that already exists in the runtime as \"$bundle\"\n  stix.ingest --obj $bundle\n\n  // Ingest an it:sec:stix:bundle that has a STIX bundle saved in node data as \"stix:bundle\"\n  it:sec:stix:bundle:id=1234 | stix.ingest\n",
+      "forms": {
+        "input": [
+          "it:sec:stix:bundle"
+        ]
+      },
+      "name": "slib.stix.ingest",
+      "storm": "init {\n    if $cmdopts.debug { $lib.debug = $lib.true }\n    $stixLib = $lib.import(slib.stix.lib)\n    $bundleURL = $cmdopts.url\n    $bundleObj = $cmdopts.obj\n\n    $bundleArgsPassed = (($bundleURL != \"\") or ($bundleObj != $lib.dict()))\n\n    if (($bundleURL != \"\") and ($bundleObj != $lib.dict())) {\n        $lib.raise(Error, \"Cannot use both --url and --obj!\")\n    }\n\n    $bundle = $lib.null\n}\n\nif (($node.form() = it:sec:stix:bundle) and ($bundleArgsPassed = $lib.false)) {\n    $bundle = $node.data.get(stix:bundle)\n}\nelif ($bundleURL != \"\") {\n    $resp = $lib.inet.http.get($bundleURL)\n    if ($resp.code != 200) {\n        $lib.print(`Error requesting the remote STIX bundle from \"{$bundleURL}\"\\nHTTP Status Code: {$resp.code}`)\n        $lib.debug(`HTTP Error: {$resp.err}`)\n    } else {\n        $bundle = $lib.json.load($resp.body)\n    }\n}\nelif ($bundleObj != $lib.dict()) {\n    $bundle=$bundleObj\n}\n\nif ($bundle = $lib.null) {\n    $lib.raise(Error, \"No bundle found!\")\n}\n\ndivert $cmdopts.yield $stixLib.ingest($bundle, yieldNodes=$cmdopts.yield)\n"
+    }
+  ],
+  "desc": "A StormLib++ Synapse Rapid Power-Up for ingesting stix bundles.",
+  "guid": "ebe2e7b2bcdf4a8a9456934474b3e63d",
+  "modules": [
+    {
+      "name": "slib.stix.lib",
+      "storm": "$importConfigUrl = \"https://raw.githubusercontent.com/gormaniac/stormlibpp/main/data/stix_import_conf.json\"\n\nfunction pullConfig(url=$importConfigUrl) {\n    $conf = $lib.null\n    $resp = $lib.inet.http.get($url)\n    if ($resp.code != 200) {\n        $lib.print(`Error requesting the STIX import config from \"{$url}\"\\nHTTP Status Code: {$resp.code}`)\n        $lib.debug(`HTTP Error: {$resp.err}`)\n        $lib.raise(Error, \"Could not pull the STIX import config!\")\n    } else {\n        $conf = $lib.json.load($resp.body)\n    }\n    return($conf)\n}\n\nfunction ingest(bundle, yieldNodes=$lib.false, config=$lib.null) {\n    if $config = $lib.null {\n        $config = $pullConfig()\n    }\n\n    divert $yieldNodes $lib.stix.import.ingest($bundle, config=$config)\n\n    if (($node.form() = it:sec:stix:bundle) {\n        $dataName = stix:bundle\n    } else {\n        $dataName = stix:object\n    }\n    $node.data.load($dataName)\n    // TODO - Pass node value and object to resolve extra relationships\n    //      Example, malware-analysis sample_ref or malware sample_refs.\n}"
+    },
+    {
+      "name": "slib.stix.admin",
+      "storm": ""
+    }
+  ],
+  "name": "stormlibpp-stix",
+  "synapse_minversion": [
+    2,
+    127,
+    0
+  ],
+  "version": "0.1.0"
+}

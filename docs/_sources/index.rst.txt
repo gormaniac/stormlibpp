@@ -1,6 +1,6 @@
 :github_url: https://github.com/gormaniac/stormlibpp
 
-Welcome to stormlibpp's documentation!
+Welcome to StormLib++'s documentation!
 =======================================
 
 .. toctree::
@@ -8,6 +8,8 @@ Welcome to stormlibpp's documentation!
    :caption: Contents:
 
    stormlibpp
+   contributing
+   pkgs/index
 
 * :ref:`modindex`
 * :ref:`search`

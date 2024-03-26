@@ -1,0 +1,95 @@
+// Storm code for making and ingesting DNS queries using Cloudflare's DoH service.
+
+$queryTypes = $lib.dict(A=1, AAAA=28, CNAME=5, MX=15, NS=2, PTR=12, TXT=16)
+
+function getDnsAnswer(fqdn, type=1) {
+    $url = "https://cloudflare-dns.com/dns-query"
+    $mime = "application/dns-json"
+
+    if ($type = '12' and not $fqdn.endswith(".in-addr.arpa")) {
+        $query = `{$fqdn}.in-addr.arpa`
+    }
+    else {
+        $query = $fqdn
+    }
+
+    $params = $lib.dict(name=$query, type=$type)
+    $headers = $lib.dict(Accept="application/dns-json")
+
+    $resp = $lib.inet.http.get($url, params=$params, headers=$headers)
+
+    if ( $resp.code = 200 ) {
+        $data = $resp.json()
+        return($data.Answer)
+    }
+    else {
+        if ( $resp.code = -1 ) {
+            $lib.log.error(`An exception occurred querying Cloudflare DoH service ({$query}): {$resp.err}`)
+        }
+        else {
+            $lib.log.warning(`An HTTP error was returned by Cloudflare's DoH service ({$query}): {$resp.code}`)
+        }
+    }
+
+    // Return an empty list if we got no answer
+    return($lib.list())
+}
+
+function ingestAnswer(answer, query, qtime) {
+    [
+        inet:dns:answer=($query, $answer.type, $answer.name, $answer.data, $qtime)
+        :ttl=$answer.TTL
+        // For now using slightly different seeds so we don't get the same GUID for both nodes - maybe change this?
+        // TODO - Make it so one unique request can be used across all answers from said request
+        :request={[( inet:dns:request=($query, $answer.data, $qtime) :time=$qtime :query:name=$query )]}
+        // TODO - this isn't supported until Synapse v2.144 or later
+        // :time=$qtime
+    ]
+
+    switch $answer.type {
+        1: { [ :a=($answer.name, $answer.data) ] }
+        28: { [ :aaaa=($answer.name, $answer.data) ] }
+        // TODO - I'm not sure if CNAME queries are actually working?
+        5: { [ :cname=($answer.name, $answer.data) ] }
+        15: {
+            ($pri, $name) = $answer.data.split(" ")
+            [ :mx=($answer.name, $name) ]
+            [ :mx:priority=$pri ]
+        }
+        2: { [ :ns=($answer.name, $answer.data) ] }
+        // TODO - Update the :dns:rev prop of the inet:ipv4/6 nodes
+        12: {
+            ($ok, $_) = $lib.trycast(inet:ipv4, $query)
+            $ip = $answer.name.rstrip(".in-addr.arpa")
+            if $ok {
+                [ :rev=($ip, $answer.data) ]
+            }
+            else {
+                [ :rev6=($ip, $answer.data) ]
+            }
+        }
+        16: { [ :txt?=($answer.name, $answer.data) ] }
+        *: { $lib.log.info(`getAnswer does not support the DNS query type {$answer.type}`) }
+    }
+
+    return($node)
+}
+
+function doQuery(query, type="A") {
+    $answers = $lib.set()
+    $qtime = $lib.time.now()
+
+    $typeNum = $queryTypes.$type
+    if ($typeNum = $lib.null) {
+        $lib.log.warning(`Invalid DNS query type passed to dns.request.lib.query {$type}`)
+        stop
+    }
+
+    $dnsResponses = $getDnsAnswer($query, type=$typeNum)
+
+    for $dnsAnswer in $dnsResponses {
+        emit $ingestAnswer($dnsAnswer, $query, $qtime)
+    }
+
+    stop
+}

@@ -10,8 +10,16 @@ change-version: # Change the version of this project (requires VERSION=#.#.#)
 	pipenv run python3 scripts/changever.py $(VERSION)
 
 .PHONY: build
-build: # Build the package tarball and wheel
+build: # Build the Python package tarball and wheel
 	pipenv run python3 -m build .
+
+.PHONY: build-storm
+build-storm: # Build all Storm packages in this project
+	./scripts/pkgs/build.sh
+
+.PHONY: push-storm
+push: # Push all package JSON files to a Cortex (requires CORTEX=<Telepath URL>)
+	./scripts/pkgs/push.sh $(CORTEX)
 
 .PHONY: setup
 setup: # Setup this project's pipenv environment
@@ -23,6 +31,7 @@ install-self: # Install this project's python package using the pipenv's pip
 
 .PHONY: docs
 docs: # Build the documentation for this package
+	./scripts/pkgs/copy-docs.sh
 	pipenv run sphinx-apidoc -T -f -o doc $(PKG_DIR)
 	pipenv run sphinx-build doc/ docs/
 
@@ -37,6 +46,7 @@ clean-py: # Clean up Python generated files
 clean: clean-py # Remove build files - including a forced "git rm" of "dist/*"
 	git rm -f dist/* --ignore-unmatch
 	rm -rf dist
+	rm -rf src/private
 
 .PHONY: read-docs
 read-docs: # Open the package docs locally

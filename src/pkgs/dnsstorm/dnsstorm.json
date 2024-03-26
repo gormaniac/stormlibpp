@@ -1,0 +1,49 @@
+{
+  "author": {
+    "name": "John Gorman",
+    "url": "https://github.com/gormaniac"
+  },
+  "build": {
+    "time": 1711493041271
+  },
+  "commands": [
+    {
+      "cmdargs": [
+        [
+          "--query",
+          {
+            "default": "",
+            "help": "An FQDN string to query for.\n\nIgnores any nodes in the pipeline and uses the string passed to this arg.\n",
+            "type": "str"
+          }
+        ],
+        [
+          "--type",
+          {
+            "default": "A",
+            "help": "The type of DNS query to make (A, TXT, NS, etc.).\n\nDefaults to DNS A records. See the mapping of supported query\ntypes in the `dns.request.lib.storm` file.\n\nSee the following link for further information on DNS query types:\nhttps://en.wikipedia.org/wiki/List_of_DNS_record_types\n",
+            "type": "str"
+          }
+        ]
+      ],
+      "descr": "Query Cloudflare's DNS over HTTPS service for the input FQDNs.\n\nYields inet:dns:answer nodes.\n\nExamples:\n\n  // Lift some inet:fqdn nodes and query their AAAA records\n  inet:fqdn | limit 5 | dns.request --type AAAA\n\n  // Make a DNS query using string input and then pivot to the inet:ipv4\n  // nodes corresponding to the DNS A records in the query's response\n  dns.request --query google.com | :a -> inet:dns:a :ipv4 -> inet:ipv4\n\n  // Lift an inet:ipv4 and make a reverse DNS query\n  inet:ipv4=1.1.1.1 | dns.request --type PTR\n",
+      "name": "dns.request",
+      "storm": "init {\n    $dnslib = $lib.import(dns.request.lib)\n    // TODO - cast query to an inet:fqdn (or an inet:ipv4 for ptr?) so we can error on bad input\n    $queryOpt = $cmdopts.query\n    // TODO - validate type on init\n    $typeOpt = $cmdopts.type\n}\n\n// Use the value in --query if it is passed\nif ( $queryOpt != '' ) {\n    // We spin when --query is used because this isn't meant to accept inbound nodes.\n    | spin |\n\n    // TODO - Make the yields optional\n    for $answer in $dnslib.doQuery($queryOpt, type=$typeOpt) {\n        yield $answer\n    }\n}\nelse {\n    $query = ''\n\n    switch $node.form() {\n        \"inet:ipv4\": {\n            if ($typeOpt = 'PTR') {\n                $query = $node.repr()\n            }\n        }\n        \"inet:fqdn\": {\n            $query = $node.value()\n        }\n    }\n\n    if ($query != '') {\n        for $answer in $dnslib.doQuery($query, type=$typeOpt) {\n            // TODO - Is it better to store the answer in a set?\n            // I think this could exponentially increase the pipeline\n            yield $answer\n        }\n    }\n}\n"
+    }
+  ],
+  "desc": "A Rapid Power-Up that provides DNS over HTTPS using Cloudflare's 1.1.1.1 service.",
+  "guid": "55d397b5e6b5042077105ec0c803ab5e",
+  "modules": [
+    {
+      "name": "dns.request.lib",
+      "storm": "// Storm code for making and ingesting DNS queries using Cloudflare's DoH service.\n\n$queryTypes = $lib.dict(A=1, AAAA=28, CNAME=5, MX=15, NS=2, PTR=12, TXT=16)\n\nfunction getDnsAnswer(fqdn, type=1) {\n    $url = \"https://cloudflare-dns.com/dns-query\"\n    $mime = \"application/dns-json\"\n\n    if ($type = '12' and not $fqdn.endswith(\".in-addr.arpa\")) {\n        $query = `{$fqdn}.in-addr.arpa`\n    }\n    else {\n        $query = $fqdn\n    }\n\n    $params = $lib.dict(name=$query, type=$type)\n    $headers = $lib.dict(Accept=\"application/dns-json\")\n\n    $resp = $lib.inet.http.get($url, params=$params, headers=$headers)\n\n    if ( $resp.code = 200 ) {\n        $data = $resp.json()\n        return($data.Answer)\n    }\n    else {\n        if ( $resp.code = -1 ) {\n            $lib.log.error(`An exception occurred querying Cloudflare DoH service ({$query}): {$resp.err}`)\n        }\n        else {\n            $lib.log.warning(`An HTTP error was returned by Cloudflare's DoH service ({$query}): {$resp.code}`)\n        }\n    }\n\n    // Return an empty list if we got no answer\n    return($lib.list())\n}\n\nfunction ingestAnswer(answer, query, qtime) {\n    [\n        inet:dns:answer=($query, $answer.type, $answer.name, $answer.data, $qtime)\n        :ttl=$answer.TTL\n        // For now using slightly different seeds so we don't get the same GUID for both nodes - maybe change this?\n        // TODO - Make it so one unique request can be used across all answers from said request\n        :request={[( inet:dns:request=($query, $answer.data, $qtime) :time=$qtime :query:name=$query )]}\n        // TODO - this isn't supported until Synapse v2.144 or later\n        // :time=$qtime\n    ]\n\n    switch $answer.type {\n        1: { [ :a=($answer.name, $answer.data) ] }\n        28: { [ :aaaa=($answer.name, $answer.data) ] }\n        // TODO - I'm not sure if CNAME queries are actually working?\n        5: { [ :cname=($answer.name, $answer.data) ] }\n        15: {\n            ($pri, $name) = $answer.data.split(\" \")\n            [ :mx=($answer.name, $name) ]\n            [ :mx:priority=$pri ]\n        }\n        2: { [ :ns=($answer.name, $answer.data) ] }\n        // TODO - Update the :dns:rev prop of the inet:ipv4/6 nodes\n        12: {\n            ($ok, $_) = $lib.trycast(inet:ipv4, $query)\n            $ip = $answer.name.rstrip(\".in-addr.arpa\")\n            if $ok {\n                [ :rev=($ip, $answer.data) ]\n            }\n            else {\n                [ :rev6=($ip, $answer.data) ]\n            }\n        }\n        16: { [ :txt?=($answer.name, $answer.data) ] }\n        *: { $lib.log.info(`getAnswer does not support the DNS query type {$answer.type}`) }\n    }\n\n    return($node)\n}\n\nfunction doQuery(query, type=\"A\") {\n    $answers = $lib.set()\n    $qtime = $lib.time.now()\n\n    $typeNum = $queryTypes.$type\n    if ($typeNum = $lib.null) {\n        $lib.log.warning(`Invalid DNS query type passed to dns.request.lib.query {$type}`)\n        stop\n    }\n\n    $dnsResponses = $getDnsAnswer($query, type=$typeNum)\n\n    for $dnsAnswer in $dnsResponses {\n        emit $ingestAnswer($dnsAnswer, $query, $qtime)\n    }\n\n    stop\n}\n"
+    }
+  ],
+  "name": "dns-storm",
+  "synapse_minversion": [
+    2,
+    127,
+    0
+  ],
+  "version": "1.0.0"
+}
