@@ -3,12 +3,13 @@
 TODO - Put a long docstring here so it gets include in docs
 """
 
-
 from collections.abc import Callable
 
 import marko
 
 from .. import StormNode
+from . import md
+from . import utils
 
 
 DocNodeExtractor = Callable[["StormGenDoc", str, str, str], list["DocNode"]]
@@ -21,13 +22,22 @@ class DocPart:
     def __init__(self, heading: marko.block.Heading | None) -> None:
         self.blocks: list[marko.block.BlockElement] = []
         self.heading = heading
+        self.title = ""
         self.level = 0
 
         if self.heading is not None:
             self.level = self.heading.level
+            self.title = md.title_from_heading(self.heading)
+            self.stripped_title = utils.strip_comment(self.title)
+
+    def __repr__(self) -> str:
+        return f"<DocPart: {self.title}>"
 
     def add_block(self, block: marko.block.BlockElement):
         self.blocks.append(block)
+
+    def markdown(self):
+        return md.md_from_parts([self])
 
 
 class StormGenDoc:
@@ -62,21 +72,29 @@ class StormGenDoc:
 
             part.add_block(child)
 
-        return
+        # Catch the last part
+        if part not in self.parts:
+            self.parts.append(part)
 
 
 class DocNode:
     """A node defined in Markdown - as a grouping of ``DocPart`` objects."""
 
-    def __init__(self, parts: list[DocPart], form: str) -> None:
-        self.parts = parts
+    def __init__(self, form: str, valu: str) -> None:
         self.form = form
-        self.valu: str = ""
+        self.valu = valu
+        self.parts: list[DocPart] = []
         self.props: list[DocPart] = []
         self.tags: list[DocPart] = []
         self.edges: list[DocPart] = []
 
         self.extract()
+
+    def __repr__(self) -> str:
+        return f"<DocNode: {self.form}={self.valu}>"
+
+    def add_part(self, part: DocPart) -> None:
+        self.parts.append(part)
 
     def extract(self):
         """Extract all parts of a DocNode from the input parts."""
@@ -99,23 +117,50 @@ class DocExtractor:
         doc_type: str = "full",
         form: str = "",
         nodes_header: str = "Nodes",
+        form_level: str = 2,
     ) -> None:
         self.doc = doc
         self.dtype = doc_type
         self.form = form
         self.nheader = nodes_header
+        self.flevel = form_level
+        self.nlevel = self.flevel + 1
 
         if doc_type not in self.types:
             raise ValueError(f"Unsupported type ({doc_type}) passed to DocExtractor!")
 
     def _extract_embedded(self):
+        # TODO - Figure out how to discover the nodes header.
         pass
 
     def _extract_forms(self):
-        pass
+        return self._extract(self.doc.parts, form=self.form)
 
     def _extract_full(self):
-        pass
+        return self._extract(self.doc.parts)
+
+    def _extract(self, parts: list[DocPart], form=""):
+        nodes: list[DocNode] = []
+        node: DocNode | None = None
+        cur_form = form
+
+        for part in parts:
+            if part.level == self.flevel:
+                if not form:
+                    cur_form = part.title
+            if part.level == self.nlevel:
+                if node is not None:
+                    nodes.append(node)
+                node = DocNode(cur_form, part.stripped_title)
+                node.add_part(part)
+            if part.level > self.nlevel:
+                node.add_part(part)
+
+        # Catch the last node
+        if isinstance(node, DocNode) and node not in nodes:
+            nodes.append(node)
+
+        return nodes
 
     def extract(self) -> list[DocNode]:
         """Get the ``DocNode`` objects from the input document."""

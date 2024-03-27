@@ -67,7 +67,7 @@ Values for arrays can be markdown lists instead of code blocks with Storm lists 
 - Visual Studio Code
 - Code
 
-### Edges
+#### Edges
 
 You can document all the kinds of edges a particular node should have.
 
@@ -112,6 +112,6 @@ It is best practice, if applicable, to use the seed values of a GUID in a commen
 
 Only the last comment separator is recognized. So titles with `//` are still supported. This example would produce the node `it:dev:str="A string with a comment // separator in it"`.
 
-### A string with an escaped \// comment separator in it
+### A string with an escaped \\// comment separator in it
 
 This example would produce the node `it:dev:str="A string with a comment // separator in it"`.
