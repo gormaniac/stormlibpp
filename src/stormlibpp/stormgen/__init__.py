@@ -77,6 +77,16 @@ class StormGenDoc:
             self.parts.append(part)
 
 
+class DocNodeSection:
+    """A collection of DocParts that are part of a DocNode, like a node prop or tag."""
+
+    def __init__(self) -> None:
+        self.parts: list[DocPart] = []
+
+    def add_part(self, part: DocPart) -> None:
+        self.parts.append(part)
+
+
 class DocNode:
     """A node defined in Markdown - as a grouping of ``DocPart`` objects."""
 
@@ -84,9 +94,10 @@ class DocNode:
         self.form = form
         self.valu = valu
         self.parts: list[DocPart] = []
-        self.props: list[DocPart] = []
-        self.tags: list[DocPart] = []
-        self.edges: list[DocPart] = []
+        self.props: list[DocNodeSection] = []
+        self.tags: list[DocNodeSection] = []
+        self.edges: list[DocNodeSection] = []
+        self.comment: str = ""
 
         self.extract()
 
@@ -98,7 +109,27 @@ class DocNode:
 
     def extract(self):
         """Extract all parts of a DocNode from the input parts."""
-        pass
+
+        comment_blocks = [block for block in self.parts[0].blocks[1:]]
+        self.comment = md.md_from_blocks(comment_blocks)
+
+        # nlevel = self.parts[0].level
+
+        # section: DocNodeSection | None = None
+
+        # # TODO - This code is wrong
+        # for part in self.parts[1:]:
+        #     if part.level == nlevel + 1:
+        #         section = DocNodeSection()
+        #         if part.stripped_title not in ("Edges", "Tags"):
+        #             self.props.append(section)
+        #             section.add_part(part)
+        #         elif part.stripped_title == "Edges":
+        #             self.edges.append(section)
+        #         elif part.stripped_title == "Tags":
+        #             self.tags.append(section)
+        #     if part.level > nlevel + 1:
+        #         section.add_part(part)
 
 
 class DocExtractor:
@@ -130,8 +161,15 @@ class DocExtractor:
             raise ValueError(f"Unsupported type ({doc_type}) passed to DocExtractor!")
 
     def _extract_embedded(self):
-        # TODO - Figure out how to discover the nodes header.
-        pass
+        for index in range(len(self.doc.parts)):
+            part = self.doc.parts[index]
+
+            if part.title == self.nheader:
+                self.flevel = part.level + 1
+                self.nlevel = self.flevel + 1
+                return self._extract(self.doc.parts[index:])
+
+        return []
 
     def _extract_forms(self):
         return self._extract(self.doc.parts, form=self.form)
@@ -145,14 +183,17 @@ class DocExtractor:
         cur_form = form
 
         for part in parts:
+
             if part.level == self.flevel:
                 if not form:
                     cur_form = part.title
+
             if part.level == self.nlevel:
                 if node is not None:
                     nodes.append(node)
                 node = DocNode(cur_form, part.stripped_title)
                 node.add_part(part)
+
             if part.level > self.nlevel:
                 node.add_part(part)
 
