@@ -24,6 +24,7 @@ import argparse
 import sys
 
 from ._args import USER_PARSER, VERIFY_PARSER
+from .errors import HttpCortexLoginError
 from .httpcore import HttpCortex
 from .output import OUTP
 from .stormcli import start_storm_cli
@@ -65,10 +66,13 @@ async def main(argv: list[str]):
 
     username, password = get_cortex_creds(args.user)
 
-    async with HttpCortex(
-        args.cortex, username, password, ssl_verify=not args.no_verify
-    ) as hcore:
-        await start_storm_cli(hcore, outp=OUTP, opts=args, onecmd=args.onecmd)
+    try:
+        async with HttpCortex(
+            args.cortex, username, password, ssl_verify=not args.no_verify
+        ) as hcore:
+            await start_storm_cli(hcore, outp=OUTP, opts=args, onecmd=args.onecmd)
+    except HttpCortexLoginError as err:
+        return str(err)
 
 
 if __name__ == "__main__":

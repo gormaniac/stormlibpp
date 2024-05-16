@@ -123,7 +123,7 @@ class HttpCortex:
         )
 
     async def __aenter__(self):
-        await self.login()
+        await self.login(close=True)
         return self
 
     async def __aexit__(self, *args, **kwargs):
@@ -263,8 +263,7 @@ class HttpCortex:
         except Exception as err:
             raise HttpCortexError(f"Unable to export nodes: {err}", err) from err
 
-    # TODO - Support API key base authentication
-    async def login(self):
+    async def login(self, close=False):
         """Login to the Cortex with the user/pass (or API key) supplied at instantiation.
 
         If a user/pass is supplied, cookie based authentication is used.
@@ -280,7 +279,21 @@ class HttpCortex:
         If an API key is passed at instantiation, the user/pass combo is ignored 
         and the ``ClientSession`` is configured to send the API key value in the
         ``X-API-KEY`` header with every request.
+
+        Parameters
+        ----------
+        close : bool
+            Close the underlying session when logins fail, by default False.
         """
+
+        try:
+            await self._login()
+        except Exception as err:
+            if stop:
+                await self.stop()
+            raise err
+
+    async def _login(self):
 
         if self.token:
             self.sess.headers.add("X-API-KEY", self.token)
