@@ -120,7 +120,21 @@ This example would produce the node `it:dev:str="A string with a comment // sepa
 
 
 import stormlibpp.stormgen
-doc = stormlibpp.stormgen.parse(x)
-doc.parts
-doc.parts[1].blocks
-doc.parts[6].blocks[0].children[0].children
+
+
+sdoc = stormlibpp.stormgen.StormGenDoc(x)
+sdoc.parse()
+extractor = stormlibpp.stormgen.DocExtractor(sdoc)
+nodes = extractor.extract()
+for node in nodes:
+    node.extract()
+    print(node, node.parts)
+
+n = nodes[0]
+n.props
+
+
+# doc = stormlibpp.stormgen.parse(x)
+# doc.parts
+# doc.parts[1].blocks
+# doc.parts[6].blocks[0].children[0].children

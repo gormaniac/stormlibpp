@@ -87,6 +87,15 @@ def endswith(text: str, items: list[str]) -> bool:
     return False
 
 
+def startswith(text: str, items: list[str]) -> bool:
+    """Check if text starts with any of items."""
+
+    for item in items:
+        if text.startswith(item):
+            return True
+    return False
+
+
 def get_cortex_creds(_user: str | None = None) -> tuple[str, str]:
     """Get credentials to use when connecting to a Cortex over HTTP.
 

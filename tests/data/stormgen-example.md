@@ -9,7 +9,7 @@ This is a group of inet:ipv4 nodes that are important enough to document.
 
 Explain stuff about this specific inet:ipv4 here.
 
-Comments directly under a primary property title may optionally be saved as `meta:notes` that get edged to this node.
+Comments directly under a primary property title may optionally be saved as a `meta:note` that is edged to this node.
 
 Images linked in this section should be saved to Synapse and edged to this node too (a wishlist feature).
 
@@ -78,7 +78,7 @@ You can document all the kinds of edges a particular node should have.
 - `-(uses)>`
     - `it:prod:soft`
 
-#### -(uses)>
+##### -(uses)>
 
 Or actually create the edge.
 

@@ -4,16 +4,27 @@ TODO - Put a long docstring here so it gets include in docs
 """
 
 from collections.abc import Callable
+from typing import Any
+from dataclasses import dataclass
 
 import marko
 
 from .. import StormNode
+from ..utils import startswith
 from . import md
 from . import utils
 
 
 DocNodeExtractor = Callable[["StormGenDoc", str, str, str], list["DocNode"]]
 """A method that extracts ``DocNodes`` from a ``StormGenDoc`` of a given type."""
+
+
+@dataclass
+class Prop:
+    """A node property."""
+
+    key: str
+    val: Any
 
 
 class DocPart:
@@ -38,6 +49,43 @@ class DocPart:
 
     def markdown(self):
         return md.md_from_parts([self])
+
+    def resolve_val(self):
+        return 'test'
+
+
+class DocSection:
+    """A grouping of related DocPart objects."""
+
+    def __init__(self) -> None:
+        self.parts: list[DocPart] = []
+
+    def add_part(self, part: DocPart) -> None:
+        self.parts.append(part)
+
+
+class PropParts(DocSection):
+    """DocPart objects that include properties.
+
+    Tags and Nodes can have properties.
+    """
+
+    def __init__(self) -> None:
+        super().__init__()
+        self.props: list[Prop] = []
+
+    def add_prop(self, prop: Prop) -> None:
+        self.props.append(prop)
+
+    def extract_props(self, prop_level: int = 3):
+        for part in self.parts:
+            if part.level == prop_level and startswith(part.stripped_title, [".", ":"]):
+                self.add_prop(
+                    Prop(
+                        key=part.stripped_title.split("=", 1)[0],
+                        val=part.resolve_val(),
+                    )
+                )
 
 
 class StormGenDoc:
@@ -77,45 +125,91 @@ class StormGenDoc:
             self.parts.append(part)
 
 
-class DocNodeSection:
+class DocNodeSection(PropParts):
     """A collection of DocParts that are part of a DocNode, like a node prop or tag."""
 
-    def __init__(self) -> None:
-        self.parts: list[DocPart] = []
+    types = (
+        "edge",
+        "tag",
+        "prop",
+    )
 
-    def add_part(self, part: DocPart) -> None:
-        self.parts.append(part)
+    def __init__(self, _type: str) -> None:
+        super().__init__()
+
+        if _type in self.types:
+            self.type = _type
+        else:
+            raise ValueError(f"Invalid type ({_type}) passed to DocNodeSection!")
 
 
-class DocNode:
+class DocNode(PropParts):
     """A node defined in Markdown - as a grouping of ``DocPart`` objects."""
 
     def __init__(self, form: str, valu: str) -> None:
+        super().__init__()
         self.form = form
         self.valu = valu
-        self.parts: list[DocPart] = []
-        self.props: list[DocNodeSection] = []
-        self.tags: list[DocNodeSection] = []
-        self.edges: list[DocNodeSection] = []
+        self.tags: list[PropParts] = []
+        self.edges: list[DocSection] = []
         self.comment: str = ""
-
-        self.extract()
 
     def __repr__(self) -> str:
         return f"<DocNode: {self.form}={self.valu}>"
 
-    def add_part(self, part: DocPart) -> None:
-        self.parts.append(part)
-
     def extract(self):
         """Extract all parts of a DocNode from the input parts."""
 
-        comment_blocks = [block for block in self.parts[0].blocks[1:]]
-        self.comment = md.md_from_blocks(comment_blocks)
+        self.comment = md.md_from_parts([self.parts[0]])
 
-        # nlevel = self.parts[0].level
+        nlevel = self.parts[0].level
 
-        # section: DocNodeSection | None = None
+        self.extract_props(prop_level=nlevel + 1)
+
+        section: DocSection | None = None
+
+        parent_section: str["Edges" | "Tags"] = ""
+        for part in self.parts[1:]:
+            if part.level == nlevel + 1:
+                if part.stripped_title == "Edges":
+                    parent_section = "Edges"
+                elif part.stripped_title == "Tags":
+                    parent_section = "Tags"
+            if part.level > nlevel + 1:
+                if parent_section == "Edges":
+                    if section is not None:
+                        self.edges.append(section)
+                    section = DocSection()
+                if parent_section == "Tags":
+                    if section is not None:
+                        self.tags.append(section)
+                    section = PropParts()
+            if part.level > nlevel + 2:
+                if section is not None:
+                    section.add_part(part)
+
+        for tag in self.tags:
+            breakpoint()
+            tag.extract_props(prop_level=tag.parts[0].level + 1)
+
+        # parent_section: str["Edges" | "Tags"] = ""
+        # for part in self.parts[1:]:
+        #     if part.level == nlevel + 1:
+        #         if part.stripped_title not in ("Edges", "Tags"):
+        #             if startswith(part.stripped_title, (":", ",")):
+        #                 self.props.append(part)
+        #         elif part.stripped_title == "Edges":
+        #             parent_section = "Edges"
+        #         elif part.stripped_title == "Tags":
+        #             parent_section = "Tags"
+        #     if part.level > nlevel + 1:
+        #         if parent_section == "Edges":
+        #             section = DocNodeSection("edge")
+        #         if parent_section == "Tags":
+        #             section = DocNodeSection("tag")
+        #     if part.level > nlevel + 2:
+        #         if section is not None:
+        #             section.add_part(part)
 
         # # TODO - This code is wrong
         # for part in self.parts[1:]:
