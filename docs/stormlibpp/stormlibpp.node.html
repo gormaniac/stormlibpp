@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en">
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>stormlibpp.node module &mdash; stormlibpp  documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/sphinx_highlight.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="stormlibpp.output module" href="stormlibpp.output.html" />
+    <link rel="prev" title="stormlibpp.import module" href="stormlibpp.import.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            stormlibpp
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../index.html">Home</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../contributing.html">Contribution Guide</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="stormlibpp.html">StormLib++ API Docs</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="stormlibpp.errors.html">stormlibpp.errors module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="stormlibpp.hfeed.html">stormlibpp.hfeed module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="stormlibpp.hstorm.html">stormlibpp.hstorm module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="stormlibpp.httpcore.html">stormlibpp.httpcore module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="stormlibpp.import.html">stormlibpp.import module</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">stormlibpp.node module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#stormlibpp.node.ItemContainer"><code class="docutils literal notranslate"><span class="pre">ItemContainer</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#stormlibpp.node.NodeDef"><code class="docutils literal notranslate"><span class="pre">NodeDef</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#stormlibpp.node.NodeForm"><code class="docutils literal notranslate"><span class="pre">NodeForm</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#stormlibpp.node.NodeTuple"><code class="docutils literal notranslate"><span class="pre">NodeTuple</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#stormlibpp.node.NodeVals"><code class="docutils literal notranslate"><span class="pre">NodeVals</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#stormlibpp.node.NodeVals.iden"><code class="docutils literal notranslate"><span class="pre">NodeVals.iden</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#stormlibpp.node.NodeVals.nodedata"><code class="docutils literal notranslate"><span class="pre">NodeVals.nodedata</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#stormlibpp.node.NodeVals.props"><code class="docutils literal notranslate"><span class="pre">NodeVals.props</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#stormlibpp.node.NodeVals.tagprops"><code class="docutils literal notranslate"><span class="pre">NodeVals.tagprops</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#stormlibpp.node.NodeVals.tags"><code class="docutils literal notranslate"><span class="pre">NodeVals.tags</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#stormlibpp.node.Props"><code class="docutils literal notranslate"><span class="pre">Props</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#stormlibpp.node.StormNode"><code class="docutils literal notranslate"><span class="pre">StormNode</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#stormlibpp.node.StormNode.addProp"><code class="docutils literal notranslate"><span class="pre">StormNode.addProp()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#stormlibpp.node.StormNode.addProps"><code class="docutils literal notranslate"><span class="pre">StormNode.addProps()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#stormlibpp.node.StormNode.addTag"><code class="docutils literal notranslate"><span class="pre">StormNode.addTag()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#stormlibpp.node.StormNode.addTags"><code class="docutils literal notranslate"><span class="pre">StormNode.addTags()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#stormlibpp.node.StormNode.form"><code class="docutils literal notranslate"><span class="pre">StormNode.form</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#stormlibpp.node.StormNode.nodevals"><code class="docutils literal notranslate"><span class="pre">StormNode.nodevals</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#stormlibpp.node.StormNode.pack"><code class="docutils literal notranslate"><span class="pre">StormNode.pack()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#stormlibpp.node.StormNode.props"><code class="docutils literal notranslate"><span class="pre">StormNode.props</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#stormlibpp.node.StormNode.tags"><code class="docutils literal notranslate"><span class="pre">StormNode.tags</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#stormlibpp.node.StormNode.unpack"><code class="docutils literal notranslate"><span class="pre">StormNode.unpack()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#stormlibpp.node.StormNode.value"><code class="docutils literal notranslate"><span class="pre">StormNode.value</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#stormlibpp.node.Tags"><code class="docutils literal notranslate"><span class="pre">Tags</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="stormlibpp.output.html">stormlibpp.output module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="stormlibpp.stormcli.html">stormlibpp.stormcli module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="stormlibpp.stormpkg.html">stormlibpp.stormpkg module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="stormlibpp.telepath.html">stormlibpp.telepath module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="stormlibpp.tmpcortex.html">stormlibpp.tmpcortex module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="stormlibpp.utils.html">stormlibpp.utils module</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../pkgs/index.html">Power-Ups</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">stormlibpp</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="stormlibpp.html">StormLib++ API Docs</a></li>
+      <li class="breadcrumb-item active">stormlibpp.node module</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/stormlibpp/stormlibpp.node.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="module-stormlibpp.node">
+<span id="stormlibpp-node-module"></span><h1>stormlibpp.node module<a class="headerlink" href="#module-stormlibpp.node" title="Permalink to this heading"></a></h1>
+<p>Work with storm:node objects in Python.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="stormlibpp.node.ItemContainer">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">stormlibpp.node.</span></span><span class="sig-name descname"><span class="pre">ItemContainer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#stormlibpp.node.ItemContainer" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Hold key/value items in dict-like container.</p>
+<p>Acts almost identically to a dict except:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>- Missing items simply return None, not raise an error.
+- Iterating over an ``ItemContainer`` returns key/value pairs instead
+  of just the key.
+- Keys must be strings.
+    - Although technically non-string keys could be used, it messes
+      up instantiation.
+- The object&#39;s ``repr`` is the current classname and all items in the
+  container as if the object was being instantiated - a la ``SimpleNamespace``.
+  Meaning, subclasses get automatic repr support.
+</pre></div>
+</div>
+<p>All default methods of a <code class="docutils literal notranslate"><span class="pre">dict</span></code> are supported, they are actually directly
+returned from the underlying <code class="docutils literal notranslate"><span class="pre">dict</span></code> thanks to <code class="docutils literal notranslate"><span class="pre">__getattr__</span></code> magic. Meaning
+calling these methods operate on the items this container.</p>
+<p>Supports <code class="docutils literal notranslate"><span class="pre">obj['item']</span></code> (and <code class="docutils literal notranslate"><span class="pre">obj['item']</span> <span class="pre">=</span> <span class="pre">'val'</span></code>) notation.</p>
+<p>When “getting” an item with <code class="docutils literal notranslate"><span class="pre">__getitem__</span></code>, that doesn’t exist in the
+container, <code class="docutils literal notranslate"><span class="pre">None</span></code> is returned instead of raising an exception.</p>
+<p>Calling <code class="docutils literal notranslate"><span class="pre">dir</span></code> on this object will only return names for items this object
+“holds” instead of all parts of this object.</p>
+<p>Supports checking if an item is “held” via the <code class="docutils literal notranslate"><span class="pre">in</span></code> operator.</p>
+<p>Supports iteration of items in the underlying <code class="docutils literal notranslate"><span class="pre">dict</span></code>. Each iteration returns
+a tuple of the item name followed by the item value.</p>
+<p>Implements only magic methods, and all of them operate on the underlying
+SimpleNamespace.</p>
+<p>To convert this object to a <code class="docutils literal notranslate"><span class="pre">dict</span></code> of the items it holds,
+call <code class="docutils literal notranslate"><span class="pre">vars</span></code> on an instance.</p>
+<section id="parameters">
+<h2>Parameters<a class="headerlink" href="#parameters" title="Permalink to this heading"></a></h2>
+<p>All keyword args passed at instantiation are added to the container as initial
+values. These are not required and no args passed just creates an empty container.</p>
+</section>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="stormlibpp.node.NodeDef">
+<span class="sig-prename descclassname"><span class="pre">stormlibpp.node.</span></span><span class="sig-name descname"><span class="pre">NodeDef</span></span><a class="headerlink" href="#stormlibpp.node.NodeDef" title="Permalink to this definition"></a></dt>
+<dd><p>A nodes definition, the node’s form and primary value.</p>
+<p>alias of <code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="stormlibpp.node.NodeForm">
+<span class="sig-prename descclassname"><span class="pre">stormlibpp.node.</span></span><span class="sig-name descname"><span class="pre">NodeForm</span></span><a class="headerlink" href="#stormlibpp.node.NodeForm" title="Permalink to this definition"></a></dt>
+<dd><p>A valid syn:form value.</p>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="stormlibpp.node.NodeTuple">
+<span class="sig-prename descclassname"><span class="pre">stormlibpp.node.</span></span><span class="sig-name descname"><span class="pre">NodeTuple</span></span><a class="headerlink" href="#stormlibpp.node.NodeTuple" title="Permalink to this definition"></a></dt>
+<dd><p>A packed node, this is what get’s sent from Storm to a Telepath endpoint.</p>
+<p>Or what get’s returned from a Cortex’s Python APIs.</p>
+<p>alias of <code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>], <a class="reference internal" href="#stormlibpp.node.NodeVals" title="stormlibpp.node.NodeVals"><code class="xref py py-class docutils literal notranslate"><span class="pre">NodeVals</span></code></a>]</p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="stormlibpp.node.NodeVals">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">stormlibpp.node.</span></span><span class="sig-name descname"><span class="pre">NodeVals</span></span><a class="headerlink" href="#stormlibpp.node.NodeVals" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">TypedDict</span></code></p>
+<p>The items a Node can have in the second part of packed NodeTuple.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="stormlibpp.node.NodeVals.iden">
+<span class="sig-name descname"><span class="pre">iden</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#stormlibpp.node.NodeVals.iden" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="stormlibpp.node.NodeVals.nodedata">
+<span class="sig-name descname"><span class="pre">nodedata</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#stormlibpp.node.NodeVals.nodedata" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="stormlibpp.node.NodeVals.props">
+<span class="sig-name descname"><span class="pre">props</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#stormlibpp.node.NodeVals.props" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="stormlibpp.node.NodeVals.tagprops">
+<span class="sig-name descname"><span class="pre">tagprops</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#stormlibpp.node.NodeVals.tagprops" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="stormlibpp.node.NodeVals.tags">
+<span class="sig-name descname"><span class="pre">tags</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#stormlibpp.node.NodeVals.tags" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="stormlibpp.node.Props">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">stormlibpp.node.</span></span><span class="sig-name descname"><span class="pre">Props</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#stormlibpp.node.Props" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#stormlibpp.node.ItemContainer" title="stormlibpp.node.ItemContainer"><code class="xref py py-class docutils literal notranslate"><span class="pre">ItemContainer</span></code></a></p>
+<p>Properties of a StormNode.</p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="stormlibpp.node.StormNode">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">stormlibpp.node.</span></span><span class="sig-name descname"><span class="pre">StormNode</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">form</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">/</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">iden</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tags</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">{}</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">props</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">{}</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nodedata</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">{}</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tagprops</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">{}</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#stormlibpp.node.StormNode" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>A storm:node Storm object that is in a Python runtime.</p>
+<p>It supports “unpacking” the node into this object, edits to the object, and
+repacking of the node to be sent back to Storm.</p>
+<p>This node can be created purely from Python code rather than a packed
+<code class="docutils literal notranslate"><span class="pre">storm:node</span></code> object. Use <code class="docutils literal notranslate"><span class="pre">__init__</span></code> directly instead of <code class="docutils literal notranslate"><span class="pre">unpack</span></code>.
+This allows the creation of a new node in Python that can be passed back to
+Storm.</p>
+<p>The intent is to represent an object that can be read from and written back
+to a Cortex. It isn’t meant to provide the same API that a <code class="docutils literal notranslate"><span class="pre">storm:node</span></code>
+has in Storm.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="stormlibpp.node.StormNode.addProp">
+<span class="sig-name descname"><span class="pre">addProp</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">propname</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">propval</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#stormlibpp.node.StormNode.addProp" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="stormlibpp.node.StormNode.addProps">
+<span class="sig-name descname"><span class="pre">addProps</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">props</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#stormlibpp.node.StormNode.addProps" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="stormlibpp.node.StormNode.addTag">
+<span class="sig-name descname"><span class="pre">addTag</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tag</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">timestamps</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">tuple</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">(None,</span> <span class="pre">None)</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#stormlibpp.node.StormNode.addTag" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="stormlibpp.node.StormNode.addTags">
+<span class="sig-name descname"><span class="pre">addTags</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tags</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">timestamps</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">tuple</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">(None,</span> <span class="pre">None)</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#stormlibpp.node.StormNode.addTags" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="stormlibpp.node.StormNode.form">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">form</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#stormlibpp.node.StormNode.form" title="Permalink to this definition"></a></dt>
+<dd><p>The form of this StormNode.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="stormlibpp.node.StormNode.nodevals">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">nodevals</span></span><a class="headerlink" href="#stormlibpp.node.StormNode.nodevals" title="Permalink to this definition"></a></dt>
+<dd><p>The NodeVals dict this Node would have in a NodeTuple.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="stormlibpp.node.StormNode.pack">
+<span class="sig-name descname"><span class="pre">pack</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="#stormlibpp.node.NodeVals" title="stormlibpp.node.NodeVals"><span class="pre">stormlibpp.node.NodeVals</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#stormlibpp.node.StormNode.pack" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="stormlibpp.node.StormNode.props">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">props</span></span><a class="headerlink" href="#stormlibpp.node.StormNode.props" title="Permalink to this definition"></a></dt>
+<dd><p>The properties of this StormNode.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="stormlibpp.node.StormNode.tags">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">tags</span></span><a class="headerlink" href="#stormlibpp.node.StormNode.tags" title="Permalink to this definition"></a></dt>
+<dd><p>The tags of this StormNode.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="stormlibpp.node.StormNode.unpack">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">unpack</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">packedtup</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="#stormlibpp.node.NodeVals" title="stormlibpp.node.NodeVals"><span class="pre">stormlibpp.node.NodeVals</span></a><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#stormlibpp.node.StormNode" title="stormlibpp.node.StormNode"><span class="pre">StormNode</span></a></span></span><a class="headerlink" href="#stormlibpp.node.StormNode.unpack" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="stormlibpp.node.StormNode.value">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">value</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#stormlibpp.node.StormNode.value" title="Permalink to this definition"></a></dt>
+<dd><p>The value of this StormNode.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="stormlibpp.node.Tags">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">stormlibpp.node.</span></span><span class="sig-name descname"><span class="pre">Tags</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#stormlibpp.node.Tags" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#stormlibpp.node.ItemContainer" title="stormlibpp.node.ItemContainer"><code class="xref py py-class docutils literal notranslate"><span class="pre">ItemContainer</span></code></a></p>
+<p>Tags of a StormNode.</p>
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="stormlibpp.import.html" class="btn btn-neutral float-left" title="stormlibpp.import module" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="stormlibpp.output.html" class="btn btn-neutral float-right" title="stormlibpp.output module" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, John Gorman.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+    <!-- Theme Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-6G9XWTWCQG"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', 'G-6G9XWTWCQG', {
+          'anonymize_ip': false,
+      });
+    </script> 
+
+</body>
+</html>

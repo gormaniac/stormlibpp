@@ -32,7 +32,7 @@ install-self: # Install this project's python package using the pipenv's pip
 .PHONY: docs
 docs: # Build the documentation for this package
 	./scripts/pkgs/copy-docs.sh
-	pipenv run sphinx-apidoc -T -f -o doc $(PKG_DIR)
+	pipenv run sphinx-apidoc -d 1 -t doc/_templates -e -M -T -f -o doc/stormlibpp $(PKG_DIR)
 	pipenv run sphinx-build doc/ docs/
 
 .PHONY: clean-py

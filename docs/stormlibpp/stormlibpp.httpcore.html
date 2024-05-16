@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en">
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>stormlibpp.httpcore module &mdash; stormlibpp  documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/sphinx_highlight.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="stormlibpp.import module" href="stormlibpp.import.html" />
+    <link rel="prev" title="stormlibpp.hstorm module" href="stormlibpp.hstorm.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            stormlibpp
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../index.html">Home</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../contributing.html">Contribution Guide</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="stormlibpp.html">StormLib++ API Docs</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="stormlibpp.errors.html">stormlibpp.errors module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="stormlibpp.hfeed.html">stormlibpp.hfeed module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="stormlibpp.hstorm.html">stormlibpp.hstorm module</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">stormlibpp.httpcore module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#stormlibpp.httpcore.HttpCortex"><code class="docutils literal notranslate"><span class="pre">HttpCortex</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#stormlibpp.httpcore.HttpCortex.addFeedData"><code class="docutils literal notranslate"><span class="pre">HttpCortex.addFeedData()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#stormlibpp.httpcore.HttpCortex.callStorm"><code class="docutils literal notranslate"><span class="pre">HttpCortex.callStorm()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#stormlibpp.httpcore.HttpCortex.exportStorm"><code class="docutils literal notranslate"><span class="pre">HttpCortex.exportStorm()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#stormlibpp.httpcore.HttpCortex.getAxonBytes"><code class="docutils literal notranslate"><span class="pre">HttpCortex.getAxonBytes()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#stormlibpp.httpcore.HttpCortex.getAxonUpload"><code class="docutils literal notranslate"><span class="pre">HttpCortex.getAxonUpload()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#stormlibpp.httpcore.HttpCortex.login"><code class="docutils literal notranslate"><span class="pre">HttpCortex.login()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#stormlibpp.httpcore.HttpCortex.stop"><code class="docutils literal notranslate"><span class="pre">HttpCortex.stop()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#stormlibpp.httpcore.HttpCortex.storm"><code class="docutils literal notranslate"><span class="pre">HttpCortex.storm()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#stormlibpp.httpcore.HttpCortex.stormlist"><code class="docutils literal notranslate"><span class="pre">HttpCortex.stormlist()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#stormlibpp.httpcore.StormMsg"><code class="docutils literal notranslate"><span class="pre">StormMsg</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#stormlibpp.httpcore.StormMsgType"><code class="docutils literal notranslate"><span class="pre">StormMsgType</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="stormlibpp.import.html">stormlibpp.import module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="stormlibpp.node.html">stormlibpp.node module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="stormlibpp.output.html">stormlibpp.output module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="stormlibpp.stormcli.html">stormlibpp.stormcli module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="stormlibpp.stormpkg.html">stormlibpp.stormpkg module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="stormlibpp.telepath.html">stormlibpp.telepath module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="stormlibpp.tmpcortex.html">stormlibpp.tmpcortex module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="stormlibpp.utils.html">stormlibpp.utils module</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../pkgs/index.html">Power-Ups</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">stormlibpp</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="stormlibpp.html">StormLib++ API Docs</a></li>
+      <li class="breadcrumb-item active">stormlibpp.httpcore module</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/stormlibpp/stormlibpp.httpcore.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="module-stormlibpp.httpcore">
+<span id="stormlibpp-httpcore-module"></span><h1>stormlibpp.httpcore module<a class="headerlink" href="#module-stormlibpp.httpcore" title="Permalink to this heading"></a></h1>
+<p>Implements some methods from synapse.cortex.Cortex but with HTTP.</p>
+<p>This is useful when replicating Telepath based tools that need to be used with
+HTTP. For example, the <code class="docutils literal notranslate"><span class="pre">hstorm</span></code> CLI replaces a <code class="docutils literal notranslate"><span class="pre">Cortex</span></code> object with an
+<code class="docutils literal notranslate"><span class="pre">HttpCortex</span></code> so it can run Storm commands over HTTP.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="stormlibpp.httpcore.HttpCortex">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">stormlibpp.httpcore.</span></span><span class="sig-name descname"><span class="pre">HttpCortex</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">url</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'https://localhost:4443'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">usr</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pwd</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">token</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">default_opts</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">{'repr':</span> <span class="pre">True}</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ssl_verify</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#stormlibpp.httpcore.HttpCortex" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>A class with some methods from synapse.cortex.Cortex but over HTTP.</p>
+<p>For now, it only supports the <cite>storm</cite> and <cite>callStorm</cite> methods. These methods
+take the same arguments and return the same types of values as their Cortex
+equivalents.</p>
+<p>Communicating with Synapse over HTTP requires a user on the Cortex that has
+a password set. HttpCortex needs to authenticate to the Cortex before making
+requests (i.e. using any of this objects methods). Because of this, HttpCortex
+implements a <code class="docutils literal notranslate"><span class="pre">login</span></code> method, and the object constructor expects a username
+and password.</p>
+<p>HttpCortex relies on an <code class="docutils literal notranslate"><span class="pre">aiohttp.ClientSession</span></code> underneath to make HTTP
+requests. This session needs to be closed to avoid errors at the end of
+program execution. HttpCortex exposes a <code class="docutils literal notranslate"><span class="pre">close</span></code> method that must be called
+when this object is no longer needed.</p>
+<p>HttpCortex is an async context manager. It calls the <code class="docutils literal notranslate"><span class="pre">login</span></code> and <code class="docutils literal notranslate"><span class="pre">close</span></code>
+methods for you upon entrance and exit of the object.</p>
+<p>Examples:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># Use HttpCortex as an async context manager so login/cleanup is handled</span>
+<span class="k">async</span> <span class="k">with</span> <span class="n">HttpCortex</span><span class="p">(</span><span class="s2">&quot;&lt;HTTP URL&gt;&quot;</span><span class="p">,</span> <span class="s2">&quot;&lt;username&gt;&quot;</span><span class="p">,</span> <span class="s2">&quot;&lt;password&gt;&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">hcore</span><span class="p">:</span>
+    <span class="k">async</span> <span class="k">for</span> <span class="n">msg</span> <span class="ow">in</span> <span class="n">hcore</span><span class="o">.</span><span class="n">storm</span><span class="p">(</span><span class="s2">&quot;[inet:ipv4=1.1.1.1]&quot;</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">msg</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;node&quot;</span><span class="p">:</span>
+            <span class="n">pprint</span><span class="o">.</span><span class="n">pprint</span><span class="p">(</span><span class="n">msg</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+
+<span class="c1"># Or handle login and object cleanup yourself</span>
+<span class="n">hcore</span> <span class="o">=</span> <span class="n">HttpCortex</span><span class="p">(</span><span class="s2">&quot;&lt;HTTP URL&gt;&quot;</span><span class="p">,</span> <span class="s2">&quot;&lt;username&gt;&quot;</span><span class="p">,</span> <span class="s2">&quot;&lt;password&gt;&quot;</span><span class="p">)</span>
+<span class="k">await</span> <span class="n">hcore</span><span class="o">.</span><span class="n">login</span><span class="p">()</span>
+<span class="k">async</span> <span class="k">for</span> <span class="n">msg</span> <span class="ow">in</span> <span class="n">hcore</span><span class="o">.</span><span class="n">storm</span><span class="p">(</span><span class="s2">&quot;[inet:ipv4=1.1.1.1]&quot;</span><span class="p">):</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+    <span class="c1"># Do other things with each &quot;msg&quot;</span>
+<span class="k">await</span> <span class="n">hcore</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+
+<span class="c1"># callStorm can be used to get a single value instead of streaming results</span>
+<span class="k">async</span> <span class="k">with</span> <span class="n">HttpCortex</span><span class="p">(</span><span class="o">...</span><span class="p">)</span> <span class="k">as</span> <span class="n">hcore</span><span class="p">:</span>
+    <span class="n">retn</span> <span class="o">=</span> <span class="k">await</span> <span class="n">hcore</span><span class="o">.</span><span class="n">callStorm</span><span class="p">(</span><span class="s2">&quot;$var = &#39;some val&#39; return($var)&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">retn</span><span class="p">[</span><span class="s2">&quot;status&quot;</span><span class="p">]:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">retn</span><span class="p">[</span><span class="s2">&quot;result&quot;</span><span class="p">])</span>
+</pre></div>
+</div>
+<section id="parameters">
+<h2>Parameters<a class="headerlink" href="#parameters" title="Permalink to this heading"></a></h2>
+<dl class="simple">
+<dt>url<span class="classifier">str, optional</span></dt><dd><p>The URL of the Synapse Cortex to connect to,
+by default <cite>“https://localhost:4443”</cite>.</p>
+</dd>
+<dt>usr<span class="classifier">str, optional</span></dt><dd><p>The username to authenticate with, by default <cite>“”</cite>.</p>
+</dd>
+<dt>pwd<span class="classifier">str, optional</span></dt><dd><p>The password to authenticate with, by default <cite>“”</cite>.</p>
+</dd>
+<dt>token<span class="classifier">str, optional</span></dt><dd><p>A token to authenticate with, instead of usr/pwd, by default <cite>“”</cite>.</p>
+</dd>
+<dt>default_opts<span class="classifier">dict, optional</span></dt><dd><p>The default Storm options to pass with every request made by this instance.
+Set this to an empty dict to disable. By default <cite>{“repr”: True}</cite>.</p>
+</dd>
+<dt>ssl_verify<span class="classifier">bool, optional</span></dt><dd><p>Whether to verify the Cortex’s SSL certificate, by default <cite>True</cite>.</p>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="stormlibpp.httpcore.HttpCortex.addFeedData">
+<em class="property"><span class="pre">async</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">addFeedData</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">items</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="stormlibpp.node.html#stormlibpp.node.NodeVals" title="stormlibpp.node.NodeVals"><span class="pre">stormlibpp.node.NodeVals</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">viewiden</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#stormlibpp.httpcore.HttpCortex.addFeedData" title="Permalink to this definition"></a></dt>
+<dd><p>Feed node tuples to the Cortex.</p>
+<section id="id1">
+<h3>Parameters<a class="headerlink" href="#id1" title="Permalink to this heading"></a></h3>
+<dl class="simple">
+<dt>name<span class="classifier">str | None</span></dt><dd><p>An “optional” name to give the import</p>
+</dd>
+<dt>items<span class="classifier">list[NodeTuple]</span></dt><dd><p>A list of NodeTuples that will be imported into the Cortex.</p>
+</dd>
+<dt>viewiden<span class="classifier">str | None, optional</span></dt><dd><p>A specific view to import data to, the default view is used if None,
+by default None.</p>
+</dd>
+</dl>
+</section>
+<section id="returns">
+<h3>Returns<a class="headerlink" href="#returns" title="Permalink to this heading"></a></h3>
+<dl class="simple">
+<dt>dict</dt><dd><p>The return from the <code class="docutils literal notranslate"><span class="pre">/api/v1/feed</span></code> endpoint.</p>
+</dd>
+</dl>
+</section>
+<section id="raises">
+<h3>Raises<a class="headerlink" href="#raises" title="Permalink to this heading"></a></h3>
+<dl class="simple">
+<dt>HttpCortexError</dt><dd><p>If an exception is raised when making an HTTP request to the Cortex.
+This will likely either be from an HTTP error, a connection error,
+or an error decoding the JSON response.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="stormlibpp.httpcore.HttpCortex.callStorm">
+<em class="property"><span class="pre">async</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">callStorm</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">text</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">opts</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#stormlibpp.httpcore.HttpCortex.callStorm" title="Permalink to this definition"></a></dt>
+<dd><p>Execute a Storm query and return the value passed to a Storm return() call.</p>
+<section id="id2">
+<h3>Parameters<a class="headerlink" href="#id2" title="Permalink to this heading"></a></h3>
+<dl class="simple">
+<dt>text<span class="classifier">str</span></dt><dd><p>The Storm code to execute.</p>
+</dd>
+<dt>opts<span class="classifier">dict | None, optional</span></dt><dd><p>Storm options to use when executing this Storm code, by default None.</p>
+</dd>
+</dl>
+</section>
+<section id="id3">
+<h3>Returns<a class="headerlink" href="#id3" title="Permalink to this heading"></a></h3>
+<dl>
+<dt>dict</dt><dd><p>The response from the Cortex’s HTTP API. It contains 2 keys:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">result</span>
+<span class="n">status</span>
+</pre></div>
+</div>
+</dd>
+</dl>
+</section>
+<section id="id4">
+<h3>Raises<a class="headerlink" href="#id4" title="Permalink to this heading"></a></h3>
+<dl class="simple">
+<dt>HttpCortexError</dt><dd><p>If an exception is raised when making an HTTP request to the Cortex.
+This will likely either be from an HTTP error, a connection error,
+or an error decoding the JSON response.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="stormlibpp.httpcore.HttpCortex.exportStorm">
+<em class="property"><span class="pre">async</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">exportStorm</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">text</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">opts</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">AsyncGenerator</span><span class="p"><span class="pre">[</span></span><span class="pre">bytes</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">None</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#stormlibpp.httpcore.HttpCortex.exportStorm" title="Permalink to this definition"></a></dt>
+<dd><p>Export packed nodes returned by a given query using <code class="docutils literal notranslate"><span class="pre">/api/v1/storm/export</span></code>.</p>
+<section id="id5">
+<h3>Parameters<a class="headerlink" href="#id5" title="Permalink to this heading"></a></h3>
+<dl class="simple">
+<dt>text<span class="classifier">str</span></dt><dd><p>A Storm query that returns nodes to export.</p>
+</dd>
+<dt>opts<span class="classifier">dict | None, optional</span></dt><dd><p>The Storm options to use for the export - see
+<code class="docutils literal notranslate"><span class="pre">synapse.tools.storm.ExportCmd</span></code> for some export specific options
+to use, by default None.</p>
+</dd>
+</dl>
+</section>
+<section id="yields">
+<h3>Yields<a class="headerlink" href="#yields" title="Permalink to this heading"></a></h3>
+<dl class="simple">
+<dt>bytes</dt><dd><p>The packed nodes returned by the query. Yielded in chunks for
+large sets of nodes.</p>
+</dd>
+</dl>
+</section>
+<section id="id6">
+<h3>Raises<a class="headerlink" href="#id6" title="Permalink to this heading"></a></h3>
+<dl class="simple">
+<dt>HttpCortexError</dt><dd><p>If an exception is raised when making an HTTP request to the Cortex.
+This will likely either be from an HTTP error, a connection error,
+or an error reading the response.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="stormlibpp.httpcore.HttpCortex.getAxonBytes">
+<em class="property"><span class="pre">async</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">getAxonBytes</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#stormlibpp.httpcore.HttpCortex.getAxonBytes" title="Permalink to this definition"></a></dt>
+<dd><p>Not implemented - here to support an HTTP Storm CLI.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="stormlibpp.httpcore.HttpCortex.getAxonUpload">
+<em class="property"><span class="pre">async</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">getAxonUpload</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#stormlibpp.httpcore.HttpCortex.getAxonUpload" title="Permalink to this definition"></a></dt>
+<dd><p>Not implemented - here to support an HTTP Storm CLI.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="stormlibpp.httpcore.HttpCortex.login">
+<em class="property"><span class="pre">async</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">login</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#stormlibpp.httpcore.HttpCortex.login" title="Permalink to this definition"></a></dt>
+<dd><p>Login to the Cortex with the user/pass (or API key) supplied at instantiation.</p>
+<p>If a user/pass is supplied, cookie based authentication is used.</p>
+<p>Sets the cookie returned by the Cortex in the underlying <code class="docutils literal notranslate"><span class="pre">ClientSession</span></code>.
+Ignores the expiration date because there was errors adding the
+<code class="docutils literal notranslate"><span class="pre">SimpleCookie</span></code> to the session’s <code class="docutils literal notranslate"><span class="pre">CookieJar</span></code>. Instead we use the
+raw cookie value, without options set by the server.</p>
+<p>Cortex cookies expire after 2 weeks. So this object shouldn’t live
+longer than that without calling this method again.</p>
+<p>If an API key is passed at instantiation, the user/pass combo is ignored 
+and the <code class="docutils literal notranslate"><span class="pre">ClientSession</span></code> is configured to send the API key value in the
+<code class="docutils literal notranslate"><span class="pre">X-API-KEY</span></code> header with every request.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="stormlibpp.httpcore.HttpCortex.stop">
+<em class="property"><span class="pre">async</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">stop</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#stormlibpp.httpcore.HttpCortex.stop" title="Permalink to this definition"></a></dt>
+<dd><p>Stop this instance by closing its HTTP session.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="stormlibpp.httpcore.HttpCortex.storm">
+<em class="property"><span class="pre">async</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">storm</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">text</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">opts</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tuplify</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">AsyncGenerator</span><span class="p"><span class="pre">[</span></span><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dict</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">None</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#stormlibpp.httpcore.HttpCortex.storm" title="Permalink to this definition"></a></dt>
+<dd><p>Evaulate a Storm query and yield the streamed Storm messages.</p>
+<section id="id7">
+<h3>Parameters<a class="headerlink" href="#id7" title="Permalink to this heading"></a></h3>
+<dl class="simple">
+<dt>text<span class="classifier">str</span></dt><dd><p>The Storm code to execute.</p>
+</dd>
+<dt>opts<span class="classifier">dict | None, optional</span></dt><dd><p>Storm options to use when executing this Storm code, by default None.</p>
+</dd>
+<dt>tuplify<span class="classifier">bool, optional</span></dt><dd><p>Whether to pass streamed Storm messages to the <code class="docutils literal notranslate"><span class="pre">synapse.lib.msgpack.deepcopy</span></code>
+function for conversion to the “packed tuple” format that most Cortex
+methods use. This results in a slight performance hit but it plays nice
+with all of the existing Synapse code, most importantly the CLI. Setting
+this option to False, will remove the performance concerns but it may
+break other tooling that are expecting “packed tuple” input values.
+<code class="docutils literal notranslate"><span class="pre">synapse.common.tuplify</span></code> was another candidate over <code class="docutils literal notranslate"><span class="pre">deepcopy</span></code>, but
+<code class="docutils literal notranslate"><span class="pre">deepcopy</span></code> is faster.
+By default True.</p>
+</dd>
+</dl>
+</section>
+<section id="id8">
+<h3>Yields<a class="headerlink" href="#id8" title="Permalink to this heading"></a></h3>
+<dl class="simple">
+<dt>StormMsg</dt><dd><p>Each message streamed by the Cortex.</p>
+</dd>
+</dl>
+</section>
+<section id="id9">
+<h3>Raises<a class="headerlink" href="#id9" title="Permalink to this heading"></a></h3>
+<dl class="simple">
+<dt>HttpCortexError</dt><dd><p>If an exception is raised when making an HTTP request to the Cortex.
+This will likely either be from an HTTP error, a connection error,
+or an error decoding the JSON response.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="stormlibpp.httpcore.HttpCortex.stormlist">
+<em class="property"><span class="pre">async</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">stormlist</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">text</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">opts</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tuplify</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dict</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#stormlibpp.httpcore.HttpCortex.stormlist" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</section>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="stormlibpp.httpcore.StormMsg">
+<span class="sig-prename descclassname"><span class="pre">stormlibpp.httpcore.</span></span><span class="sig-name descname"><span class="pre">StormMsg</span></span><a class="headerlink" href="#stormlibpp.httpcore.StormMsg" title="Permalink to this definition"></a></dt>
+<dd><p>A message yielded by a Cortex <code class="docutils literal notranslate"><span class="pre">storm</span></code> call.</p>
+<p>See <a class="reference external" href="https://synapse.docs.vertex.link/en/latest/synapse/devguides/storm_api.html#message-types">Storm Message Types</a>.</p>
+<p>alias of <code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code>]</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="stormlibpp.httpcore.StormMsgType">
+<span class="sig-prename descclassname"><span class="pre">stormlibpp.httpcore.</span></span><span class="sig-name descname"><span class="pre">StormMsgType</span></span><a class="headerlink" href="#stormlibpp.httpcore.StormMsgType" title="Permalink to this definition"></a></dt>
+<dd><p>The type of a Storm message.</p>
+<p>See <a class="reference external" href="https://synapse.docs.vertex.link/en/latest/synapse/devguides/storm_api.html#message-types">Storm Message Types</a>.</p>
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="stormlibpp.hstorm.html" class="btn btn-neutral float-left" title="stormlibpp.hstorm module" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="stormlibpp.import.html" class="btn btn-neutral float-right" title="stormlibpp.import module" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, John Gorman.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+    <!-- Theme Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-6G9XWTWCQG"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', 'G-6G9XWTWCQG', {
+          'anonymize_ip': false,
+      });
+    </script> 
+
+</body>
+</html>

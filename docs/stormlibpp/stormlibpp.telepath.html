@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en">
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>stormlibpp.telepath module &mdash; stormlibpp  documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/sphinx_highlight.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="stormlibpp.tmpcortex module" href="stormlibpp.tmpcortex.html" />
+    <link rel="prev" title="stormlibpp.stormpkg module" href="stormlibpp.stormpkg.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            stormlibpp
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../index.html">Home</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../contributing.html">Contribution Guide</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="stormlibpp.html">StormLib++ API Docs</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="stormlibpp.errors.html">stormlibpp.errors module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="stormlibpp.hfeed.html">stormlibpp.hfeed module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="stormlibpp.hstorm.html">stormlibpp.hstorm module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="stormlibpp.httpcore.html">stormlibpp.httpcore module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="stormlibpp.import.html">stormlibpp.import module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="stormlibpp.node.html">stormlibpp.node module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="stormlibpp.output.html">stormlibpp.output module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="stormlibpp.stormcli.html">stormlibpp.stormcli module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="stormlibpp.stormpkg.html">stormlibpp.stormpkg module</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">stormlibpp.telepath module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#stormlibpp.telepath.BoolRetn"><code class="docutils literal notranslate"><span class="pre">BoolRetn</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#stormlibpp.telepath.BoolRetn.data"><code class="docutils literal notranslate"><span class="pre">BoolRetn.data</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#stormlibpp.telepath.BoolRetn.mesg"><code class="docutils literal notranslate"><span class="pre">BoolRetn.mesg</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#stormlibpp.telepath.BoolRetn.status"><code class="docutils literal notranslate"><span class="pre">BoolRetn.status</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#stormlibpp.telepath.DictRetn"><code class="docutils literal notranslate"><span class="pre">DictRetn</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#stormlibpp.telepath.DictRetn.data"><code class="docutils literal notranslate"><span class="pre">DictRetn.data</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#stormlibpp.telepath.DictRetn.mesg"><code class="docutils literal notranslate"><span class="pre">DictRetn.mesg</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#stormlibpp.telepath.DictRetn.status"><code class="docutils literal notranslate"><span class="pre">DictRetn.status</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#stormlibpp.telepath.ListRetn"><code class="docutils literal notranslate"><span class="pre">ListRetn</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#stormlibpp.telepath.ListRetn.data"><code class="docutils literal notranslate"><span class="pre">ListRetn.data</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#stormlibpp.telepath.ListRetn.mesg"><code class="docutils literal notranslate"><span class="pre">ListRetn.mesg</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#stormlibpp.telepath.ListRetn.status"><code class="docutils literal notranslate"><span class="pre">ListRetn.status</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#stormlibpp.telepath.StrRetn"><code class="docutils literal notranslate"><span class="pre">StrRetn</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#stormlibpp.telepath.StrRetn.data"><code class="docutils literal notranslate"><span class="pre">StrRetn.data</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#stormlibpp.telepath.StrRetn.mesg"><code class="docutils literal notranslate"><span class="pre">StrRetn.mesg</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#stormlibpp.telepath.StrRetn.status"><code class="docutils literal notranslate"><span class="pre">StrRetn.status</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#stormlibpp.telepath.TelepathRetn"><code class="docutils literal notranslate"><span class="pre">TelepathRetn</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#stormlibpp.telepath.TelepathRetn.data"><code class="docutils literal notranslate"><span class="pre">TelepathRetn.data</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#stormlibpp.telepath.TelepathRetn.mesg"><code class="docutils literal notranslate"><span class="pre">TelepathRetn.mesg</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#stormlibpp.telepath.TelepathRetn.status"><code class="docutils literal notranslate"><span class="pre">TelepathRetn.status</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#stormlibpp.telepath.genDefaultTelepathRetn"><code class="docutils literal notranslate"><span class="pre">genDefaultTelepathRetn()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#stormlibpp.telepath.tpath_proxy_contextmanager"><code class="docutils literal notranslate"><span class="pre">tpath_proxy_contextmanager()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="stormlibpp.tmpcortex.html">stormlibpp.tmpcortex module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="stormlibpp.utils.html">stormlibpp.utils module</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../pkgs/index.html">Power-Ups</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">stormlibpp</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="stormlibpp.html">StormLib++ API Docs</a></li>
+      <li class="breadcrumb-item active">stormlibpp.telepath module</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/stormlibpp/stormlibpp.telepath.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="module-stormlibpp.telepath">
+<span id="stormlibpp-telepath-module"></span><h1>stormlibpp.telepath module<a class="headerlink" href="#module-stormlibpp.telepath" title="Permalink to this heading"></a></h1>
+<p>Python objects for working with Synapse Telepath endpoints.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="stormlibpp.telepath.BoolRetn">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">stormlibpp.telepath.</span></span><span class="sig-name descname"><span class="pre">BoolRetn</span></span><a class="headerlink" href="#stormlibpp.telepath.BoolRetn" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></p>
+<p>A TelepathRetn where <code class="docutils literal notranslate"><span class="pre">data</span></code> is a boolean value.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="stormlibpp.telepath.BoolRetn.data">
+<span class="sig-name descname"><span class="pre">data</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><a class="headerlink" href="#stormlibpp.telepath.BoolRetn.data" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="stormlibpp.telepath.BoolRetn.mesg">
+<span class="sig-name descname"><span class="pre">mesg</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#stormlibpp.telepath.BoolRetn.mesg" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="stormlibpp.telepath.BoolRetn.status">
+<span class="sig-name descname"><span class="pre">status</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><a class="headerlink" href="#stormlibpp.telepath.BoolRetn.status" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="stormlibpp.telepath.DictRetn">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">stormlibpp.telepath.</span></span><span class="sig-name descname"><span class="pre">DictRetn</span></span><a class="headerlink" href="#stormlibpp.telepath.DictRetn" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></p>
+<p>A TelepathRetn where <code class="docutils literal notranslate"><span class="pre">data</span></code> is a dict value.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="stormlibpp.telepath.DictRetn.data">
+<span class="sig-name descname"><span class="pre">data</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">dict</span></em><a class="headerlink" href="#stormlibpp.telepath.DictRetn.data" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="stormlibpp.telepath.DictRetn.mesg">
+<span class="sig-name descname"><span class="pre">mesg</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#stormlibpp.telepath.DictRetn.mesg" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="stormlibpp.telepath.DictRetn.status">
+<span class="sig-name descname"><span class="pre">status</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><a class="headerlink" href="#stormlibpp.telepath.DictRetn.status" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="stormlibpp.telepath.ListRetn">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">stormlibpp.telepath.</span></span><span class="sig-name descname"><span class="pre">ListRetn</span></span><a class="headerlink" href="#stormlibpp.telepath.ListRetn" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></p>
+<p>A TelepathRetn where <code class="docutils literal notranslate"><span class="pre">data</span></code> is a list value.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="stormlibpp.telepath.ListRetn.data">
+<span class="sig-name descname"><span class="pre">data</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">list</span></em><a class="headerlink" href="#stormlibpp.telepath.ListRetn.data" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="stormlibpp.telepath.ListRetn.mesg">
+<span class="sig-name descname"><span class="pre">mesg</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#stormlibpp.telepath.ListRetn.mesg" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="stormlibpp.telepath.ListRetn.status">
+<span class="sig-name descname"><span class="pre">status</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><a class="headerlink" href="#stormlibpp.telepath.ListRetn.status" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="stormlibpp.telepath.StrRetn">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">stormlibpp.telepath.</span></span><span class="sig-name descname"><span class="pre">StrRetn</span></span><a class="headerlink" href="#stormlibpp.telepath.StrRetn" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></p>
+<p>A TelepathRetn where <code class="docutils literal notranslate"><span class="pre">data</span></code> is a str value.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="stormlibpp.telepath.StrRetn.data">
+<span class="sig-name descname"><span class="pre">data</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#stormlibpp.telepath.StrRetn.data" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="stormlibpp.telepath.StrRetn.mesg">
+<span class="sig-name descname"><span class="pre">mesg</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#stormlibpp.telepath.StrRetn.mesg" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="stormlibpp.telepath.StrRetn.status">
+<span class="sig-name descname"><span class="pre">status</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><a class="headerlink" href="#stormlibpp.telepath.StrRetn.status" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="stormlibpp.telepath.TelepathRetn">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">stormlibpp.telepath.</span></span><span class="sig-name descname"><span class="pre">TelepathRetn</span></span><a class="headerlink" href="#stormlibpp.telepath.TelepathRetn" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">TypedDict</span></code></p>
+<p>A standard return value from a Telepath API endpoint.</p>
+<p>Also typically returned by Cell methods that eventually
+get called by a Telepath endpoint method.</p>
+<p>Can be subclassed to override type of <code class="docutils literal notranslate"><span class="pre">data</span></code>.</p>
+<p>Using this standard class to return values to Storm helps error handling in
+Storm code. Subclassing to set <code class="docutils literal notranslate"><span class="pre">data</span></code>’s type also improves a Storm
+developer’s understanding of the Python object available in Storm.</p>
+<p>A <code class="docutils literal notranslate"><span class="pre">status</span></code> of <code class="docutils literal notranslate"><span class="pre">False</span></code> means and error occurred. <code class="docutils literal notranslate"><span class="pre">mesg</span></code> must be set
+if <code class="docutils literal notranslate"><span class="pre">status</span></code> is <code class="docutils literal notranslate"><span class="pre">False</span></code>. <code class="docutils literal notranslate"><span class="pre">data</span></code> may or may not be set.</p>
+<p>A <code class="docutils literal notranslate"><span class="pre">status</span></code> of <code class="docutils literal notranslate"><span class="pre">True</span></code> means everything worked well. In this case <code class="docutils literal notranslate"><span class="pre">mesg</span></code>
+may be empty, but <code class="docutils literal notranslate"><span class="pre">data</span></code> must have a value.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="stormlibpp.telepath.TelepathRetn.data">
+<span class="sig-name descname"><span class="pre">data</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Any</span></em><a class="headerlink" href="#stormlibpp.telepath.TelepathRetn.data" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="stormlibpp.telepath.TelepathRetn.mesg">
+<span class="sig-name descname"><span class="pre">mesg</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#stormlibpp.telepath.TelepathRetn.mesg" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="stormlibpp.telepath.TelepathRetn.status">
+<span class="sig-name descname"><span class="pre">status</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><a class="headerlink" href="#stormlibpp.telepath.TelepathRetn.status" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="stormlibpp.telepath.genDefaultTelepathRetn">
+<span class="sig-prename descclassname"><span class="pre">stormlibpp.telepath.</span></span><span class="sig-name descname"><span class="pre">genDefaultTelepathRetn</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">obj=&lt;class</span> <span class="pre">'stormlibpp.telepath.TelepathRetn'&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">/</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">default_data=None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#stormlibpp.telepath.TelepathRetn" title="stormlibpp.telepath.TelepathRetn"><span class="pre">TelepathRetn</span></a></span></span><a class="headerlink" href="#stormlibpp.telepath.genDefaultTelepathRetn" title="Permalink to this definition"></a></dt>
+<dd><p>Generate a default TelepathRetn return object, or the given subclass.</p>
+<p>Default values have a <code class="docutils literal notranslate"><span class="pre">status</span></code> of <code class="docutils literal notranslate"><span class="pre">True</span></code>, an empty <code class="docutils literal notranslate"><span class="pre">mesg</span></code>, and
+<code class="docutils literal notranslate"><span class="pre">data</span></code> is set to the <code class="docutils literal notranslate"><span class="pre">default_data</span></code> arg - which defaults to <code class="docutils literal notranslate"><span class="pre">None</span></code>.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="stormlibpp.telepath.tpath_proxy_contextmanager">
+<span class="sig-prename descclassname"><span class="pre">stormlibpp.telepath.</span></span><span class="sig-name descname"><span class="pre">tpath_proxy_contextmanager</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cortex_url</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Proxy</span></span></span><a class="headerlink" href="#stormlibpp.telepath.tpath_proxy_contextmanager" title="Permalink to this definition"></a></dt>
+<dd><p>Context manager that yields a telepath proxy object connected to cortex_url.</p>
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="stormlibpp.stormpkg.html" class="btn btn-neutral float-left" title="stormlibpp.stormpkg module" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="stormlibpp.tmpcortex.html" class="btn btn-neutral float-right" title="stormlibpp.tmpcortex module" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, John Gorman.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+    <!-- Theme Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-6G9XWTWCQG"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', 'G-6G9XWTWCQG', {
+          'anonymize_ip': false,
+      });
+    </script> 
+
+</body>
+</html>

@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en">
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>stormlibpp.utils module &mdash; stormlibpp  documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/sphinx_highlight.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Power-Ups" href="../pkgs/index.html" />
+    <link rel="prev" title="stormlibpp.tmpcortex module" href="stormlibpp.tmpcortex.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            stormlibpp
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../index.html">Home</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../contributing.html">Contribution Guide</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="stormlibpp.html">StormLib++ API Docs</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="stormlibpp.errors.html">stormlibpp.errors module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="stormlibpp.hfeed.html">stormlibpp.hfeed module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="stormlibpp.hstorm.html">stormlibpp.hstorm module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="stormlibpp.httpcore.html">stormlibpp.httpcore module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="stormlibpp.import.html">stormlibpp.import module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="stormlibpp.node.html">stormlibpp.node module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="stormlibpp.output.html">stormlibpp.output module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="stormlibpp.stormcli.html">stormlibpp.stormcli module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="stormlibpp.stormpkg.html">stormlibpp.stormpkg module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="stormlibpp.telepath.html">stormlibpp.telepath module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="stormlibpp.tmpcortex.html">stormlibpp.tmpcortex module</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">stormlibpp.utils module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#stormlibpp.utils.absjoin"><code class="docutils literal notranslate"><span class="pre">absjoin()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#stormlibpp.utils.add_parser_parents"><code class="docutils literal notranslate"><span class="pre">add_parser_parents()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#stormlibpp.utils.chk_storm_syntax"><code class="docutils literal notranslate"><span class="pre">chk_storm_syntax()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#stormlibpp.utils.csv_genr"><code class="docutils literal notranslate"><span class="pre">csv_genr()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#stormlibpp.utils.endswith"><code class="docutils literal notranslate"><span class="pre">endswith()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#stormlibpp.utils.get_cortex_creds"><code class="docutils literal notranslate"><span class="pre">get_cortex_creds()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#stormlibpp.utils.get_cortex_obj"><code class="docutils literal notranslate"><span class="pre">get_cortex_obj()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#stormlibpp.utils.get_cortex_token"><code class="docutils literal notranslate"><span class="pre">get_cortex_token()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#stormlibpp.utils.json_genr"><code class="docutils literal notranslate"><span class="pre">json_genr()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#stormlibpp.utils.normver"><code class="docutils literal notranslate"><span class="pre">normver()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#stormlibpp.utils.txt_genr"><code class="docutils literal notranslate"><span class="pre">txt_genr()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../pkgs/index.html">Power-Ups</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">stormlibpp</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="stormlibpp.html">StormLib++ API Docs</a></li>
+      <li class="breadcrumb-item active">stormlibpp.utils module</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/stormlibpp/stormlibpp.utils.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="module-stormlibpp.utils">
+<span id="stormlibpp-utils-module"></span><h1>stormlibpp.utils module<a class="headerlink" href="#module-stormlibpp.utils" title="Permalink to this heading"></a></h1>
+<p>Miscellaneous functions that are helpful for working with Storm/Synapse.</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="stormlibpp.utils.absjoin">
+<span class="sig-prename descclassname"><span class="pre">stormlibpp.utils.</span></span><span class="sig-name descname"><span class="pre">absjoin</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">paths</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="headerlink" href="#stormlibpp.utils.absjoin" title="Permalink to this definition"></a></dt>
+<dd><p>Join paths with os.path.join and then pass it to os.path.abspath.</p>
+<section id="parameters">
+<h2>Parameters<a class="headerlink" href="#parameters" title="Permalink to this heading"></a></h2>
+<dl class="simple">
+<dt>paths<span class="classifier">list[str]</span></dt><dd><p>The path strings to join together, as would be passed to <code class="docutils literal notranslate"><span class="pre">os.path.join</span></code>.</p>
+</dd>
+</dl>
+</section>
+<section id="returns">
+<h2>Returns<a class="headerlink" href="#returns" title="Permalink to this heading"></a></h2>
+<dl class="simple">
+<dt>str</dt><dd><p>The absolute path derived from the joined <code class="docutils literal notranslate"><span class="pre">paths</span></code>.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="stormlibpp.utils.add_parser_parents">
+<span class="sig-prename descclassname"><span class="pre">stormlibpp.utils.</span></span><span class="sig-name descname"><span class="pre">add_parser_parents</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">parser</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ArgumentParser</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">parents</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ArgumentParser</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">ArgumentParser</span></span></span><a class="headerlink" href="#stormlibpp.utils.add_parser_parents" title="Permalink to this definition"></a></dt>
+<dd><p>Add parent parsers to an ArgumentParser after it is created.</p>
+<p>Implementation borrowed from the init of <code class="docutils literal notranslate"><span class="pre">argparse.ArgumentParser</span></code>.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="stormlibpp.utils.chk_storm_syntax">
+<span class="sig-prename descclassname"><span class="pre">stormlibpp.utils.</span></span><span class="sig-name descname"><span class="pre">chk_storm_syntax</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">storm</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#stormlibpp.utils.chk_storm_syntax" title="Permalink to this definition"></a></dt>
+<dd><p>Check if the given Storm code has valid syntax, raise exception if not.</p>
+<section id="raises">
+<h2>Raises<a class="headerlink" href="#raises" title="Permalink to this heading"></a></h2>
+<dl class="simple">
+<dt>StormSyntaxError</dt><dd><p>If a Storm syntax error was found in the given Storm code.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="stormlibpp.utils.csv_genr">
+<span class="sig-prename descclassname"><span class="pre">stormlibpp.utils.</span></span><span class="sig-name descname"><span class="pre">csv_genr</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fd</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">list</span></span></span><a class="headerlink" href="#stormlibpp.utils.csv_genr" title="Permalink to this definition"></a></dt>
+<dd><p>Read a CSV from fd and yield each row.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="stormlibpp.utils.endswith">
+<span class="sig-prename descclassname"><span class="pre">stormlibpp.utils.</span></span><span class="sig-name descname"><span class="pre">endswith</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">text</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">items</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="headerlink" href="#stormlibpp.utils.endswith" title="Permalink to this definition"></a></dt>
+<dd><p>Check if text ends with any of items.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="stormlibpp.utils.get_cortex_creds">
+<span class="sig-prename descclassname"><span class="pre">stormlibpp.utils.</span></span><span class="sig-name descname"><span class="pre">get_cortex_creds</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">_user</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#stormlibpp.utils.get_cortex_creds" title="Permalink to this definition"></a></dt>
+<dd><p>Get credentials to use when connecting to a Cortex over HTTP.</p>
+<p>If <code class="docutils literal notranslate"><span class="pre">_user</span></code> is set, it overrides any other options to get a username.
+Otherwise use the value of the <code class="docutils literal notranslate"><span class="pre">CORTEX_USER</span></code> environment variable. If that
+is also empty, prompt for a username. A default option is given to the user
+at the prompt, it is the return of <code class="docutils literal notranslate"><span class="pre">getpass.getuser()</span></code>.</p>
+<p>The password is read from the <code class="docutils literal notranslate"><span class="pre">CORTEX_PASS</span></code> environment variable and the
+user is prompted if this is empty.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="stormlibpp.utils.get_cortex_obj">
+<em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">stormlibpp.utils.</span></span><span class="sig-name descname"><span class="pre">get_cortex_obj</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cortex</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">http</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">local</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ssl_verify</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">username</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">password</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">token</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">''</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#stormlibpp.utils.get_cortex_obj" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="stormlibpp.utils.get_cortex_token">
+<span class="sig-prename descclassname"><span class="pre">stormlibpp.utils.</span></span><span class="sig-name descname"><span class="pre">get_cortex_token</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">prompt</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="headerlink" href="#stormlibpp.utils.get_cortex_token" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="stormlibpp.utils.json_genr">
+<span class="sig-prename descclassname"><span class="pre">stormlibpp.utils.</span></span><span class="sig-name descname"><span class="pre">json_genr</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fd</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#stormlibpp.utils.json_genr" title="Permalink to this definition"></a></dt>
+<dd><p>Read a JSON file from fd, and yield each top-level item within it.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="stormlibpp.utils.normver">
+<span class="sig-prename descclassname"><span class="pre">stormlibpp.utils.</span></span><span class="sig-name descname"><span class="pre">normver</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ver</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">tuple</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">tuple</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#stormlibpp.utils.normver" title="Permalink to this definition"></a></dt>
+<dd><p>Take either a version str “x.x.x” or tuple (x, x, x) and return both.</p>
+<section id="id1">
+<h2>Raises<a class="headerlink" href="#id1" title="Permalink to this heading"></a></h2>
+<dl class="simple">
+<dt>TypeError</dt><dd><p>If <code class="docutils literal notranslate"><span class="pre">ver</span></code> is not a str or tuple.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="stormlibpp.utils.txt_genr">
+<span class="sig-prename descclassname"><span class="pre">stormlibpp.utils.</span></span><span class="sig-name descname"><span class="pre">txt_genr</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fd</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#stormlibpp.utils.txt_genr" title="Permalink to this definition"></a></dt>
+<dd><p>Read a raw text file from fd and yield each line.</p>
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="stormlibpp.tmpcortex.html" class="btn btn-neutral float-left" title="stormlibpp.tmpcortex module" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="../pkgs/index.html" class="btn btn-neutral float-right" title="Power-Ups" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, John Gorman.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+    <!-- Theme Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-6G9XWTWCQG"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', 'G-6G9XWTWCQG', {
+          'anonymize_ip': false,
+      });
+    </script> 
+
+</body>
+</html>
