@@ -15,6 +15,6 @@
 - Adds export/import methods to `HttpCortex` for greater CLI parity ([#28](https://github.com/gormaniac/stormlibpp/pull/28)).
 - Improves `ItemContainer` to use a `dict` under the hood ([#28](https://github.com/gormaniac/stormlibpp/pull/28)).
 - An HTTP based version of the `synapse.tools.feed` script - `hfeed` ([#29](https://github.com/gormaniac/stormlibpp/pull/29)).
-- Moves the `dnsstorm` and `lookup-storm` Synapse Power-Ups into the StormLib++ project.
+- Moves the `dnsstorm` and `lookup-storm` Synapse Power-Ups into the StormLib++ project ([#30](https://github.com/gormaniac/stormlibpp/pull/30)).
 ### Fixes
 - N/A
