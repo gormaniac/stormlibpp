@@ -1,3 +1,7 @@
+---
+github_url: https://github.com/gormaniac/stormlibpp/doc
+---
+
 # Welcome to StormLib++'s documentation!
 
 <a href="https://github.com/gormaniac/stormlibpp" title="Github Project"><img src="_static/github-logo.png" width="20" height="20"></a>
