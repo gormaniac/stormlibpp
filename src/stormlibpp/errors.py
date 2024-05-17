@@ -49,3 +49,14 @@ class HttpCortexNotImplementedError(s_exc.SynErr, NotImplementedError):
 
 class HttpCortexJsonError(HttpCortexError):
     """Unable to parse JSON response from Synapse with HttpCortex."""
+
+class BundleConfError(RuntimeError):
+    """An error raised by BundleConf."""
+
+
+class BundleConfSaveError(BundleConfError):
+    """Raise when a BundleConf can't be saved."""
+
+
+class BundleConfLoadStormError(BundleConfError):
+    """Raise when a BundleConf can't load a Storm file."""

@@ -1,0 +1,72 @@
+// TODO - Figure out a way to support encryption - might require a Storm Service.
+function get_file(url) {
+    $resp = $lib.inet.http.get($url)
+    if ($resp.code != 200) {
+        $lib.print(`Error requesting the STIX import config from "{$url}"\nHTTP Status Code: {$resp.code}\nErr: {$resp.err}`)
+        return($lib.null)
+    } else {
+        return($resp.body)
+    }
+}
+
+function validate_file_hash(hashes, byts) {
+    for ($algo, $hash) in $hashes {
+        switch $algo {
+            "MD5": { if $hash = $lib.crypto.hashes.md5($byts) {return($lib.true)} }
+            "SHA-1": { if $hash = $lib.crypto.hashes.sha1($byts) {return($lib.true)} }
+            "SHA-256": { if $hash = $lib.crypto.hashes.sha256($byts) {return($lib.true)} }
+            "SHA-512": { if $hash = $lib.crypto.hashes.sha512($byts) {return($lib.true)} }
+        }
+    }
+    return($lib.false)
+}
+
+function axon_available() {
+    $data = $lib.axon.metrics()
+    if $data {
+        return($lib.true)
+    }
+    return($lib.false)
+}
+
+if $object.payload_bin {
+    $bin = $lib.base64.decode($object.payload_bin)
+} else {
+    $bin = $get_file($object.url)
+    // TODO - Can we return messages, or raise errors?
+    if (not $bin) { return() }
+    if $object.hashes {
+        if (not $validate_file_hash($object.hashes, $bin)) {
+            return()
+        }
+    }
+}
+
+// TODO - Figure out a way to support encryption - might require a Storm Service.
+
+$sha256 = $lib.crypto.hashes.sha256($bin)
+$size = $lib.null
+if $axon_available() {
+    try:
+        ($size, $_) = $lib.axon.put($bin)
+    catch * as err {
+        $lib.print(`Unable to upload {$sha256} to the Axon.`)
+    }
+}
+
+file:bytes:sha256=$sha256
+[ <(refs)+ { it:sec:stix:bundle:id=$bundle.id } ]
+$node.data.set(`stix:object:bundle:{$bundle.id}`, $object)
+return($node)
+
+[
+    file:bytes=`sha256:{$sha256}`
+    :size?=$size
+    :md5?=$lib.crypto.hashes.md5($bin)
+    :sha1?=$lib.crypto.hashes.sha1($bin)
+    :sha256?=$lib.crypto.hashes.sha256($bin)
+    :sha512?=$lib.crypto.hashes.sha512($bin)
+]
+[ <(refs)+ { it:sec:stix:bundle:id=$bundle.id } ]
+$node.data.set(`stix:object:bundle:{$bundle.id}`, $object)
+return($node)

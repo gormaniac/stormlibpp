@@ -1,0 +1,167 @@
+{
+  "addbundle": true,
+  "bundle": {
+    "storm": "it:sec:stix:bundle:id=$bundle.id\nreturn($node)\n[ it:sec:stix:bundle=* :id=$bundle.id ]\n$node.data.set(stix:bundle, $object)\nreturn($node)"
+  },
+  "objects": {
+    "artifact": {
+      "storm": "// TODO - Figure out what these look like."
+    },
+    "attack-pattern": {
+      "storm": "// TODO - Figure out what these look like."
+    },
+    "autonomous-system": {
+      "storm": "// TODO - Make sure value is the right key for this\n[inet:as=$object.value]\n[ <(refs)+ { it:sec:stix:bundle:id=$bundle.id } ]\n$node.data.set(stix:object, $object)\nreturn($node)"
+    },
+    "campaign": {
+      "storm": "[ ou:campaign=(stix, campaign, $object.id)\n    :name?=$object.name\n    :desc?=$object.description\n    .seen?=$object.last_seen\n    .seen?=$object.first_seen\n]\n[ <(refs)+ { it:sec:stix:bundle:id=$bundle.id } ]\n$node.data.set(stix:object, $object)\nreturn($node)"
+    },
+    "course-of-action": {
+      "storm": "[ risk:mitigation=(stix, course-of-action, $object.id)\n    :name?=$object.name\n    :desc?=$object.description\n]\n[ <(refs)+ { it:sec:stix:bundle:id=$bundle.id } ]\n$node.data.set(stix:object, $object)\nreturn($node)"
+    },
+    "directory": {
+      "storm": "// TODO - Figure out what these look like."
+    },
+    "domain-name": {
+      "storm": "// TODO - Make sure value is the right key for this\n[inet:fqdn=$object.value]\n[ <(refs)+ { it:sec:stix:bundle:id=$bundle.id } ]\n$node.data.set(stix:object, $object)\nreturn($node)"
+    },
+    "email-addr": {
+      "storm": "// TODO - Make sure value is the right key for this\n[inet:email=$object.value]\n[ <(refs)+ { it:sec:stix:bundle:id=$bundle.id } ]\n$node.data.set(stix:object, $object)\nreturn($node)"
+    },
+    "email-message": {
+      "storm": "// TODO - Figure out what these look like."
+    },
+    "file": {
+      "storm": "if ($object.hashes != $lib.null) {\n    ($ok, $hash) = $lib.trycast(file:bytes, $object.hashes.\"SHA-256\")\n    if $ok {\n        $guid = `sha256:{$hash}`\n    } else {\n        $guid = `guid:{$lib.guid(stix, file, $object.id)}`\n    }\n    [\n        file:bytes=$guid\n        :size?=$object.size\n        :name?=$object.name\n        :md5?=$object.hashes.\"MD5\"\n        :sha1?=$object.hashes.\"SHA-1\"\n        :sha256?=$object.hashes.\"SHA-256\"\n        :sha512?=$object.hashes.\"SHA-512\"\n    ]\n    // TODO - Do something with windows-pebinary-ext extension\n    [ <(refs)+ { it:sec:stix:bundle:id=$bundle.id } ]\n    $node.data.set(stix:object, $object)\n    return($node)\n}"
+    },
+    "grouping": {
+      "storm": "// TODO - Figure out what these look like."
+    },
+    "identity": {
+      "storm": "switch $object.identity_class {\n    group: {[ ps:contact=(stix, identity, $object.id) :orgname?=$object.name ]}\n    organization: {[ ps:contact=(stix, identity, $object.id) :orgname?=$object.name ]}\n    individual: {[ ps:contact=(stix, identity, $object.id) :name?=$object.name ]}\n    system: {[ it:host=(stix, identity, $object.id) :name?=$object.name ]}\n}\n[ <(refs)+ { it:sec:stix:bundle:id=$bundle.id } ]\n$node.data.set(stix:object, $object)\nreturn($node)"
+    },
+    "incident": {
+      "storm": "// TODO - Figure out what these look like."
+    },
+    "indicator": {
+      "storm": "$guid = $lib.guid(stix, indicator, $object.id)\nswitch $object.pattern_type {\n\n    yara: {[ it:app:yara:rule=$guid\n                :name?=$object.name\n                :text?=$object.pattern\n    ]}\n\n    snort: {[ it:app:snort:rule=$guid\n                :name?=$object.name\n                :text?=$object.pattern\n    ]}\n\n    *: {[ it:sec:stix:indicator=$guid\n            :name?=$object.name\n            :pattern?=$object.pattern\n            :created?=$object.created\n            :updated?=$object.modified]\n       | scrape --refs :pattern\n       }\n}\n[ <(refs)+ { it:sec:stix:bundle:id=$bundle.id } ]\n$node.data.set(stix:object, $object)\nreturn($node)"
+    },
+    "infrastructure": {
+      "storm": "// TODO - Figure out what these look like."
+    },
+    "intrusion-set": {
+      "storm": "($ok, $name) = $lib.trycast(ou:name, $object.name)\nif $ok {\n\n    ou:name=$name -> ou:org\n    { for $alias in $object.aliases { [ :names?+=$alias ] } }\n    [ <(refs)+ { it:sec:stix:bundle:id=$bundle.id } ]\n    return($node)\n\n    [ ou:org=* :name=$name ]\n    { for $alias in $object.aliases { [ :names?+=$alias ] } }\n    [ <(refs)+ { it:sec:stix:bundle:id=$bundle.id } ]\n    $node.data.set(stix:object, $object)\n    return($node)\n}"
+    },
+    "ipv4-addr": {
+      "storm": "[inet:ipv4=$object.value]\n[ <(refs)+ { it:sec:stix:bundle:id=$bundle.id } ]\n$node.data.set(stix:object, $object)\nreturn($node)"
+    },
+    "ipv6-addr": {
+      "storm": "[inet:ipv6=$object.value]\n[ <(refs)+ { it:sec:stix:bundle:id=$bundle.id } ]\n$node.data.set(stix:object, $object)\nreturn($node)"
+    },
+    "location": {
+      "storm": "// TODO - Figure out what these look like."
+    },
+    "mac-addr": {
+      "storm": "// TODO - Figure out what these look like."
+    },
+    "malware-analysis": {
+      "storm": "[\n    it:av:scan:result=$lib.guid(stix, \"malware-analysis\", $object.id)\n    :verdict=$object.result\n    :signame=$object.result_name\n    :scanner:name=$object.product\n]\n[ <(refs)+ { it:sec:stix:bundle:id=$bundle.id } ]\n$node.data.set(stix:object, $object)\nreturn($node)"
+    },
+    "malware": {
+      "storm": "($ok, $name) = $lib.trycast(it:prod:softname, $object.name)\nif $ok {\n    it:prod:softname=$name -> it:prod:soft\n    [ <(refs)+ { it:sec:stix:bundle:id=$bundle.id } ]\n    return($node)\n    [ it:prod:soft=* :name=$name ]\n    [ <(refs)+ { it:sec:stix:bundle:id=$bundle.id } ]\n    $node.data.set(stix:object, $object)\n    return($node)\n} else { // Sometimes malware objects don't have a name, let's save the description as a meta:note instead.\n    [\n        meta:note=(stix, note, $object.id)\n        :type=stix.malware\n        :text=$object.description\n        :created=$object.created\n        :updated=$object.modified\n    ]\n    [ <(refs)+ { it:sec:stix:bundle:id=$bundle.id } ]\n    $node.data.set(stix:object, $object)\n    return($node)\n}"
+    },
+    "mutex": {
+      "storm": "// TODO - Figure out what these look like."
+    },
+    "network-traffic": {
+      "storm": "// TODO - Figure out what these look like."
+    },
+    "note": {
+      "storm": "[\n    meta:note=(stix, note, $object.id)\n    :type=stix.note\n    :text=$object.content\n    :created=$object.created\n    :updated=$object.modified\n]\n[ <(refs)+ { it:sec:stix:bundle:id=$bundle.id } ]\nreturn($node)"
+    },
+    "observed-data": {
+      "storm": "// TODO - Figure out what these look like."
+    },
+    "opinion": {
+      "storm": "// TODO - Figure out if content is the right key here.\n[\n    meta:note=(stix, note, $object.id)\n    :type=stix.opinion\n    :text=$object.content\n    :created=$object.created\n    :updated=$object.modified\n]\n[ <(refs)+ { it:sec:stix:bundle:id=$bundle.id } ]\nreturn($node)"
+    },
+    "process": {
+      "storm": "// TODO - Figure out what these look like."
+    },
+    "relationship": {
+      "storm": "// TODO - Figure out what these look like."
+    },
+    "report": {
+      "storm": "[ media:news=(stix, report, $object.id)\n    :title?=$object.name\n    :summary?=$object.description\n    :published?=$object.published\n]\n[ <(refs)+ { it:sec:stix:bundle:id=$bundle.id } ]\n$node.data.set(stix:object, $object)\nreturn($node)"
+    },
+    "sighting": {
+      "storm": "// TODO - Figure out what these look like."
+    },
+    "software": {
+      "storm": "// TODO - Figure out what these look like."
+    },
+    "threat-actor": {
+      "storm": "[ ps:contact=(stix, threat-actor, $object.id)\n    :name?=$object.name\n    :desc?=$object.description\n    :names?=$object.aliases\n]\n[ <(refs)+ { it:sec:stix:bundle:id=$bundle.id } ]\n$node.data.set(stix:object, $object)\nreturn($node)"
+    },
+    "tool": {
+      "storm": "($ok, $name) = $lib.trycast(it:prod:softname, $object.name)\nif $ok {\n    it:prod:softname=$name -> it:prod:soft\n    [ <(refs)+ { it:sec:stix:bundle:id=$bundle.id } ]\n    return($node)\n    [ it:prod:soft=* :name=$name ]\n    [ <(refs)+ { it:sec:stix:bundle:id=$bundle.id } ]\n    return($node)\n}"
+    },
+    "url": {
+      "storm": "// TODO - Make sure value is the right key for this\n[inet:url=`{$object.value}`]\n[ <(refs)+ { it:sec:stix:bundle:id=$bundle.id } ]\n$node.data.set(stix:object, $object)\nreturn($node)"
+    },
+    "user-account": {
+      "storm": ""
+    },
+    "vulnerability": {
+      "storm": "// TODO - Figure out what these look like."
+    },
+    "windows-registry-key": {
+      "storm": "// TODO - Figure out what these look like."
+    },
+    "x509-certificate": {
+      "storm": "// TODO - Figure out what these look like."
+    }
+  },
+  "relationships": [
+    {
+      "type": [
+        "campaign",
+        "attributed-to",
+        "intrusion-set"
+      ],
+      "storm": "$n1node.props.org = $n2node"
+    },
+    {
+      "type": [
+        "intrusion-set",
+        "attributed-to",
+        "threat-actor"
+      ],
+      "storm": "$n2node.props.org = $n1node"
+    },
+    {
+      "type": [
+        null,
+        "uses",
+        null
+      ],
+      "storm": "yield $n1node [ +(uses)> { yield $n2node } ]"
+    },
+    {
+      "type": [
+        null,
+        "indicates",
+        null
+      ],
+      "storm": "yield $n1node [ +(indicates)> { yield $n2node } ]"
+    },
+    {
+      "type": [
+        "threat-actor",
+        "attributed-to",
+        "identity"
+      ],
+      "storm": ""
+    }
+  ]
+}

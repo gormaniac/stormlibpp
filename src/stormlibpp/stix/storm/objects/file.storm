@@ -1,0 +1,26 @@
+if ($object.hashes != $lib.null) {
+    ($ok, $hash) = $lib.trycast(file:bytes, $object.hashes."SHA-256")
+    if $ok {
+        $guid = `sha256:{$hash}`
+    } else {
+        $guid = `guid:{$lib.guid(stix, file, $object.id)}`
+    }
+    [
+        file:bytes=$guid
+        :size?=$object.size
+        :name?=$object.name
+        :mime?=$object.mime_type
+        :md5?=$object.hashes."MD5"
+        :sha1?=$object.hashes."SHA-1"
+        :sha256?=$object.hashes."SHA-256"
+        :sha512?=$object.hashes."SHA-512"
+    ]
+
+    if (($object.parent_directory_ref != $lib.null) and ($object.name != $lib.null)) {
+        {[( file:filepath=((file, $guid), (path, `{$object.parent_directory_ref/$object.name}`)) )]}
+    }
+    // TODO - Do something with windows-pebinary-ext extension
+    [ <(refs)+ { it:sec:stix:bundle:id=$bundle.id } ]
+    $node.data.set(`stix:object:bundle:{$bundle.id}`, $object)
+    return($node)
+}

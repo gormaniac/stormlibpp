@@ -1,0 +1,10 @@
+// TODO - Figure out what these look like.
+[ it:fs:file=(stix, directory, $object.id)
+    :path=$object.path
+    :ctime?=$object.ctime
+    :mtime?=$object.mtime
+    :atime?=$object.atime
+]
+[ <(refs)+ { it:sec:stix:bundle:id=$bundle.id } ]
+$node.data.set(`stix:object:bundle:{$bundle.id}`, $object)
+return($node)

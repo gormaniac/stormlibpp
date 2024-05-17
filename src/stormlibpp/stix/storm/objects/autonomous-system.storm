@@ -1,0 +1,7 @@
+[
+    inet:as=$object.number
+    :name?=$object.name
+]
+[ <(refs)+ { it:sec:stix:bundle:id=$bundle.id } ]
+$node.data.set(`stix:object:bundle:{$bundle.id}`, $object)
+return($node)
