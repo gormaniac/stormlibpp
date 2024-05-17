@@ -79,6 +79,7 @@
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../pkgs/index.html">Power-Ups</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../changelog.html">Changelog</a></li>
 </ul>
 
         </div>
@@ -288,7 +289,7 @@ or an error reading the response.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="stormlibpp.httpcore.HttpCortex.login">
-<em class="property"><span class="pre">async</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">login</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#stormlibpp.httpcore.HttpCortex.login" title="Permalink to this definition"></a></dt>
+<em class="property"><span class="pre">async</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">login</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">close</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#stormlibpp.httpcore.HttpCortex.login" title="Permalink to this definition"></a></dt>
 <dd><p>Login to the Cortex with the user/pass (or API key) supplied at instantiation.</p>
 <p>If a user/pass is supplied, cookie based authentication is used.</p>
 <p>Sets the cookie returned by the Cortex in the underlying <code class="docutils literal notranslate"><span class="pre">ClientSession</span></code>.
@@ -300,6 +301,13 @@ longer than that without calling this method again.</p>
 <p>If an API key is passed at instantiation, the user/pass combo is ignored 
 and the <code class="docutils literal notranslate"><span class="pre">ClientSession</span></code> is configured to send the API key value in the
 <code class="docutils literal notranslate"><span class="pre">X-API-KEY</span></code> header with every request.</p>
+<section id="id7">
+<h3>Parameters<a class="headerlink" href="#id7" title="Permalink to this heading"></a></h3>
+<dl class="simple">
+<dt>close<span class="classifier">bool</span></dt><dd><p>Close the underlying session when logins fail, by default False.</p>
+</dd>
+</dl>
+</section>
 </dd></dl>
 
 <dl class="py method">
@@ -312,8 +320,8 @@ and the <code class="docutils literal notranslate"><span class="pre">ClientSessi
 <dt class="sig sig-object py" id="stormlibpp.httpcore.HttpCortex.storm">
 <em class="property"><span class="pre">async</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">storm</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">text</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">opts</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tuplify</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">AsyncGenerator</span><span class="p"><span class="pre">[</span></span><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dict</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">None</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#stormlibpp.httpcore.HttpCortex.storm" title="Permalink to this definition"></a></dt>
 <dd><p>Evaulate a Storm query and yield the streamed Storm messages.</p>
-<section id="id7">
-<h3>Parameters<a class="headerlink" href="#id7" title="Permalink to this heading"></a></h3>
+<section id="id8">
+<h3>Parameters<a class="headerlink" href="#id8" title="Permalink to this heading"></a></h3>
 <dl class="simple">
 <dt>text<span class="classifier">str</span></dt><dd><p>The Storm code to execute.</p>
 </dd>
@@ -331,15 +339,15 @@ By default True.</p>
 </dd>
 </dl>
 </section>
-<section id="id8">
-<h3>Yields<a class="headerlink" href="#id8" title="Permalink to this heading"></a></h3>
+<section id="id9">
+<h3>Yields<a class="headerlink" href="#id9" title="Permalink to this heading"></a></h3>
 <dl class="simple">
 <dt>StormMsg</dt><dd><p>Each message streamed by the Cortex.</p>
 </dd>
 </dl>
 </section>
-<section id="id9">
-<h3>Raises<a class="headerlink" href="#id9" title="Permalink to this heading"></a></h3>
+<section id="id10">
+<h3>Raises<a class="headerlink" href="#id10" title="Permalink to this heading"></a></h3>
 <dl class="simple">
 <dt>HttpCortexError</dt><dd><p>If an exception is raised when making an HTTP request to the Cortex.
 This will likely either be from an HTTP error, a connection error,

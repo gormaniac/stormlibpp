@@ -13,4 +13,5 @@ self
 contributing
 stormlibpp/stormlibpp
 pkgs/index
+changelog
 ```
