@@ -1,10 +1,20 @@
+# Copyright (c) 2024, John Gorman
+# Licensed under the MIT License
+#
+# Portions of this file are derived from the Synapse project:
+#   https://github.com/vertexproject/synapse
+# Copyright (c) The Vertex Project
+# Licensed under the Apache License, Version 2.0.
+#
+# Modified for use in the stormlibpp project.
+
+
 """Storm message printing code that was copied and modified from the Storm CLI.
 
 Unfortunately, the Storm CLI code does not include the following code as easily
-exportable methods for reuse in other code. I have copied the relevant code
-from the Storm CLI and modified it to work in standalone methods.
+exportable methods for reuse in other code. The relevant code from the Storm CLI
+from vertexproject/synapse has been modified to work in standalone methods.
 """
-
 
 import io
 import json
