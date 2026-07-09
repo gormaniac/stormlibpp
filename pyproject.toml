@@ -22,7 +22,7 @@ file = "LICENSE"
 
 [project.urls]
 Homepage = "https://github.com/gormaniac/stormlibpp"
-Documentation = "https://gormo.co/stormlibpp/"
+Documentation = "https://gormo.co/docs/stormlibpp/"
 
 [tool.setuptools.packages.find]
 namespaces = true

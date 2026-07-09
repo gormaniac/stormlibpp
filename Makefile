@@ -33,7 +33,7 @@ install-self: # Install this project's python package using the pipenv's pip
 docs: # Build the documentation for this package
 	./scripts/pkgs/copy-docs.sh
 	pipenv run sphinx-apidoc -d 1 -t doc/_templates -e -M -T -f -o doc/stormlibpp $(PKG_DIR)
-	pipenv run sphinx-build doc/ docs/
+	pipenv run sphinx-build -b dirhtml doc/ docs/
 
 .PHONY: clean-py
 clean-py: # Clean up Python generated files
@@ -47,6 +47,8 @@ clean: clean-py # Remove build files - including a forced "git rm" of "dist/*"
 	git rm -f dist/* --ignore-unmatch
 	rm -rf dist
 	rm -rf src/private
+	git rm -f docs/* --ignore-unmatch
+	rm -rf docs
 
 .PHONY: read-docs
 read-docs: # Open the package docs locally
@@ -54,12 +56,12 @@ read-docs: # Open the package docs locally
 
 .PHONY: release
 release: change-version clean setup build docs # Build a new versioned release and push it (requires VERSION=#.#.#)
-	git add doc/* docs/* pyproject.toml $(PKG_DIR)/__init__.py
+	git add doc/* pyproject.toml $(PKG_DIR)/__init__.py
 	git commit -m "build: release v$(VERSION)"
 	git push
 	git tag -a v$(VERSION) -m "Release v$(VERSION)"
 	git push origin v$(VERSION)
-	$(MAKE) clean-py
+	$(MAKE) clean
 
 .PHONY: tests
 tests: # Run the pytest suite for this project.

@@ -72,7 +72,7 @@ class TestNode:
         for tag in tags:
             assert tag in node.tags
 
-        assert dir(node.tags) == [item[0] for item in iter(node.tags)]
+        assert sorted(dir(node.tags)) == sorted([item[0] for item in iter(node.tags)])
 
     def test_add_props(self):
         props = {'prop': 'test', 'other': 'value'}

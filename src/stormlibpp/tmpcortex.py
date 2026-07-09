@@ -1,3 +1,14 @@
+# Copyright (c) 2024, John Gorman
+# Licensed under the MIT License
+#
+# Portions of this file are derived from the Synapse project:
+#   https://github.com/vertexproject/synapse
+# Copyright (c) The Vertex Project
+# Licensed under the Apache License, Version 2.0.
+#
+# Modified for use in the stormlibpp project.
+
+
 """Start a temporary Synapse Cortex for testing purposes."""
 
 

@@ -86,6 +86,9 @@ class ItemContainer:
     def __dict__(self):
         return self.__ns
 
+    def __dir__(self):
+        return list(self.__ns.keys())
+
     def __iter__(self) -> Any:
         for item in self.__ns:
             yield (item, self[item])
