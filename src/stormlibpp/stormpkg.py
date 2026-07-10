@@ -18,21 +18,19 @@ class StormPkg:
 
     This class must be subclassed - this is how default proto dir loading is supported.
 
-    By default, the subclasses expect a Storm package proto to be stored in a
-    ``pkgproto`` directory that is within the same directory as the ``__init__.py``
-    of the module the object is defined within. This can be changed. But, if
-    it isn't, this means you must setup your package proto files to be built with
-    your Python module.
+    Notes
+    -----
 
-    By default, subclasses look for a Yaml package proto file with a basename
-    equal to the lowercase version of the subclass' name. Subclasses must
-    override the ``proto_name`` class property to change this behavior.
+    This module exists to make the process of defining Storm Packages 
+    for Storm Advanced Power-Ups in Python easier. Rather than defining 
+    a Service's Storm package in a Python dict, this object allows you
+    to define a typical Rapid Power-Up and attach it to a Storm Service
+    API class.
 
-    This object is ready to use on init - access the ``pkgdef`` prop for
-    the full Storm package definition loaded from the definied package proto.
-    The ``pkgdef`` property is also returned by this object's ``asdict`` method.
+    This object also allows you to check your Packages definition and syntax
+    before you try to load it into a Cortex. Streamlining the development process.
 
-    It takes the following steps on start up:
+    StormPkg takes the following steps on start up:
 
     - Resolves the path of the package proto based on ``proto_name`` and
       ``proto_dir``.
@@ -41,7 +39,6 @@ class StormPkg:
 
     - Converts the returned object to a ``dict`` using ``json.dumps`` and
       ``json.loads``.
-
         - This is necessary because ``tryLoadPkgProto`` returns a "tuplified"
           object (the return of ``synapse.common.tuplify``). Which can return
           immutable objects that ``synapse.cortex.Cortex.addStormPkg`` expects
@@ -56,6 +53,30 @@ class StormPkg:
     - If ``check_syntax`` is True, all Storm code that is loaded in the ``pkdef``
       is passed to Synapse's Storm parser to check for Storm syntax errors.
       Any errors are raised as a ``StormPkgSyntaxError`` exception.
+    
+    Usage
+    -----
+
+    In order to support the default package definition (proto) dir resolution, this
+    class must be subclassed. There are special rules described below for how this
+    class resolves the default package proto dir and the default package proto file.
+    In short, it must either be set as a property on the subclass or the name of the
+    subclass (when all lower case) must match the name of the package proto dir and
+    file name (without extension).
+
+    By default, the subclasses expect a Storm package proto to be stored in a
+    ``pkgproto`` directory that is within the same directory as the ``__init__.py``
+    of the module the object is defined within. This can be changed. But, if
+    it isn't, this means you must setup your package proto files to be built with
+    your Python module.
+
+    By default, subclasses look for a Yaml package proto file with a basename
+    equal to the lowercase version of the subclass' name. Subclasses must
+    override the ``proto_name`` class property to change this behavior.
+
+    This object is ready to use on init - access the ``pkgdef`` prop for
+    the full Storm package definition loaded from the definied package proto.
+    The ``pkgdef`` property is also returned by this object's ``asdict`` method.
 
     Examples::
 

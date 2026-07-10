@@ -3,6 +3,8 @@
 
 from typing import Any, TypedDict
 
+from .utils import ItemContainer
+
 
 NodeForm = str
 """A valid syn:form value."""
@@ -27,18 +29,22 @@ NodeTuple = tuple[NodeDef, NodeVals]
 Or what get's returned from a Cortex's Python APIs.
 """
 
-
+# TODO - Make this its own package outside stormlibpp.
 class ItemContainer:
     """Hold key/value items in dict-like container.
+
+    Why? Sometimes I want a fancy dict with a nice, intuitive repr and
+    no funky ergonomic overhead.
 
     Acts almost identically to a dict except::
         
         - Missing items simply return None, not raise an error.
         - Iterating over an ``ItemContainer`` returns key/value pairs instead
           of just the key.
-        - Keys must be strings.
-            - Although technically non-string keys could be used, it messes
-              up instantiation.
+        - Keys should be strings.
+            - Although no enforcement is done, non-string keys mess up instantiation.
+            - A non-string key may be added after instantiation, but it is not
+            recommended. And this use case is not tested.
         - The object's ``repr`` is the current classname and all items in the
           container as if the object was being instantiated - a la ``SimpleNamespace``.
           Meaning, subclasses get automatic repr support.
@@ -50,7 +56,10 @@ class ItemContainer:
     Supports ``obj['item']`` (and ``obj['item'] = 'val'``) notation.
 
     When "getting" an item with ``__getitem__``, that doesn't exist in the
-    container, ``None`` is returned instead of raising an exception.
+    container, ``None`` is returned instead of raising an exception. Example::
+
+        # "missing" is not a key in the container.
+        foo = obj['missing']  # returns None, no exception raised
 
     Calling ``dir`` on this object will only return names for items this object
     "holds" instead of all parts of this object.
@@ -58,10 +67,9 @@ class ItemContainer:
     Supports checking if an item is "held" via the ``in`` operator.
 
     Supports iteration of items in the underlying ``dict``. Each iteration returns
-    a tuple of the item name followed by the item value.
+    a tuple of the item name and the item value.
 
-    Implements only magic methods, and all of them operate on the underlying
-    SimpleNamespace.
+    Implements only magic methods, and all of them operate on the underlying dict.
 
     To convert this object to a ``dict`` of the items it holds,
     call ``vars`` on an instance.
@@ -91,6 +99,7 @@ class ItemContainer:
 
     def __iter__(self) -> Any:
         for item in self.__ns:
+            # TODO - Should this be self.__ns[item] instead?
             yield (item, self[item])
 
     def __getattr__(self, __name):
@@ -208,15 +217,47 @@ class StormNode:
 
     @classmethod
     def unpack(cls, packedtup: NodeTuple) -> "StormNode":
+        """Unpack a NodeTuple into a StormNode instance.
+
+        Parameters
+        ----------
+        packedtup : NodeTuple
+            The packed node tuple to unpack into a StormNode instance.
+
+        Returns
+        -------
+        StormNode
+            The StormNode instance created from the packed node tuple.
+        """
         form, name = packedtup[0]
         vals = NodeVals(**packedtup[1])
         return cls(form, name, **vals)
 
     def pack(self) -> NodeTuple:
+        """Pack this StormNode into a NodeTuple.
+
+        Returns
+        -------
+        NodeTuple
+            The packed node tuple representing this StormNode.
+        """
         return ((self.form, self.value), self.nodevals)
 
     # TODO - Support tag properties
     def addTag(self, tag, timestamps: tuple = (None, None)) -> None:
+        """Add a tag to this node.
+
+        If the tag already exists, and the timestamps provided do not match the
+        existing timestamps, the timestamps will be updated to the new values.
+
+        Parameters
+        ----------
+        tag : str
+            The tag to add to this node.
+        timestamps : tuple, optional
+            The first and last timestamps seen for the tag, by default (None, None).
+            See the Synapse documentation for information on tag timestamp usage.
+        """
         if (
             tag in self._tags
             and timestamps != (None, None)
@@ -227,12 +268,41 @@ class StormNode:
             self._tags[tag] = timestamps
 
     def addTags(self, tags, timestamps: tuple = (None, None)) -> None:
+        """Add a list of tags to this node - ``timestamps`` is shared for all tags added.
+
+        Parameters
+        ----------
+        tags : list[str]
+            The list of tags to add to this node.
+        timestamps : tuple, optional
+            The first and last seen timestamps for the tags, by default (None, None).
+        """
         for tag in tags:
             self.addTag(tag, timestamps=timestamps)
 
     def addProp(self, propname: str, propval: Any) -> None:
+        """Add a property to this node.
+
+        This does not do any validation that the property is valid for the node's
+        form. It is up to the caller to ensure that the property is valid.
+
+        Parameters
+        ----------
+        propname : str
+            The name of the property to add.
+        propval : Any
+            The value of the property to add.
+        """
         self._props[propname] = propval
 
     def addProps(self, props: dict[str, Any]) -> None:
+        """Add multiple properties to a node as a dict.
+
+        Parameters
+        ----------
+        props : dict[str, Any]
+            The properties to add. Where the key is the property name and the
+            value is the property value.
+        """
         for propname, propval in props.items():
             self._props[propname] = propval

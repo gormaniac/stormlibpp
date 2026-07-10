@@ -9,7 +9,7 @@ class StormSyntaxError(Exception):
 
 
 class StormRaiseError(Exception):
-    """There was a syntax error in Storm code."""
+    """An error was raised from within Storm code."""
 
 
 class StormPkgError(Exception):

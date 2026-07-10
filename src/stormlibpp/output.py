@@ -18,8 +18,8 @@ from vertexproject/synapse has been modified to work in standalone methods.
 
 import io
 import json
+from typing import Any
 
-import synapse.common as s_common
 import synapse.lib.node as s_node
 import synapse.lib.output as s_output
 
@@ -29,17 +29,59 @@ from .errors import StormRaiseError
 OUTP = s_output.stdout
 
 
-def log_storm_msg(logfd, mesg):
+def log_storm_msg(logfd: io.BufferedRandom, mesg: dict) -> None:
+    """Write ``mesg`` to ``logfd`` after converting it to JSON bytes.
+
+    Parameters
+    ----------
+    logfd : io.BufferedRandom
+        The file descriptor to write the log message to.
+    mesg : dict
+        The Storm message to log.
+    """
     if logfd is not None:
         byts = json.dumps(mesg).encode("utf8")
         logfd.write(byts + b"\n")
 
 
-def print_node_prop(name, valu):
+def print_node_prop(name: str, valu: Any) -> None:
+    """Print a node property to the output stream.
+
+    Adopted from ``synapse.tools.storm.StormCli._printNodeProp()`` and modified to
+    be a standalone function.
+
+    Used heavily in ``handle_msg()``.
+
+    Parameters
+    ----------
+    name : str
+        The property name to print.
+    valu : Any
+        The property value to print.
+    """
     OUTP.printf(f"        {name} = {valu}")
 
 
-def handle_err(mesg, storm_raise=True):
+def handle_err(mesg: tuple, storm_raise: bool = True) -> None:
+    """Handle an error message streamed from Storm/a Cortex.
+
+    Adopted from ``synapse.tools.storm.StormCli.handleErr()`` and modified to
+    be a standalone function. The storm_raise parameter was added to allow the
+    caller to control whether errors streamed from Storm should be raised in
+    the Python runtime.
+
+    Parameters
+    ----------
+    mesg : tuple
+        The message tuple
+    storm_raise : bool, optional
+        Raises errors streamed from Storm in the Python runtime, by default True.
+
+    Raises
+    ------
+    StormRaiseError
+        The error streamed from Storm, only raised if ``storm_raise = True``.
+    """
     err = mesg[1]
     if err[0] == "BadSyntax":
         pos = err[1].get("at", None)
@@ -71,13 +113,42 @@ def handle_err(mesg, storm_raise=True):
 
 
 def handle_msg(
-    mesg: dict,
+    mesg: tuple,
     hideprops: bool = False,
     hidetags: bool = False,
     print_skips: list[str] = [],
     print_fini: bool = True,
     logfd: io.BufferedRandom = None,
-):
+) -> None:
+    """Process a message streamed from the Storm runtime for cli applications.
+
+    Adopted from ``synapse.tools.storm.StormCli.storm()`` and modified to
+    be a standalone function. Since the method is adopted from a class, the
+    function params are adopted to provide similar control of processing behavior. 
+
+    This is intended for cli applications, messages are printed directly to stdout.
+    Though a a log file descriptor can be provided to also log messages to a file in
+    JSON format. One could monkey-patch the ``stormlibpp.output.OUTP`` object to 
+    redirect output to a different stream. Future versions may provide this
+    functionality natively.
+
+    Parameters
+    ----------
+    mesg : tuple
+        The message tuple streamed from the Storm runtime.
+    hideprops : bool, optional
+        Whether to hide node properties, by default False.
+    hidetags : bool, optional
+        Whether to hide node tags, by default False.
+    print_skips : list[str], optional
+        List of message types to skip printing, by default [].
+    print_fini : bool, optional
+        Whether to print the final "stream finished" message, by default True.
+    logfd : io.BufferedRandom, optional
+        A log file descriptor to write messages in JSON format, by default None.
+        Message types in print_skips are also not logged.
+    """
+    # TODO - Ensure this is still up to date with the latest Storm CLI code.
     mtyp = mesg[0]
 
     # Do nothing if we don't want to handle this message type
