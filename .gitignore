@@ -8,3 +8,4 @@ dist
 build
 Pipfile.lock
 docs/
+.DS_Store
