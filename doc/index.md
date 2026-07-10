@@ -20,12 +20,8 @@ pkgs/index
 ```
 
 ```{toctree}
-:maxdepth: 3
-stormlibpp/stormlibpp
-```
-
-```{toctree}
 :maxdepth: 1
 
+stormlibpp/stormlibpp
 changelog
 ```
