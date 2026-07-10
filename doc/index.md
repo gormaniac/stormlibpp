@@ -1,8 +1,4 @@
----
-github_url: https://github.com/gormaniac/stormlibpp/tree/main/doc
----
-
-# Welcome to StormLib++'s documentation!
+# StormLib++ Docs
 
 <a href="https://github.com/gormaniac/stormlibpp" title="Github Project"><iconify-icon icon="simple-icons:github"></iconify-icon></a>
 <a href="https://pypi.org/project/stormlibpp/" title="PyPi Page"><iconify-icon icon="simple-icons:pypi"></iconify-icon></a>
@@ -20,8 +16,12 @@ Home <self>
 
 userguide
 contributing
-stormlibpp/stormlibpp
 pkgs/index
+```
+
+```{toctree}
+:maxdepth: 3
+stormlibpp/stormlibpp
 ```
 
 ```{toctree}
