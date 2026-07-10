@@ -36,6 +36,31 @@ async def getTempCortexWithArgs(
     password: str = "test",
     print_dir: bool = True,
 ):
+    """Start a temporary Synapse Cortex for local testing.
+
+    Adopted from ``synapse.cortex.getTempCortex``, modified with the ability to
+    pass in a ``conf`` dict to modify the Cortex behavior.
+
+    Parameters
+    ----------
+    mods : Iterable | None, optional
+        A list of core modules to load, by default None.
+    conf : dict | None, optional
+        A dictionary of configuration options to override the default Cortex behavior,
+        by default None.
+    user : str, optional
+        The username for the default user, by default "test".
+    password : str, optional
+        The password for the default user, by default "test".
+    print_dir : bool, optional
+        Whether to print the temporary directory, by default True.
+
+    Yields
+    ------
+    s_cortex.Cortex
+        The temporary Cortex instance.
+    """
+
     with s_common.getTempDir() as dirn:
         async with await s_cortex.Cortex.anit(dirn, conf=conf) as core:
             if print_dir:
