@@ -1,3 +1,9 @@
+## v0.10.4 - 2026-07-10
+### Features
+- Move docs theme to Shibuya
+### Fixes
+- Remove a circular import that made it's way into stormlibpp.node
+
 ## v0.10.3 - 2026-07-09
 ### Features
 - Docs improvements.
