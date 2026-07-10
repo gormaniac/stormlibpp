@@ -3,8 +3,6 @@
 
 from typing import Any, TypedDict
 
-from .utils import ItemContainer
-
 
 NodeForm = str
 """A valid syn:form value."""
