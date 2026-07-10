@@ -38,7 +38,10 @@ jobs:
         run: make install-self
 
       - name: Build documentation
-        run: make docs
+        run: |
+          make docs
+          mkdir -p build/stormlibpp
+          cp -r docs/* build/stormlibpp
 
       - name: Configure Pages
         uses: actions/configure-pages@v5
@@ -46,7 +49,7 @@ jobs:
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: docs
+          path: build
 
   deploy-pages:
     needs: build-pages
