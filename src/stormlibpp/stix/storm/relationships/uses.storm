@@ -1,0 +1,1 @@
+yield $n1node [ +(uses)> { yield $n2node } ]

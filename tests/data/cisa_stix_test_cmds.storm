@@ -1,0 +1,7 @@
+$x="https://www.cisa.gov/sites/default/files/2024-02/MAR-10448362.c1.v1.CLEAR_stix2.json"
+$resp=$lib.inet.http.get($x)
+$bundle = $lib.json.load($resp.body)
+$c=$lib.stix.import.config()
+$lib.print($lib.json.save($c))
+yield $lib.stix.import.ingest($bundle, config=$c)
+$lib.print($bundle)

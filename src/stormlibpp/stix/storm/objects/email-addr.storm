@@ -1,0 +1,15 @@
+function addUser(n) {
+    [ inet:user?=$object.display_name ]
+    [ <(refs)+ {yield $n} ]
+    return()
+}
+
+[inet:email=$object.value]
+
+if $object.display_name {
+    $addUser($node)
+}
+
+[ <(refs)+ { it:sec:stix:bundle:id=$bundle.id } ]
+$node.data.set(`stix:object:bundle:{$bundle.id}`, $object)
+return($node)
