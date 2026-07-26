@@ -34,4 +34,4 @@ class UtilsTest(s_test.StormPkgTest):
                 $val = $lib.import(slib.utils).getUserOrSystemOpt("slib:utils:testopt")
                 return($val)
             ''')
-            self.assertIsNone(resp)
+            self.assertEqual(resp, 'null')
