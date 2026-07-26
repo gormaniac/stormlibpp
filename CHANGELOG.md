@@ -1,3 +1,11 @@
+## v0.11.0 - 2026-07-26
+### Features
+- Adds version 0.1.0 of an ipinfo.io Rapid Power-Up - slib.ipinfo
+- Adds version 0.1.0 of a utils Rapid Power-Up - slib.utils - for shared StormLib++ storm code
+- Cleans up docs
+### Fixes
+- N/A
+
 ## v0.10.4 - 2026-07-10
 ### Features
 - Move docs theme to Shibuya
