@@ -13,6 +13,10 @@ author:
 
 desc: A StormLib++ Synapse Rapid Power-Up for ingesting threat intel reports, and other articles, from the web.
 
+docs:
+  - title: README
+    path: README.md
+
 modules:
   - name: slib.report.ingest.lib
 

@@ -1,0 +1,21 @@
+name: slib.utils
+version: 0.1.0
+guid: 580bffa9e719277bd25405164899527f
+
+synapse_minversion: [2, 127, 0]
+
+genopts:
+    dotstorm: true
+
+author:
+  url: https://github.com/gormaniac
+  name: John Gorman
+
+desc: A Rapid Power-Up that exposes useful utility functions for use in Storm commands.
+
+docs:
+  - title: README
+    path: README.md
+
+modules:
+  - name: slib.utils
