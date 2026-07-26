@@ -1,0 +1,53 @@
+// Storm code for querying and ingesting ipinfo.io data into Synapse
+
+function getIpInfo(ip, token) {
+    $url = "https://api.ipinfo.io/lite/"
+
+    $headers = $lib.dict(Authorization="Bearer {$token}")
+
+    $resp = $lib.inet.http.get($url, headers=$headers)
+
+    if ( $resp.code = 200 ) {
+        $data = $resp.json()
+        return($data)
+    }
+    else {
+        if ( $resp.code = -1 ) {
+            $lib.log.error(`An exception occurred querying the IpInfo API for "{$ip}": {$resp.err}`)
+        }
+        else {
+            $lib.log.warning(`An HTTP error was returned by the IpInfo API for "{$ip}": {$resp.code}`)
+        }
+    }
+
+    // Return an empty dict if we got no answer
+    return($lib.dict())
+}
+
+function getOrBuildAsn(data) {
+    [
+        inet:asn=$data.asn.replace('AS', '')
+        :owner?={yield $lib.gen.orgByName($data.as_name)}
+    ]
+
+    return($node)
+}
+
+function ingestIpInfo(data, query) {
+
+    [
+        inet:ipv4?=$data.ip
+        inet:ipv6?=$data.ip
+        :asn={yield $getOrBuildAsn($data)}
+    ]
+
+    return($node)
+}
+
+function doQuery(query, token) {
+    $resp = $getIpInfo($query, $token)
+
+    emit $ingestIpInfo($resp, $query)
+
+    stop
+}
