@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "stormlibpp"
 version = "0.10.4"
-description = "The stormlibpp Python package"
+description = "The StormLib++ Python package"
 readme = "README.md"
 requires-python = ">=3.11"
 
@@ -22,7 +22,7 @@ file = "LICENSE"
 
 [project.urls]
 Homepage = "https://github.com/gormaniac/stormlibpp"
-Documentation = "https://gormo.co/docs/stormlibpp/"
+Documentation = "https://docs.gormo.co/stormlibpp/"
 
 [tool.setuptools.packages.find]
 namespaces = true

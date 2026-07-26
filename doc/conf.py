@@ -27,8 +27,9 @@ html_title = "StormLib++ Docs"
 
 myst_enable_extensions = ["colon_fence"]
 
+html_baseurl = 'https://docs.gormo.co/stormlibpp/'
+
 html_theme_options = {
-    "analytics_id": "G-6G9XWTWCQG",
     "accent_color": "teal",
     "color_mode": "auto",
     "nav_socials": [
@@ -37,12 +38,22 @@ html_theme_options = {
             "url": "https://github.com/gormaniac/stormlibpp",
             "icon": "simple-icons:github",
         },
+        {
+            "name": "PyPI",
+            "url": "https://pypi.org/project/stormlibpp/",
+            "icon": "simple-icons:pypi",
+        },
     ],
     "foot_socials": [
         {
             "name": "GitHub",
             "url": "https://github.com/gormaniac/stormlibpp",
             "icon": "simple-icons:github",
+        },
+        {
+            "name": "PyPI",
+            "url": "https://pypi.org/project/stormlibpp/",
+            "icon": "simple-icons:pypi",
         },
     ]
 }
