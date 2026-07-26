@@ -40,8 +40,18 @@ jobs:
         run: tar -czf docs.tar.gz -C docs .
 
       - name: Create GitHub Release
-        uses: softprops/action-gh-release@v3
+        uses: softprops/action-gh-release@v2
         with:
           files: |
             dist/*
             docs.tar.gz
+
+      - name: Notify docs.gormo.co repo
+        env:
+          GH_TOKEN: ${{ secrets.DOCS_DISPATCH_TOKEN }}
+        run: |
+          gh api repos/gormaniac/docs.gormo.co/dispatches \
+            -f event_type=doc-release \
+            -f 'client_payload[tag]=${{ github.ref_name }}' \
+            -f 'client_payload[repository]=${{ github.repository }}' \
+            -f 'client_payload[github_sha]=${{ github.sha }}'
