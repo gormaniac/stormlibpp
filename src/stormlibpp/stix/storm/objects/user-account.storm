@@ -1,0 +1,46 @@
+if (($object.account_type != $lib.null) and ($object.account_login != $lib.null)) {
+    if ($object.account_type in ("posix", "windows-local", "windows-domain")) {
+        [
+            it:account=(stix, "user-account", $object.id)
+            :user?=$object.account_login
+        ]
+        if ($object.account_type = "posix") {
+            [ :posix:uid?=$object.user_id ]
+        } else {
+            [ :windows:sid?=$object.user_id ]
+        }
+    } elif (($object.account_type in (facebook, skype, twitter)){
+        switch $object.account_type {
+            facebook: {[inet:web:account=`facebook.com/{$object.account_login}`]}
+            skype: {[inet:web:account=`skype.com/{$object.account_login}`]}
+            twitter: {[inet:web:account=`twitter.com/{$object.account_login}`]}
+        }
+    } else {
+        [
+            auth:creds=(stix, "user-account", $object.id)
+            :user=$object.account_login
+            :passwd?=$object.credential
+        ]
+    }
+}
+
+if (($node != $lib.null) and ($node.form != auth:creds)) {
+    $acct = $node
+    {
+        [
+            auth:creds=(stix, "user-account", $object.id)\
+            :user=$object.account_login
+            :passwd?=$object.credential
+        ]
+        -inet:web:account
+        -it:account
+        if ($object.account_type in ("posix", "windows-local", "windows-domain")) {
+            [:account={yield $acct}]
+        } else {
+            [:web:acct={yield $acct}]
+        }
+    }
+}
+[ <(refs)+ { it:sec:stix:bundle:id=$bundle.id } ]
+$node.data.set(`stix:object:bundle:{$bundle.id}`, $object)
+return($node)

@@ -1,0 +1,1 @@
+yield $n1node [ +(indicates)> { yield $n2node } ]

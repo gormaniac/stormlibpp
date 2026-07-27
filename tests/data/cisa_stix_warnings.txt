@@ -1,0 +1,8 @@
+WARNING: STIX bundle ingest has no object definition for: marking-definition.
+.....
+WARNING: STIX bundle ingest has no object definition for: file.
+WARNING: STIX bundle ingest has no object definition for: malware-analysis.
+................
+WARNING: STIX bundle ingest has no object definition for: ipv4-addr.
+WARNING: STIX bundle ingest has no object definition for: note.
+WARNING: STIX bundle ingest has no object definition for: location.
