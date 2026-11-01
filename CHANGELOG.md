@@ -1,3 +1,9 @@
+## Unreleased
+### Features
+- Publish the Python package to PyPI from the Release GitHub Action.
+- Add a manually run Prepare Release GitHub Action that bumps the version, rolls the CHANGELOG, tags, and runs the release.
+### Fixes
+
 ## v0.11.0 - 2026-07-26
 ### Features
 - Adds version 0.1.0 of an ipinfo.io Rapid Power-Up - slib.ipinfo

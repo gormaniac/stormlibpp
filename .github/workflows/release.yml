@@ -5,9 +5,8 @@ on:
   push:
     tags:
       - "v*"
-  # Called by the "Prepare Release" workflow after it creates and pushes a tag.
-  # Tags pushed with the default GITHUB_TOKEN do not trigger `push` workflows,
-  # so the prepare workflow invokes this one directly instead.
+  # Called by the "Prepare Release" workflow after it pushes a tag with the
+  # default GITHUB_TOKEN, since such pushes do not trigger `push` workflows.
   workflow_call:
     inputs:
       tag:
@@ -67,7 +66,7 @@ jobs:
         run: tar -czf docs.tar.gz -C docs .
 
       - name: Extract release notes from CHANGELOG
-        run: python3 scripts/changelog.py "${RELEASE_TAG}" > release-notes.md || true
+        run: python3 scripts/changelog.py notes "${RELEASE_TAG}" > release-notes.md || true
 
       # dist/ also holds the Storm package JSON files, so only upload the
       # Python sdist and wheel.
