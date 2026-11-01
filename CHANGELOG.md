@@ -1,5 +1,9 @@
 ## Unreleased
 ### Features
+### Fixes
+
+## v0.12.0 - 2026-11-01
+### Features
 - The test suite fails on deprecated Synapse API use (see `tests/conftest.py`) and on Python `DeprecationWarning`s raised from StormLib++ code. This only affects test runs, the library and CLIs still treat deprecation warnings normally.
 - Requires Synapse `>=2.225.0`, where Synapse's tools moved to their new module paths.
 - Publish the Python package to PyPI from the Release GitHub Action.
