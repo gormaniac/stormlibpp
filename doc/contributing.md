@@ -16,8 +16,9 @@ Each PR runs a build and test job. This allows you to make sure your code works 
 
 Releases are cut entirely from CI by the project maintainer:
 
-1. Go to **Actions → Prepare Release → Run workflow** on `main`.
-2. Pick a `patch`, `minor`, or `major` version bump, or enter an explicit version.
+1. As changes land on `main`, add entries to the `## Unreleased` section at the top of `CHANGELOG.md`, under its `### Features` and `### Fixes` headers (see the Changelog section below).
+2. Go to **Actions → Prepare Release → Run workflow** on `main`.
+3. Pick a `patch`, `minor`, or `major` version bump, or enter an explicit version.
 
 The **Prepare Release** workflow runs the tests, bumps the version, updates `CHANGELOG.md` (see the Changelog section below), commits to `main`, and pushes a `vX.Y.Z` tag using the `RELEASE_TOKEN` secret (see below). That tag push starts the **Release** workflow, which:
 

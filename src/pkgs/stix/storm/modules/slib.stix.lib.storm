@@ -5,7 +5,7 @@ function pullConfig(url=$importConfigUrl) {
     $resp = $lib.inet.http.get($url)
     if ($resp.code != 200) {
         $lib.print(`Error requesting the STIX import config from "{$url}"\nHTTP Status Code: {$resp.code}`)
-        $lib.debug(`HTTP Error: {$resp.err}`)
+        if $lib.debug { $lib.print(`HTTP Error: {$resp.err}`) }
         $lib.raise(Error, "Could not pull the STIX import config!")
     } else {
         $conf = $lib.json.load($resp.body)
@@ -14,16 +14,16 @@ function pullConfig(url=$importConfigUrl) {
 }
 
 function ingest(bundle, yieldNodes=$lib.false, config=$lib.null) {
-    if $config = $lib.null {
+    if ($config = $lib.null) {
         $config = $pullConfig()
     }
 
     divert $yieldNodes $lib.stix.import.ingest($bundle, config=$config)
 
-    if (($node.form() = it:sec:stix:bundle) {
-        $dataName = stix:bundle
+    if ($node.form() = "it:sec:stix:bundle") {
+        $dataName = "stix:bundle"
     } else {
-        $dataName = stix:object
+        $dataName = "stix:object"
     }
     $node.data.load($dataName)
     // TODO - Pass node value and object to resolve extra relationships

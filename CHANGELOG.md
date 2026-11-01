@@ -13,6 +13,8 @@
 - `HttpCortex` no longer uses aiohttp's deprecated `read_timeout` argument.
 - The ipinfo package sends the API token; its `Authorization` header used a plain string instead of a format string.
 - Bumps the patch version of every StormLib++ Storm package.
+- The stix package loads: fix its Storm syntax errors and its `$lib.debug(...)` calls (`$lib.debug` is a boolean, not a function).
+- The release steps moved from the README to the contribution guide.
 
 ## v0.11.0 - 2026-07-26
 ### Features
