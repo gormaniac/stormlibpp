@@ -1,5 +1,5 @@
 name: stormlibpp-report-ingest
-version: 0.1.1
+version: 0.1.2
 guid: 410ee625af02311e67a73e4db025e3d1
 
 synapse_version: ">=2.162.0,<3.0.0"
@@ -28,10 +28,10 @@ commands:
       Examples:
   
         // Ingest from a node and scrape the report text for new nodes, yielding them.
-        inet:url="https://example.com/APT-9000.html" | stix.ingest --scrape --yield
+        inet:url="https://example.com/APT-9000.html" | slib.report.ingest --scrape --yield
 
         // Ingest+scrape the report and add refs edges between the media:news and new nodes.
-        inet:url="https://example.com/APT-9000.html" | stix.ingest --scrape --refs
+        inet:url="https://example.com/APT-9000.html" | slib.report.ingest --scrape --refs
 
     cmdargs:
       - - --scrape
