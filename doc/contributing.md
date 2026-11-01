@@ -12,11 +12,41 @@ The project uses CI to perform the building/releasing/testing tasks automagicall
 
 Each PR runs a build and test job. This allows you to make sure your code works and builds properly before merges. Each build job also builds this docs site to make sure nothing broke on that front.
 
-The CI *does not* publish to PyPi, the project maintainer will own the PyPi release process.
-
 ### Releases
 
-When a git tag is created and pushed to GitHub, the CI publishes a new GitHub release as well. This can be done using the `make release VERSION=x.x.x` command, it pushes to the current branch for you. 
+Releases are cut entirely from CI by the project maintainer:
+
+1. Go to **Actions → Prepare Release → Run workflow** on `main`.
+2. Pick a `patch`, `minor`, or `major` version bump, or enter an explicit version.
+
+The **Prepare Release** workflow runs the tests, bumps the version, updates `CHANGELOG.md` (see the Changelog section below), commits to `main`, and pushes a `vX.Y.Z` tag using the `RELEASE_TOKEN` secret (see below). That tag push starts the **Release** workflow, which:
+
+- builds the Python package, the Storm packages, and these docs,
+- publishes the Python package to [PyPI](https://pypi.org/project/stormlibpp/),
+- creates a GitHub Release with the version's changelog entry as its notes and the Python package, Storm package JSON files, and docs attached,
+- notifies the docs site so it picks up the new docs.
+
+Pushing a `v*` tag yourself (e.g. with `make release VERSION=x.x.x`) also runs the **Release** workflow.
+
+The workflows rely on these repository secrets:
+
+- `PYPI_DEPLOY_TOKEN` - the PyPI API token used to upload the package.
+- `DOCS_DISPATCH_TOKEN` - used to notify the docs site repo.
+- `RELEASE_TOKEN` (required) - `main` is protected by branch protection, so Prepare Release pushes the release commit and tag with this token instead of the default `GITHUB_TOKEN`. It must be a token for this repo with **Contents: read and write** (e.g. a fine-grained personal access token), from an account allowed to bypass the branch protection rule. Prepare Release fails right away if it is missing. Because the tag is pushed with this token rather than `GITHUB_TOKEN`, the tag push starts the **Release** workflow, which shows up as its own run under Actions. If the token expires or is revoked, the push step will fail and the token needs to be replaced.
+
+### Changelog
+
+Changes are recorded in `CHANGELOG.md` under a `## Unreleased` header at the top of the file, as they land on `main`:
+
+```markdown
+## Unreleased
+### Features
+- Describe new features here.
+### Fixes
+- Describe bug fixes here.
+```
+
+Please add an entry there with your PR. When a release is cut, `## Unreleased` is renamed to `## vX.Y.Z - YYYY-MM-DD`, any empty `### Features` or `### Fixes` section gets `- N/A`, and a fresh, empty `## Unreleased` section is added above it. If a `## vX.Y.Z` entry was already written by hand, the changelog is left as is.
 
 ## The Makefile
 
@@ -62,6 +92,8 @@ Release:
 ```bash
 make release VERSION=1.2.3
 ```
+
+Releases are normally cut from CI with the **Prepare Release** workflow instead (see the Releases section above). `make release` does the same version bump and `CHANGELOG.md` update locally, then pushes the commit and tag, which starts the **Release** workflow.
 
 ## Docs
 

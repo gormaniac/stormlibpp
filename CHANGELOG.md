@@ -2,6 +2,8 @@
 ### Features
 - The test suite fails on deprecated Synapse API use (see `tests/conftest.py`) and on Python `DeprecationWarning`s raised from StormLib++ code. This only affects test runs, the library and CLIs still treat deprecation warnings normally.
 - Requires Synapse `>=2.225.0`, where Synapse's tools moved to their new module paths.
+- Publish the Python package to PyPI from the Release GitHub Action.
+- Add a manually run Prepare Release GitHub Action that bumps the version, rolls the CHANGELOG, tags, and runs the release.
 ### Fixes
 - Migrate off deprecated Synapse APIs:
   - `$lib.dict()`/`$lib.list()` are replaced with `({})`/`([])` literals in the dnsstorm, ipinfo, and stix packages.
