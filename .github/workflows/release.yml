@@ -1,24 +1,17 @@
 name: Release
 
+# Runs on every v* tag push: from the "Prepare Release" workflow (pushed with
+# RELEASE_TOKEN) or from `make release` run locally.
 on:
-  # Tags pushed by a person (e.g. `make release` run locally).
   push:
     tags:
       - "v*"
-  # Called by the "Prepare Release" workflow after it pushes a tag with the
-  # default GITHUB_TOKEN, since such pushes do not trigger `push` workflows.
-  workflow_call:
-    inputs:
-      tag:
-        description: The release tag to build and publish (e.g. v1.2.3)
-        required: true
-        type: string
 
 permissions:
   contents: write
 
 concurrency:
-  group: release-${{ inputs.tag || github.ref_name }}
+  group: release-${{ github.ref_name }}
   cancel-in-progress: false
 
 jobs:
@@ -26,7 +19,7 @@ jobs:
     runs-on: ubuntu-latest
 
     env:
-      RELEASE_TAG: ${{ inputs.tag || github.ref_name }}
+      RELEASE_TAG: ${{ github.ref_name }}
 
     steps:
       - name: Checkout

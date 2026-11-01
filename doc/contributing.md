@@ -19,7 +19,7 @@ Releases are cut entirely from CI by the project maintainer:
 1. Go to **Actions → Prepare Release → Run workflow** on `main`.
 2. Pick a `patch`, `minor`, or `major` version bump, or enter an explicit version.
 
-The **Prepare Release** workflow runs the tests, bumps the version, updates `CHANGELOG.md` (see the Changelog section below), commits to `main`, and pushes a `vX.Y.Z` tag. The **Release** workflow then:
+The **Prepare Release** workflow runs the tests, bumps the version, updates `CHANGELOG.md` (see the Changelog section below), commits to `main`, and pushes a `vX.Y.Z` tag using the `RELEASE_TOKEN` secret (see below). That tag push starts the **Release** workflow, which:
 
 - builds the Python package, the Storm packages, and these docs,
 - publishes the Python package to [PyPI](https://pypi.org/project/stormlibpp/),
@@ -32,7 +32,7 @@ The workflows rely on these repository secrets:
 
 - `PYPI_DEPLOY_TOKEN` - the PyPI API token used to upload the package.
 - `DOCS_DISPATCH_TOKEN` - used to notify the docs site repo.
-- `RELEASE_TOKEN` (optional) - only needed if `main` blocks direct pushes. A fine-grained personal access token for this repo with **Contents: read and write**, from an account allowed to bypass the branch protection rule. Prepare Release pushes with it when it is set; the tag push then starts the Release workflow as its own run.
+- `RELEASE_TOKEN` (required) - `main` is protected by branch protection, so Prepare Release pushes the release commit and tag with this token instead of the default `GITHUB_TOKEN`. It must be a token for this repo with **Contents: read and write** (e.g. a fine-grained personal access token), from an account allowed to bypass the branch protection rule. Prepare Release fails right away if it is missing. Because the tag is pushed with this token rather than `GITHUB_TOKEN`, the tag push starts the **Release** workflow, which shows up as its own run under Actions. If the token expires or is revoked, the push step will fail and the token needs to be replaced.
 
 ### Changelog
 

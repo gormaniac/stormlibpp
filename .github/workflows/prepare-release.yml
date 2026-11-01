@@ -4,18 +4,14 @@ name: Prepare Release
 #
 # This bumps the version in pyproject.toml and the package __init__.py, turns
 # the "## Unreleased" CHANGELOG.md section into the new version's entry, commits
-# to the default branch, creates and pushes an annotated v#.#.# tag, then the
-# Release workflow runs (build, PyPI upload, GitHub Release, docs).
+# to the default branch, then creates and pushes an annotated v#.#.# tag. The
+# tag push starts the Release workflow (build, PyPI upload, GitHub Release,
+# docs) as its own run.
 #
-# Branch protection: if the default branch blocks direct pushes, add a
-# RELEASE_TOKEN repository secret holding a token that may bypass that rule
-# (e.g. a fine-grained PAT with "Contents: read and write" from an account on
-# the rule's bypass list). It is used for the push when set; otherwise the
-# default GITHUB_TOKEN is used.
-#
-# Tags pushed with RELEASE_TOKEN trigger release.yml's `push: tags` event
-# themselves. Tags pushed with GITHUB_TOKEN do not, so in that case this
-# workflow calls release.yml directly.
+# The default branch is protected, so the commit and tag are pushed with the
+# RELEASE_TOKEN repository secret: a token from an account allowed to bypass
+# the branch protection rule. A token other than GITHUB_TOKEN is also what lets
+# the tag push trigger release.yml.
 
 on:
   workflow_dispatch:
@@ -39,8 +35,9 @@ on:
         default: false
         type: boolean
 
+# Pushes use RELEASE_TOKEN, so GITHUB_TOKEN only needs to read.
 permissions:
-  contents: write
+  contents: read
 
 concurrency:
   group: prepare-release
@@ -50,10 +47,6 @@ jobs:
   tag:
     runs-on: ubuntu-latest
 
-    outputs:
-      tag: ${{ steps.version.outputs.tag }}
-      used_release_token: ${{ steps.token.outputs.used_release_token }}
-
     steps:
       - name: Require default branch
         if: github.ref_name != github.event.repository.default_branch
@@ -61,17 +54,20 @@ jobs:
           echo "::error::Releases must be cut from ${{ github.event.repository.default_branch }} (got ${{ github.ref_name }})"
           exit 1
 
-      - name: Choose push token
-        id: token
+      - name: Require RELEASE_TOKEN
         env:
           HAS_RELEASE_TOKEN: ${{ secrets.RELEASE_TOKEN != '' }}
-        run: echo "used_release_token=${HAS_RELEASE_TOKEN}" >> "$GITHUB_OUTPUT"
+        run: |
+          if [ "${HAS_RELEASE_TOKEN}" != "true" ]; then
+            echo "::error::The RELEASE_TOKEN secret is not set; it is needed to push past branch protection"
+            exit 1
+          fi
 
       - name: Checkout
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
-          token: ${{ secrets.RELEASE_TOKEN || github.token }}
+          token: ${{ secrets.RELEASE_TOKEN }}
 
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -129,7 +125,6 @@ jobs:
             exit 1
           fi
           echo "version=${new_version}" >> "$GITHUB_OUTPUT"
-          echo "tag=v${new_version}" >> "$GITHUB_OUTPUT"
 
       - name: Update CHANGELOG
         env:
@@ -157,12 +152,3 @@ jobs:
           git commit -m "build: release v${VERSION}"
           git tag -a "v${VERSION}" -m "Release v${VERSION}"
           git push --atomic origin "HEAD:${GITHUB_REF_NAME}" "refs/tags/v${VERSION}"
-
-  release:
-    needs: tag
-    # With RELEASE_TOKEN the tag push already triggered release.yml.
-    if: needs.tag.outputs.used_release_token != 'true'
-    uses: ./.github/workflows/release.yml
-    with:
-      tag: ${{ needs.tag.outputs.tag }}
-    secrets: inherit
