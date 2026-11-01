@@ -1,8 +1,8 @@
 name: stormlibpp-stix
-version: 0.1.0
+version: 0.1.1
 guid: ebe2e7b2bcdf4a8a9456934474b3e63d
 
-synapse_minversion: [2, 127, 0]
+synapse_version: ">=2.162.0,<3.0.0"
 
 genopts:
     dotstorm: true
@@ -60,9 +60,9 @@ commands:
           action: store_true
           help: Enable debug output.
   
-    forms:
-      input:
-        - it:sec:stix:bundle
+    cmdinputs:
+      - form: it:sec:stix:bundle
+        help: A bundle to ingest from its stix:bundle node data, if --url and --obj aren't used.
       # output:
       #   - hash:md5
       #   - hash:sha1

@@ -1,8 +1,8 @@
 name: stormlibpp-report-ingest
-version: 0.1.0
+version: 0.1.1
 guid: 410ee625af02311e67a73e4db025e3d1
 
-synapse_minversion: [2, 127, 0]
+synapse_version: ">=2.162.0,<3.0.0"
 
 genopts:
     dotstorm: true
@@ -58,8 +58,6 @@ commands:
           action: store_true
           help: Enable debug output.
   
-    forms:
-      input:
-        - inet:url
-      output:
-        - media:news
+    cmdinputs:
+      - form: inet:url
+        help: The URL of the report to ingest as a media:news node.

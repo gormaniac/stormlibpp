@@ -7,7 +7,7 @@ import sys
 
 import synapse.common as s_common
 import synapse.exc as s_exc
-import synapse.tools.genpkg as s_genpkg
+import synapse.tools.storm.pkg.gen as s_genpkg
 
 from . import errors
 from . import utils
@@ -35,7 +35,7 @@ class StormPkg:
     - Resolves the path of the package proto based on ``proto_name`` and
       ``proto_dir``.
 
-    - Loads the package proto using ``synapse.tools.genpkg.tryLoadPkgProto``.
+    - Loads the package proto using ``synapse.tools.storm.pkg.gen.tryLoadPkgProto``.
 
     - Converts the returned object to a ``dict`` using ``json.dumps`` and
       ``json.loads``.

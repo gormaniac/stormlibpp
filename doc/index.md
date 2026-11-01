@@ -17,7 +17,7 @@ StormLib++ is split into 2 parts:
 - [`python -m stormlibpp.hstorm`](https://docs.gormo.co/stormlibpp/stormlibpp/stormlibpp.hstorm/)
     - A version of Synapse's `synapse.tools.storm` CLI that works over HTTPS instead of Telepath (Axon features aren't supported).
 - [`python -m stormlibpp.hfeed`](https://docs.gormo.co/stormlibpp/stormlibpp/stormlibpp.hstorm/)
-    - A wrapper of Synapse's `synapse.tools.feed` script that works over HTTPS instead of Telepath.
+    - A wrapper of Synapse's `synapse.tools.cortex.feed` script that works over HTTPS instead of Telepath.
 
 ### Python Objects
 

@@ -119,8 +119,11 @@ class HttpCortex:
         self.pwd = pwd
         self.token = token
 
+        # No total timeout, Storm queries can run for a long time.
         self.sess = aiohttp.ClientSession(
-            self.url, raise_for_status=True, read_timeout=0
+            self.url,
+            raise_for_status=True,
+            timeout=aiohttp.ClientTimeout(total=None, sock_connect=30),
         )
 
     async def __aenter__(self) -> Self:

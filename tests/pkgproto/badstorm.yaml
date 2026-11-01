@@ -2,7 +2,7 @@ name: badstorm
 version: 0.0.1
 guid: 77c52e6802ca68aba78779e1dcdb3912
 
-synapse_minversion: [2, 137, 0]
+synapse_version: ">=2.162.0,<3.0.0"
 
 genopts:
     dotstorm: true
