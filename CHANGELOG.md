@@ -1,6 +1,7 @@
 ## Unreleased
 ### Features
 ### Fixes
+- report-ingest raises its own "Could not get the report URL!" error when a report request fails, instead of `'boolean' object is not callable` from a `$lib.debug(...)` call. `--debug` now prints the HTTP error. Its help examples also use the right command name.
 
 ## v0.12.0 - 2026-11-01
 ### Features
