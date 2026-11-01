@@ -1,0 +1,147 @@
+name: Prepare Release
+
+# Cut a release entirely from GitHub: Actions -> Prepare Release -> Run workflow.
+#
+# This bumps the version in pyproject.toml and the package __init__.py, commits
+# the change to the selected branch, creates and pushes an annotated v#.#.# tag,
+# then runs the Release workflow (build, PyPI upload, GitHub Release, docs).
+
+on:
+  workflow_dispatch:
+    inputs:
+      bump:
+        description: Version component to bump (ignored if an explicit version is given)
+        required: true
+        default: patch
+        type: choice
+        options:
+          - patch
+          - minor
+          - major
+      version:
+        description: Explicit version to release, e.g. 1.2.3 (optional, overrides bump)
+        required: false
+        type: string
+      require_changelog:
+        description: Fail if CHANGELOG.md has no entry for the new version
+        required: false
+        default: false
+        type: boolean
+
+permissions:
+  contents: write
+
+concurrency:
+  group: prepare-release
+  cancel-in-progress: false
+
+jobs:
+  tag:
+    runs-on: ubuntu-latest
+
+    outputs:
+      tag: ${{ steps.version.outputs.tag }}
+
+    steps:
+      - name: Require default branch
+        if: github.ref_name != github.event.repository.default_branch
+        run: |
+          echo "::error::Releases must be cut from ${{ github.event.repository.default_branch }} (got ${{ github.ref_name }})"
+          exit 1
+
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install pipenv
+        run: pip install pipenv
+
+      - name: Set up project environment
+        run: make setup
+
+      - name: Install project package
+        run: make install-self
+
+      - name: Run tests
+        run: make tests
+
+      - name: Determine new version
+        id: version
+        env:
+          BUMP: ${{ inputs.bump }}
+          EXPLICIT: ${{ inputs.version }}
+        run: |
+          new_version="$(python3 - <<'PY'
+          import os, re, sys, tomllib
+
+          current = tomllib.load(open("pyproject.toml", "rb"))["project"]["version"]
+          explicit = os.environ.get("EXPLICIT", "").strip().lstrip("v")
+          semver = re.compile(r"^(\d+)\.(\d+)\.(\d+)$")
+
+          if explicit:
+              if not semver.match(explicit):
+                  sys.exit(f"Invalid version {explicit!r}; expected #.#.#")
+              print(explicit)
+              sys.exit(0)
+
+          m = semver.match(current)
+          if not m:
+              sys.exit(f"Current version {current!r} is not #.#.#; pass an explicit version")
+          major, minor, patch = map(int, m.groups())
+          bump = os.environ["BUMP"]
+          if bump == "major":
+              major, minor, patch = major + 1, 0, 0
+          elif bump == "minor":
+              minor, patch = minor + 1, 0
+          else:
+              patch += 1
+          print(f"{major}.{minor}.{patch}")
+          PY
+          )"
+          echo "New version: ${new_version}"
+          if git rev-parse -q --verify "refs/tags/v${new_version}" >/dev/null; then
+            echo "::error::Tag v${new_version} already exists"
+            exit 1
+          fi
+          echo "version=${new_version}" >> "$GITHUB_OUTPUT"
+          echo "tag=v${new_version}" >> "$GITHUB_OUTPUT"
+
+      - name: Check CHANGELOG entry
+        env:
+          REQUIRE: ${{ inputs.require_changelog }}
+          VERSION: ${{ steps.version.outputs.version }}
+        run: |
+          if ! python3 scripts/changelog.py "${VERSION}" >/dev/null; then
+            if [ "${REQUIRE}" = "true" ]; then
+              echo "::error::CHANGELOG.md has no '## v${VERSION}' entry"
+              exit 1
+            fi
+            echo "::warning::CHANGELOG.md has no '## v${VERSION}' entry; the GitHub Release will only have auto-generated notes"
+          fi
+
+      - name: Bump version
+        run: make change-version VERSION=${{ steps.version.outputs.version }}
+
+      - name: Commit, tag, and push
+        env:
+          VERSION: ${{ steps.version.outputs.version }}
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add pyproject.toml src/stormlibpp/__init__.py
+          git commit -m "build: release v${VERSION}"
+          git tag -a "v${VERSION}" -m "Release v${VERSION}"
+          git push --atomic origin "HEAD:${GITHUB_REF_NAME}" "refs/tags/v${VERSION}"
+
+  release:
+    needs: tag
+    uses: ./.github/workflows/release.yml
+    with:
+      tag: ${{ needs.tag.outputs.tag }}
+    secrets: inherit

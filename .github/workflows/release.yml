@@ -1,20 +1,39 @@
 name: Release
 
 on:
+  # Tags pushed by a person (e.g. `make release` run locally).
   push:
     tags:
       - "v*"
+  # Called by the "Prepare Release" workflow after it creates and pushes a tag.
+  # Tags pushed with the default GITHUB_TOKEN do not trigger `push` workflows,
+  # so the prepare workflow invokes this one directly instead.
+  workflow_call:
+    inputs:
+      tag:
+        description: The release tag to build and publish (e.g. v1.2.3)
+        required: true
+        type: string
 
 permissions:
   contents: write
+
+concurrency:
+  group: release-${{ inputs.tag || github.ref_name }}
+  cancel-in-progress: false
 
 jobs:
   release:
     runs-on: ubuntu-latest
 
+    env:
+      RELEASE_TAG: ${{ inputs.tag || github.ref_name }}
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          ref: refs/tags/${{ env.RELEASE_TAG }}
 
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -26,6 +45,14 @@ jobs:
 
       - name: Set up project environment
         run: make setup
+
+      - name: Verify tag matches package version
+        run: |
+          pkg_version="$(python3 -c 'import tomllib; print(tomllib.load(open("pyproject.toml", "rb"))["project"]["version"])')"
+          if [ "v${pkg_version}" != "${RELEASE_TAG}" ]; then
+            echo "::error::Tag ${RELEASE_TAG} does not match pyproject.toml version ${pkg_version}"
+            exit 1
+          fi
 
       - name: Build stormlibpp python package
         run: make build
@@ -39,9 +66,26 @@ jobs:
       - name: Package documentation
         run: tar -czf docs.tar.gz -C docs .
 
+      - name: Extract release notes from CHANGELOG
+        run: python3 scripts/changelog.py "${RELEASE_TAG}" > release-notes.md || true
+
+      # dist/ also holds the Storm package JSON files, so only upload the
+      # Python sdist and wheel.
+      - name: Publish to PyPI
+        env:
+          TWINE_USERNAME: __token__
+          TWINE_PASSWORD: ${{ secrets.PYPI_DEPLOY_TOKEN }}
+        run: |
+          pipenv run python3 -m twine check dist/*.whl dist/*.tar.gz
+          pipenv run python3 -m twine upload --non-interactive --skip-existing dist/*.whl dist/*.tar.gz
+
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
+          tag_name: ${{ env.RELEASE_TAG }}
+          name: ${{ env.RELEASE_TAG }}
+          body_path: release-notes.md
+          generate_release_notes: true
           files: |
             dist/*
             docs.tar.gz
@@ -52,6 +96,6 @@ jobs:
         run: |
           gh api repos/gormaniac/docs.gormo.co/dispatches \
             -f event_type=doc-release \
-            -f 'client_payload[tag]=${{ github.ref_name }}' \
+            -f "client_payload[tag]=${RELEASE_TAG}" \
             -f 'client_payload[repository]=${{ github.repository }}' \
-            -f 'client_payload[github_sha]=${{ github.sha }}'
+            -f "client_payload[github_sha]=$(git rev-parse HEAD)"
