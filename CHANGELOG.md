@@ -1,5 +1,9 @@
 ## Unreleased
 ### Features
+### Fixes
+
+## v0.12.1 - 2026-11-01
+### Features
 - Bump the GitHub Actions the workflows use to their latest releases, which run on Node.js 24 (GitHub deprecated the Node.js 20 runtime the old ones used).
 - CI catches Storm syntax errors in every package: a test loads every package under `src/pkgs/` into a Cortex, and a new `make lint-storm` step runs Synapse's Storm linter before the tests. The dev environment (Pipfile) now requires Synapse `>=2.256.0`, the first release with the linter.
 ### Fixes
