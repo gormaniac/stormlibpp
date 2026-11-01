@@ -1,3 +1,17 @@
+## Unreleased
+### Features
+- Tests fail when they use a deprecated Synapse API (see `tests/conftest.py`), and Python `DeprecationWarning`s raised from StormLib++ are errors.
+- Requires Synapse `>=2.225.0`, where Synapse's tools moved to their new module paths.
+### Fixes
+- Migrate off deprecated Synapse APIs:
+  - `$lib.dict()`/`$lib.list()` are replaced with `({})`/`([])` literals in the dnsstorm, ipinfo, and stix packages.
+  - Storm packages use `synapse_version` instead of `synapse_minversion`, and `cmdinputs` instead of the command `forms` key.
+  - `stormlibpp.stormpkg` and the package build scripts use `synapse.tools.storm.pkg.gen` instead of `synapse.tools.genpkg`.
+- `stormlibpp.hfeed` and `stormlibpp.stormcli` (used by `hstorm` and `import`) work with current Synapse, which removed `synapse.tools.feed.makeargparser()` and moved `StormCli` into `synapse.tools.storm._cli`.
+- `HttpCortex` no longer uses aiohttp's deprecated `read_timeout` argument.
+- The ipinfo package sends the API token; its `Authorization` header used a plain string instead of a format string.
+- Bumps the patch version of every StormLib++ Storm package.
+
 ## v0.11.0 - 2026-07-26
 ### Features
 - Adds version 0.1.0 of an ipinfo.io Rapid Power-Up - slib.ipinfo

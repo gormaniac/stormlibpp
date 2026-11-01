@@ -4,9 +4,9 @@ init {
     $bundleURL = $cmdopts.url
     $bundleObj = $cmdopts.obj
 
-    $bundleArgsPassed = (($bundleURL != "") or ($bundleObj != $lib.dict()))
+    $bundleArgsPassed = (($bundleURL != "") or ($bundleObj != ({})))
 
-    if (($bundleURL != "") and ($bundleObj != $lib.dict())) {
+    if (($bundleURL != "") and ($bundleObj != ({}))) {
         $lib.raise(Error, "Cannot use both --url and --obj!")
     }
 
@@ -25,7 +25,7 @@ elif ($bundleURL != "") {
         $bundle = $lib.json.load($resp.body)
     }
 }
-elif ($bundleObj != $lib.dict()) {
+elif ($bundleObj != ({})) {
     $bundle=$bundleObj
 }
 

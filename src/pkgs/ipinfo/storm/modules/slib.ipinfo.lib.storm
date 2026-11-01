@@ -3,7 +3,7 @@
 function getIpInfo(ip, token) {
     $url = "https://api.ipinfo.io/lite/"
 
-    $headers = $lib.dict(Authorization="Bearer {$token}")
+    $headers = ({"Authorization": `Bearer {$token}`})
 
     $resp = $lib.inet.http.get($url, headers=$headers)
 
@@ -21,7 +21,7 @@ function getIpInfo(ip, token) {
     }
 
     // Return an empty dict if we got no answer
-    return($lib.dict())
+    return(({}))
 }
 
 function getOrBuildAsn(data) {

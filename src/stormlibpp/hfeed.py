@@ -1,14 +1,13 @@
-"""A wrapper of ``synapse.tools.feed`` that feeds data to a Cortex over HTTP instead of Telepath."""
+"""A wrapper of ``synapse.tools.cortex.feed`` that feeds data to a Cortex over HTTP instead of Telepath."""
 
 
 import asyncio
 import sys
 
-import synapse.tools.feed as s_feed
+import synapse.tools.cortex.feed as s_feed
 
 from ._args import TOKEN_PARSER, USER_PARSER, VERIFY_PARSER
 from .output import OUTP
-from .utils import add_parser_parents
 from .utils import (
     add_parser_parents,
     get_cortex_creds,
@@ -18,7 +17,7 @@ from .utils import (
 
 
 def get_args(argv: list[str]):
-    parser = s_feed.makeargparser()
+    parser = s_feed.getArgParser(OUTP)
     parser.prog = "stormlibpp.hfeed"
     parser.description = __doc__
 

@@ -2,7 +2,7 @@ name: test
 version: 0.0.1
 guid: 7348048db0c112e80087ffa313740c39
 
-synapse_minversion: [2, 137, 0]
+synapse_version: ">=2.162.0,<3.0.0"
 
 genopts:
     dotstorm: true

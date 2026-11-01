@@ -1,6 +1,6 @@
 // Storm code for making and ingesting DNS queries using Cloudflare's DoH service.
 
-$queryTypes = $lib.dict(A=1, AAAA=28, CNAME=5, MX=15, NS=2, PTR=12, TXT=16)
+$queryTypes = ({"A": 1, "AAAA": 28, "CNAME": 5, "MX": 15, "NS": 2, "PTR": 12, "TXT": 16})
 
 function getDnsAnswer(fqdn, type=1) {
     $url = "https://cloudflare-dns.com/dns-query"
@@ -13,8 +13,8 @@ function getDnsAnswer(fqdn, type=1) {
         $query = $fqdn
     }
 
-    $params = $lib.dict(name=$query, type=$type)
-    $headers = $lib.dict(Accept="application/dns-json")
+    $params = ({"name": $query, "type": $type})
+    $headers = ({"Accept": "application/dns-json"})
 
     $resp = $lib.inet.http.get($url, params=$params, headers=$headers)
 
@@ -32,7 +32,7 @@ function getDnsAnswer(fqdn, type=1) {
     }
 
     // Return an empty list if we got no answer
-    return($lib.list())
+    return(([]))
 }
 
 function ingestAnswer(answer, query, qtime) {

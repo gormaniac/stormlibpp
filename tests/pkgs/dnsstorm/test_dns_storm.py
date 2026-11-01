@@ -27,5 +27,4 @@ class DnsStormTest(s_test.StormPkgTest):
             for query in queries:
                 msgs = await core.stormlist(query)
                 print([m[1] for m in msgs if m[0] == 'node'])
-                # TODO - Fix use of $lib.dict to remove warnings.
-                # self.stormHasNoWarnErr(msgs)
+                self.stormHasNoWarnErr(msgs)
