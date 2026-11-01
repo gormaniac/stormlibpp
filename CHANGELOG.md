@@ -1,6 +1,6 @@
 ## Unreleased
 ### Features
-- Tests fail when they use a deprecated Synapse API (see `tests/conftest.py`), and Python `DeprecationWarning`s raised from StormLib++ are errors.
+- The test suite fails on deprecated Synapse API use (see `tests/conftest.py`) and on Python `DeprecationWarning`s raised from StormLib++ code. This only affects test runs, the library and CLIs still treat deprecation warnings normally.
 - Requires Synapse `>=2.225.0`, where Synapse's tools moved to their new module paths.
 ### Fixes
 - Migrate off deprecated Synapse APIs:
