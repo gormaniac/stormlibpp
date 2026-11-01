@@ -83,6 +83,9 @@ jobs:
       - name: Install project package
         run: make install-self
 
+      - name: Lint Storm packages
+        run: make lint-storm
+
       - name: Run tests
         run: make tests
 

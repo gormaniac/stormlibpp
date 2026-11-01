@@ -4,7 +4,7 @@ verify_ssl = true
 name = "pypi"
 
 [packages]
-synapse = ">=2.225.0,<3"
+synapse = ">=2.256.0,<3"
 aiohttp = "*"
 
 [dev-packages]

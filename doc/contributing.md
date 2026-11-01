@@ -73,6 +73,15 @@ make tests
 pytest tests/ -svx
 ```
 
+`tests/pkgs/test_all_pkgs.py` loads every Storm package under `src/pkgs/` into a Cortex, so a package with no tests of its own still fails the suite if its Storm doesn't parse. Packages are found by directory, as `src/pkgs/<name>/<name>.yaml`.
+
+CI also runs Synapse's Storm linter for syntax errors before the tests:
+```bash
+make lint-storm
+```
+
+The linter needs Synapse 2.256.0 or later, which the Pipfile requires. Run it without `--select E` to see its style findings too, or with `--v3-ready` for the changes Synapse 3.x will need.
+
 ## Building and Releasing
 
 The build/release process is managed by the Makefile. Building can be done without releasing, but releasing always forces a fresh build, even if it rebuilds the same exact code. A `VERSION` argument is required when releasing, but not when building.

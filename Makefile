@@ -68,6 +68,10 @@ release: change-version clean setup build docs # Build a new versioned release a
 tests: # Run the pytest suite for this project.
 	pipenv run pytest tests/
 
+.PHONY: lint-storm
+lint-storm: # Fail on Storm syntax errors in the Storm packages (Synapse's linter, E rules).
+	pipenv run python3 -m synapse.tools.storm.lint --select E src/pkgs
+
 .PHONY: pypi
 pypi: # Upload all Python packages in "dist/" to PyPI.
 	pipenv run python3 -m twine upload dist/*
