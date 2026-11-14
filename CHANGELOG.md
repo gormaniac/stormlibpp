@@ -1,5 +1,6 @@
 ## Unreleased
 ### Features
+- Adds a pure Storm X.509 certificate parser to the utils package, `slib.utils.x509`, and bumps slib.utils to 0.2.0. It parses certificates and CT precertificate TBSCertificates (DER, PEM or base64) into Storm primitives, including the RFC 5280 extensions (subjectDirectoryAttributes is kept raw), RFC 6962 SCT lists and RSA-PSS/EC/EdDSA/DSA keys, and lists recoverable DER and RFC 5280 deviations as warnings. Its output matches Python cryptography on a corpus of real root CA and CT certificates.
 ### Fixes
 
 ## v0.12.1 - 2026-11-01
