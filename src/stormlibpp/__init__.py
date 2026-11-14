@@ -44,6 +44,14 @@ familiar to those used to Synapse's builtin tools.
 that can be used for testing other tools. It creates a user (``test``) with password
 (``test``) and starts the HTTP API over port ``4443``. Future versions of this
 script will support custom Cortex configuration.
+
+The ``svc`` module has the building blocks for a Storm service's Telepath API: a
+``RetnApi`` ``CellApi`` mixin whose methods always return a ``TelepathRetn`` instead of
+raising to Storm, and path helpers for values from Storm that end up on disk.
+
+The ``testing`` package is a pytest plugin for Storm service and package test suites (it
+fails tests that use deprecated Synapse APIs), with checks every service should run.
+Neither is imported by ``import stormlibpp``.
 """
 
 __version__ = "0.12.1"
