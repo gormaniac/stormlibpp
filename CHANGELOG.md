@@ -1,6 +1,10 @@
 ## Unreleased
 ### Features
+- Adds version 1.0.0 of the `slib.ipapi` Rapid Power-Up, which enriches IPs from ip-api.com. It replaces the `slib.ipapi` Storm Service from the stormsvcs repo with the same commands, perms and settings, but no service to deploy. ip-api.com's rate limit (45 requests a minute) is now shared by every query on the Cortex through its rate limit headers, and rate limited queries wait and retry. To upgrade, remove the service with `service.del` and load the package.
+- Adds `slib.utils.inet` to the utils package, with the ASN and owner org modeling that `slib.ipapi` and `ipinfo` share.
+- Adds a pure Storm X.509 certificate parser to the utils package, `slib.utils.x509`, and bumps slib.utils to 0.2.0. It parses certificates and CT precertificate TBSCertificates (DER, PEM or base64) into Storm primitives, including the RFC 5280 extensions (subjectDirectoryAttributes is kept raw), RFC 6962 SCT lists and RSA-PSS/EC/EdDSA/DSA keys, and lists recoverable DER and RFC 5280 deviations as warnings. Its output matches Python cryptography on a corpus of real root CA and CT certificates.
 ### Fixes
+- ipinfo (0.1.2) models ASNs with `slib.utils.inet`, and no longer makes an `ou:org` with an empty name when ipinfo.io has no AS name.
 
 ## v0.12.1 - 2026-11-01
 ### Features

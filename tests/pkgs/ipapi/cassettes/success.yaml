@@ -1,0 +1,23 @@
+interactions:
+- request:
+    body: null
+    headers: {}
+    method: GET
+    uri: http://ip-api.com/json/8.8.8.8?fields=status,message,country,countryCode,region,regionName,city,zip,lat,lon,timezone,isp,org,as,asname,mobile,proxy,hosting,query
+  response:
+    body:
+      string: '{"status": "success", "country": "United States", "countryCode": "US", "region": "VA", "regionName": "Virginia", "city": "Ashburn", "zip": "20149", "lat": 39.03, "lon": -77.5, "timezone":
+        "America/New_York", "isp": "Google LLC", "org": "Google Public DNS", "as": "AS15169 Google LLC", "asname": "GOOGLE", "mobile": false, "proxy": false, "hosting": true, "query": "8.8.8.8"}'
+    headers:
+      Content-Type:
+      - application/json; charset=utf-8
+      Content-Length:
+      - '374'
+      X-Rl:
+      - '44'
+      X-Ttl:
+      - '60'
+    status:
+      code: 200
+      message: OK
+version: 1

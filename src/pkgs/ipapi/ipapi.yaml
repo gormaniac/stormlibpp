@@ -1,0 +1,120 @@
+name: slib.ipapi
+version: 1.0.0
+guid: 92cc9d722c63125d64911389cd39c685
+
+synapse_version: ">=2.162.0,<3.0.0"
+
+genopts:
+    dotstorm: true
+
+author:
+  url: https://github.com/gormaniac
+  name: John Gorman
+
+desc: A Rapid Power-Up that calls the ip-api.com API to retrieve information about IP addresses.
+
+docs:
+  - title: README
+    path: README.md
+
+depends:
+  requires:
+    - name: slib.utils
+      version: ">=0.2.0,<1.0.0"
+      desc: slib.ipapi models ASNs with slib.utils.inet.
+
+# Runs every time the package loads. The tag globals are only set when they're missing, so
+# reloading or upgrading the package never wipes out settings made with slib.ipapi.admin.*.
+onload: |
+  [ meta:source=c177b2a9c0eff5c2984946d439de23ea :name=slib.ipapi ]
+  | spin |
+  if ($lib.globals.get("slib:ipapi:tag:enabled") = (null)) { $lib.globals.set("slib:ipapi:tag:enabled", (true)) }
+  if ($lib.globals.get("slib:ipapi:tag:prefix") = (null)) { $lib.globals.set("slib:ipapi:tag:prefix", "rep.ipapi.infra") }
+
+perms:
+  - perm: [ slib, ipapi, admin ]
+    gate: cortex
+    desc: Allows a user to call admin APIs of the slib.ipapi Storm Package.
+  - perm: [ slib, ipapi, user ]
+    gate: cortex
+    desc: Allows a user to call user APIs of the slib.ipapi Storm Package.
+
+modules:
+  - name: slib.ipapi.lib
+    perms:
+        - [ slib, ipapi, user ]
+  - name: slib.ipapi.privsep
+    asroot:perms:
+        - [ slib, ipapi, user ]
+  - name: slib.ipapi.admin
+    asroot:perms:
+        - [ slib, ipapi, admin ]
+commands:
+  - name: slib.ipapi.query
+    perms:
+        - [ slib, ipapi, user ]
+    descr: |
+      Query the ip-api.com API for information about the input IP addresses.
+
+      Examples:
+
+        // Lift some inet:ipv4 nodes and query ip-api.com for information.
+        inet:ipv4 | limit 5 | slib.ipapi.query
+
+        // Use a string argument to query for a specific IP address.
+        slib.ipapi.query --query 8.8.8.8
+
+    cmdargs:
+      - - --query
+        - type: str
+          default: ''
+          help: |
+            An IP address string to query for.
+
+            Ignores any nodes in the pipeline and uses only the string passed to this arg.
+
+      - - --yield
+        - default: false
+          action: store_true
+          help: |
+            Yield the newly created inet:ipv4/ipv6 records.
+            
+            A bit redundant when not using --query because nodes stay in the pipeline otherwise.
+
+    cmdinputs:
+      - form: inet:ipv4
+        help: IPs to query ip-api.com for (ignored when --query is used).
+      - form: inet:ipv6
+        help: IPs to query ip-api.com for (ignored when --query is used).
+
+  - name: slib.ipapi.admin.settag
+    perms:
+        - [ slib, ipapi, admin ]
+    descr: |
+      Set a custom tag prefix for modeling the ip-api.com hosting/mobile/proxy results.
+
+      slib.ipapi will use #<prefix>.hosting, #<prefix>.mobile, and #<prefix>.proxy tags on
+      inet:ipv4/ipv6 nodes if those values are "true" in the ip-api.com results.
+      By default, the prefix is "rep.ipapi.infra".
+
+      This can be disabled using the slib.ipapi.admin.disabletag command.
+
+    cmdargs:
+      - - prefix
+        - type: str
+          help: |
+            The custom tag prefix to use.
+
+  - name: slib.ipapi.admin.disabletag
+    perms:
+        - [ slib, ipapi, admin ]
+    descr: |
+      Disable setting any tags on inet:ipv4/ipv6 nodes for the ip-api.com hosting/mobile/proxy results.
+
+  - name: slib.ipapi.admin.enabletag
+    perms:
+        - [ slib, ipapi, admin ]
+    descr: |
+      Enable setting tags on inet:ipv4/ipv6 nodes for the ip-api.com hosting/mobile/proxy results.
+
+      Use the slib.ipapi.admin.settag command to set a custom tag prefix.
