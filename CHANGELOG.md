@@ -1,6 +1,11 @@
 ## Unreleased
 ### Features
+- Add `stormlibpp.stix.BundleConf` to build standalone STIX import configs from Storm files, with 38 object mappings, six relationship mappings, and source-object node data.
+- Release `stormlibpp-stix` version `0.2.0`. Built packages download the config from their matching repository release instead of following `main`; custom config and URL overrides remain supported.
+- Attach `stix_import_conf.json` to GitHub Releases and add automated config-freshness, Cortex ingest, release-pinning, and distribution-content checks.
 ### Fixes
+- Isolate config-builder state and make repeated loads atomic and idempotent. Fix Storm syntax and runtime mappings, preserve metadata on reused software nodes, and reject artifact hash mismatches.
+- Correct the STIX command examples to use `slib.stix.ingest`.
 
 ## v0.12.1 - 2026-11-01
 ### Features
