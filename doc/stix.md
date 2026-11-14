@@ -115,3 +115,21 @@ CISA fixture with this custom config, without downloading fixture data.
 
 The separate `stix` Power-Up remains a work in progress. This builder and config
 do not depend on that Power-Up or its planned post-processing commands.
+
+## Release Downloads
+
+Release CI attaches the generated JSON as `stix_import_conf.json` alongside the
+Python and Storm packages. Download a specific version using a release-asset
+URL such as:
+
+```text
+https://github.com/gormaniac/stormlibpp/releases/download/v0.12.1/stix_import_conf.json
+```
+
+The built STIX Power-Up pins this URL to the repository release tag, not its
+independent Storm package version. `make build-storm` stamps the default URL
+from `pyproject.toml`; CI's `RELEASE_TAG` must match that version. Source YAML
+is not a release artifact and retains a build marker until this stamping step.
+Missing assets fail explicitly, without falling back to `main` or `latest`.
+Older releases are not backfilled. For unpublished local versions, use an
+explicit config or URL override as described in the [Power-Up docs](pkgs/stix.md).

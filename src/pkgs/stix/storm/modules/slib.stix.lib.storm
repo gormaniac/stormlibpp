@@ -1,4 +1,4 @@
-$importConfigUrl = "https://raw.githubusercontent.com/gormaniac/stormlibpp/main/data/stix_import_conf.json"
+$importConfigUrl = "https://github.com/gormaniac/stormlibpp/releases/download/__STORMLIBPP_RELEASE_TAG__/stix_import_conf.json"
 
 function pullConfig(url=$importConfigUrl) {
     $conf = $lib.null

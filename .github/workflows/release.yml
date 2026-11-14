@@ -78,9 +78,11 @@ jobs:
           name: ${{ env.RELEASE_TAG }}
           body_path: release-notes.md
           generate_release_notes: true
+          fail_on_unmatched_files: true
           files: |
             dist/*
             docs.tar.gz
+            data/stix_import_conf.json
 
       - name: Notify docs.gormo.co repo
         env:
