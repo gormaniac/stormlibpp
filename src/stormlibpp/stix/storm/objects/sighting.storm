@@ -1,1 +1,33 @@
-// TODO - Figure out what these look like.
+/*
+Example Stix 2.1 "sighting" object:
+{
+    "type": "sighting",
+    "spec_version": "2.1",
+    "id": "sighting--ee20065d-2555-424f-ad9e-0f8428623c75",
+    "created": "2016-04-06T20:08:31.000Z",
+    "modified": "2016-04-06T20:08:31.000Z",
+    "first_seen": "2015-12-21T19:00:00.000Z",
+    "last_seen": "2015-12-21T19:00:00.000Z",
+    "count": 1,
+    "sighting_of_ref": "indicator--26ffb872-1dd9-446e-b6f5-d58527e5b5d2",
+    "observed_data_refs": [
+        "observed-data--b67d30ff-02ac-498a-92f9-32f845f448cf"
+    ]
+}
+
+IMPORTANT: unlike "relationship" objects, "sighting" objects are NOT diverted
+before reaching config['objects'] in Synapse's LibStixImport.ingest (only the
+literal type "relationship" is special-cased) - this file genuinely executes
+for every Stix "sighting" object. sighting_of_ref and observed_data_refs point
+at other Stix objects and cannot be resolved here (no nodesbyid access at
+this stage) - same limitation as elsewhere in this folder. Mapped to
+meta:note as a fallback since Synapse has no dedicated "sighting" form.
+*/
+[ meta:note=(stix, sighting, $object.id)
+    :type=stix.sighting
+    .seen?=$object.first_seen
+    .seen?=$object.last_seen
+]
+[ <(refs)+ { it:sec:stix:bundle:id=$bundle.id } ]
+$node.data.set(`stix:object:bundle:{$bundle.id}`, $object)
+return($node)

@@ -10,9 +10,20 @@ change-version: # Change the version of this project (requires VERSION=#.#.#)
 	pipenv run python3 scripts/changever.py $(VERSION)
 
 .PHONY: build
-build: # Build the package tarball and wheel
+build: build-stix # Build the Python package tarball and wheel
 	pipenv run python3 -m build .
+
+.PHONY: build-stix
+build-stix: # Rebuild the standalone STIX import configuration
 	pipenv run python3 scripts/build_stix_conf.py
+
+.PHONY: build-storm
+build-storm: # Build all Storm packages in this project
+	./scripts/pkgs/build.sh
+
+.PHONY: push-storm
+push: # Push all package JSON files to a Cortex (requires CORTEX=<Telepath URL>)
+	./scripts/pkgs/push.sh $(CORTEX)
 
 .PHONY: setup
 setup: # Setup this project's pipenv environment
@@ -24,8 +35,9 @@ install-self: # Install this project's python package using the pipenv's pip
 
 .PHONY: docs
 docs: # Build the documentation for this package
-	pipenv run sphinx-apidoc -T -f -o doc $(PKG_DIR)
-	pipenv run sphinx-build doc/ docs/
+	./scripts/pkgs/copy-docs.sh
+	pipenv run sphinx-apidoc -d 1 -t doc/_templates -e -M -T -f -o doc/stormlibpp $(PKG_DIR)
+	pipenv run sphinx-build -b dirhtml doc/ docs/
 
 .PHONY: clean-py
 clean-py: # Clean up Python generated files
@@ -38,6 +50,9 @@ clean-py: # Clean up Python generated files
 clean: clean-py # Remove build files - including a forced "git rm" of "dist/*"
 	git rm -f dist/* --ignore-unmatch
 	rm -rf dist
+	rm -rf src/private
+	git rm -f docs/* --ignore-unmatch
+	rm -rf docs
 
 .PHONY: read-docs
 read-docs: # Open the package docs locally
@@ -45,16 +60,21 @@ read-docs: # Open the package docs locally
 
 .PHONY: release
 release: change-version clean setup build docs # Build a new versioned release and push it (requires VERSION=#.#.#)
-	git add doc/* docs/* pyproject.toml $(PKG_DIR)/__init__.py
+	python3 scripts/changelog.py release $(VERSION) || echo "WARNING: no CHANGELOG entries for v$(VERSION)"
+	git add doc/* pyproject.toml $(PKG_DIR)/__init__.py CHANGELOG.md
 	git commit -m "build: release v$(VERSION)"
 	git push
 	git tag -a v$(VERSION) -m "Release v$(VERSION)"
 	git push origin v$(VERSION)
-	$(MAKE) clean-py
+	$(MAKE) clean
 
 .PHONY: tests
 tests: # Run the pytest suite for this project.
 	pipenv run pytest tests/
+
+.PHONY: lint-storm
+lint-storm: # Fail on Storm syntax errors in the Storm packages (Synapse's linter, E rules).
+	pipenv run python3 -m synapse.tools.storm.lint --select E src/pkgs
 
 .PHONY: pypi
 pypi: # Upload all Python packages in "dist/" to PyPI.

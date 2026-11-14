@@ -31,7 +31,6 @@ MAP = {
         "observed-data": "observed-data.storm",
         "opinion": "opinion.storm",
         "process": "process.storm",
-        "relationship": "relationship.storm",
         "report": "report.storm",
         "sighting": "sighting.storm",
         "software": "software.storm",
@@ -59,6 +58,10 @@ MAP = {
         {
             "type": [None, "indicates", None],
             "storm": "indicates.storm",
+        },
+        {
+            "type": [None, "communicates-with", None],
+            "storm": "communicates_with.storm",
         },
         {
             "type": ["threat-actor", "attributed-to", "identity"],
@@ -118,7 +121,6 @@ The default mapping represents a file structure like this::
     │   ├── observed-data.storm
     │   ├── opinion.storm
     │   ├── process.storm
-    │   ├── relationship.storm
     │   ├── report.storm
     │   ├── sighting.storm
     │   ├── software.storm
@@ -131,6 +133,7 @@ The default mapping represents a file structure like this::
     │   └── x509-certificate.storm
     └── relationships
         ├── camp_to_intset.storm
+        ├── communicates_with.storm
         ├── indicates.storm
         ├── intset_to_ta.storm
         ├── ta_to_id.storm

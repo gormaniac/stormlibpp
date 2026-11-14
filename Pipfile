@@ -4,7 +4,7 @@ verify_ssl = true
 name = "pypi"
 
 [packages]
-synapse = "*"
+synapse = ">=2.256.0,<3"
 aiohttp = "*"
 
 [dev-packages]
@@ -12,11 +12,12 @@ black = "*"
 build = "*"
 pylint = "*"
 setuptools = "*"
-sphinx = "*"
-sphinx-rtd-theme = "*"
+sphinx = ">=8.0.0"
 tomlkit = "*"
 twine = "*"
 pytest = "*"
+myst-parser = "*"
+shibuya = "*"
 
 [requires]
 python_version = "3.11"

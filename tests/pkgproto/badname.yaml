@@ -2,7 +2,7 @@ name: badname
 version: 0.0.1
 guid: 72a575c5f66286e13221303fd784c8a5
 
-synapse_minversion: [2, 137, 0]
+synapse_version: ">=2.162.0,<3.0.0"
 
 genopts:
     dotstorm: true

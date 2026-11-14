@@ -1,7 +1,6 @@
 """Work with storm:node objects in Python."""
 
 
-from types import SimpleNamespace
 from typing import Any, TypedDict
 
 
@@ -28,58 +27,104 @@ NodeTuple = tuple[NodeDef, NodeVals]
 Or what get's returned from a Cortex's Python APIs.
 """
 
-
+# TODO - Make this its own package outside stormlibpp.
 class ItemContainer:
-    """Hold key/value items in a SimpleNamespace.
+    """Hold key/value items in dict-like container.
 
-    Keys must be strings.
+    Why? Sometimes I want a fancy dict with a nice, intuitive repr and
+    no funky ergonomic overhead.
+
+    Acts almost identically to a dict except::
+        
+        - Missing items simply return None, not raise an error.
+        - Iterating over an ``ItemContainer`` returns key/value pairs instead
+          of just the key.
+        - Keys should be strings.
+            - Although no enforcement is done, non-string keys mess up instantiation.
+            - A non-string key may be added after instantiation, but it is not
+            recommended. And this use case is not tested.
+        - The object's ``repr`` is the current classname and all items in the
+          container as if the object was being instantiated - a la ``SimpleNamespace``.
+          Meaning, subclasses get automatic repr support.
+
+    All default methods of a ``dict`` are supported, they are actually directly
+    returned from the underlying ``dict`` thanks to ``__getattr__`` magic. Meaning
+    calling these methods operate on the items this container.
 
     Supports ``obj['item']`` (and ``obj['item'] = 'val'``) notation.
 
     When "getting" an item with ``__getitem__``, that doesn't exist in the
-    container, ``None`` is returned instead of raising an exception.
+    container, ``None`` is returned instead of raising an exception. Example::
+
+        # "missing" is not a key in the container.
+        foo = obj['missing']  # returns None, no exception raised
 
     Calling ``dir`` on this object will only return names for items this object
     "holds" instead of all parts of this object.
 
     Supports checking if an item is "held" via the ``in`` operator.
 
-    Supports iteration of items in the SimpleNamespace. Each iteration returns
-    a tuple of the item name followed by the item value.
+    Supports iteration of items in the underlying ``dict``. Each iteration returns
+    a tuple of the item name and the item value.
 
-    Implements only magic methods, and all of them operate on the underlying
-    SimpleNamespace.
+    Implements only magic methods, and all of them operate on the underlying dict.
 
     To convert this object to a ``dict`` of the items it holds,
     call ``vars`` on an instance.
+
+    Parameters
+    ----------
+    All keyword args passed at instantiation are added to the container as initial
+    values. These are not required and no args passed just creates an empty container.
     """
 
     def __init__(self, /, **kwargs) -> None:
-        # TODO - Is SimpleNamespace really the best option for this?
-        self.__ns = SimpleNamespace(**kwargs)
+        self.__ns = dict(**kwargs)
 
     def __contains__(self, __name: str) -> bool:
-        return __name in dir(self)
+        return __name in self.__ns
+
+    def __delitem__(self, __name: str) -> None:
+        if __name in self:
+            del self.__ns[__name]
 
     @property
     def __dict__(self):
-        return self.__ns.__dict__
+        return self.__ns
 
-    def __dir__(self) -> list[str]:
-        return [val for val in dir(self.__ns) if not val.startswith("_")]
+    def __dir__(self):
+        return list(self.__ns.keys())
 
     def __iter__(self) -> Any:
-        for item in dir(self):
+        for item in self.__ns:
+            # TODO - Should this be self.__ns[item] instead?
             yield (item, self[item])
 
+    def __getattr__(self, __name):
+        try:
+            return getattr(self.__ns, __name)
+        # Rewrite the attribute error to use the current class's name.
+        except AttributeError:
+            raise AttributeError(
+                f"'{self.__class__.__name__}' object has no attribute '{__name}'"
+            )
+
     def __getitem__(self, __name: str) -> Any:
-        return getattr(self.__ns, __name, None)
+        return self.__ns.get(__name, None)
 
     def __repr__(self) -> str:
-        return repr(self.__ns).replace("namespace", self.__class__.__name__)
+        orig = f"{self.__class__.__name__}("
+        ret = orig
+        for key, val in self:
+            ret += f"{key}={val}, "
+        if ret != orig:
+            ret = f"{ret[:-2]})"
+        else:
+            ret = f"{ret})"
+        return ret
 
-    def __setitem__(self, __name: str, __value: str) -> None:
-        setattr(self.__ns, __name, __value)
+    def __setitem__(self, __name: str, __value: Any) -> None:
+        self.__ns[__name] = __value
 
 
 class Props(ItemContainer):
@@ -125,6 +170,7 @@ class StormNode:
         self._props = Props(**props)
 
         self.iden = iden
+        # TODO - Should these also become ItemContainers?
         self.nodedata = nodedata
         self.tagprops = tagprops
 
@@ -169,15 +215,47 @@ class StormNode:
 
     @classmethod
     def unpack(cls, packedtup: NodeTuple) -> "StormNode":
+        """Unpack a NodeTuple into a StormNode instance.
+
+        Parameters
+        ----------
+        packedtup : NodeTuple
+            The packed node tuple to unpack into a StormNode instance.
+
+        Returns
+        -------
+        StormNode
+            The StormNode instance created from the packed node tuple.
+        """
         form, name = packedtup[0]
         vals = NodeVals(**packedtup[1])
         return cls(form, name, **vals)
 
     def pack(self) -> NodeTuple:
+        """Pack this StormNode into a NodeTuple.
+
+        Returns
+        -------
+        NodeTuple
+            The packed node tuple representing this StormNode.
+        """
         return ((self.form, self.value), self.nodevals)
 
     # TODO - Support tag properties
     def addTag(self, tag, timestamps: tuple = (None, None)) -> None:
+        """Add a tag to this node.
+
+        If the tag already exists, and the timestamps provided do not match the
+        existing timestamps, the timestamps will be updated to the new values.
+
+        Parameters
+        ----------
+        tag : str
+            The tag to add to this node.
+        timestamps : tuple, optional
+            The first and last timestamps seen for the tag, by default (None, None).
+            See the Synapse documentation for information on tag timestamp usage.
+        """
         if (
             tag in self._tags
             and timestamps != (None, None)
@@ -188,12 +266,41 @@ class StormNode:
             self._tags[tag] = timestamps
 
     def addTags(self, tags, timestamps: tuple = (None, None)) -> None:
+        """Add a list of tags to this node - ``timestamps`` is shared for all tags added.
+
+        Parameters
+        ----------
+        tags : list[str]
+            The list of tags to add to this node.
+        timestamps : tuple, optional
+            The first and last seen timestamps for the tags, by default (None, None).
+        """
         for tag in tags:
             self.addTag(tag, timestamps=timestamps)
 
     def addProp(self, propname: str, propval: Any) -> None:
+        """Add a property to this node.
+
+        This does not do any validation that the property is valid for the node's
+        form. It is up to the caller to ensure that the property is valid.
+
+        Parameters
+        ----------
+        propname : str
+            The name of the property to add.
+        propval : Any
+            The value of the property to add.
+        """
         self._props[propname] = propval
 
     def addProps(self, props: dict[str, Any]) -> None:
+        """Add multiple properties to a node as a dict.
+
+        Parameters
+        ----------
+        props : dict[str, Any]
+            The properties to add. Where the key is the property name and the
+            value is the property value.
+        """
         for propname, propval in props.items():
             self._props[propname] = propval

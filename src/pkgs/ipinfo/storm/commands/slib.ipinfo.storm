@@ -1,0 +1,37 @@
+init {
+    $ipinfolib = $lib.import(slib.ipinfo.lib)
+    $utils = $lib.import(slib.utils)
+    // TODO - cast query to an inet:fqdn (or an inet:ipv4 for ptr?) so we can error on bad input
+    $queryOpt = $cmdopts.query
+    $token = $utils.getUserOrSystemOpt("slib:ipinfo:token")
+    if ($token = $lib.null) {
+        $lib.raise("No IpInfo API token named 'slib:ipinfo:token' was found in the user or system config.")
+    }
+}
+
+$query = ''
+
+// Use the value in --query if it is passed
+if ( $queryOpt != '' ) {
+    // We spin when --query is used because this isn't meant to accept inbound nodes.
+    | spin |
+    $query = $queryOpt
+}
+else {
+
+    // TODO - Make this shorter somehow, one line...
+    switch $node.form() {
+        "inet:ipv4": {
+            $query = $node.value()
+        }
+        "inet:ipv6": {
+            $query = $node.value()
+        }
+        *: {
+            $lib.log.warning(`The node form "{$node.form()}" is not supported by the slib.ipinfo command.`)
+        }
+    }
+}
+
+// TODO - Make the yields optional
+yield $ipinfolib.doQuery($query, $token)

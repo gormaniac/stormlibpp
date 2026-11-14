@@ -1,15 +1,21 @@
 """Miscellaneous functions that are helpful for working with Storm/Synapse."""
 
 
+import argparse
+from collections.abc import Iterator
 import csv
 import getpass
 import json
+import functools
 import os
 
+import synapse.cortex as s_cortex
 import synapse.exc as s_exc
 import synapse.lib.parser as s_parser
 
 from . import errors
+from .httpcore import HttpCortex
+from .telepath import tpath_proxy_contextmanager
 
 
 def absjoin(*paths: str) -> str:
@@ -29,6 +35,26 @@ def absjoin(*paths: str) -> str:
     return os.path.abspath(os.path.join(*paths))
 
 
+def add_parser_parents(
+    parser: argparse.ArgumentParser, parents: argparse.ArgumentParser
+) -> argparse.ArgumentParser:
+    """Add parent parsers to an ArgumentParser after it is created.
+
+    Implementation borrowed from the init of ``argparse.ArgumentParser``.
+    """
+
+    for parent in parents:
+        parser._add_container_actions(parent)
+        try:
+            defaults = parent._defaults
+        except AttributeError:
+            pass
+        else:
+            parser._defaults.update(defaults)
+    
+    return parser
+
+
 def chk_storm_syntax(storm: str) -> None:
     """Check if the given Storm code has valid syntax, raise exception if not.
 
@@ -46,7 +72,7 @@ def chk_storm_syntax(storm: str) -> None:
         raise errors.StormSyntaxError("Storm Syntax Error!", err) from err
 
 
-def csv_genr(fd: str) -> list:
+def csv_genr(fd: str) -> Iterator[list[str]]:
     """Read a CSV from fd and yield each row."""
 
     for row in csv.reader(fd):
@@ -64,7 +90,7 @@ def endswith(text: str, items: list[str]) -> bool:
 
 def get_cortex_creds(_user: str | None = None) -> tuple[str, str]:
     """Get credentials to use when connecting to a Cortex over HTTP.
-    
+
     If ``_user`` is set, it overrides any other options to get a username.
     Otherwise use the value of the ``CORTEX_USER`` environment variable. If that
     is also empty, prompt for a username. A default option is given to the user
@@ -89,6 +115,49 @@ def get_cortex_creds(_user: str | None = None) -> tuple[str, str]:
         password = getpass.getpass()
 
     return username, password
+
+
+def get_cortex_token(prompt: bool = False) -> str:
+    if envtoken := os.environ.get("CORTEX_TOKEN"):
+        token = envtoken
+    elif prompt:
+        token = getpass.getpass("API Key: ")
+    else:
+        token = ""
+    return token
+
+
+async def get_cortex_obj(
+    cortex: str = "",
+    http: bool = True,
+    local: bool = False,
+    ssl_verify: bool = True,
+    username: str = "",
+    password: str = "",
+    token: str = "",
+):
+    if cortex and local:
+        raise ValueError("Can't use both cortex and local in get_cortex_obj!")
+    elif local:
+        core_obj = s_cortex.getTempCortex
+    elif cortex:
+        if http:
+            core_obj = functools.partial(
+                HttpCortex,
+                url=cortex,
+                usr=username,
+                pwd=password,
+                token=token,
+                ssl_verify=ssl_verify,
+            )
+        else:
+            core_obj = functools.partial(tpath_proxy_contextmanager, cortex)
+    else:
+        raise ValueError(
+            "Must provide a Cortex URL (cortex) or use a temp Cortex (local/test)!"
+        )
+
+    return core_obj
 
 
 def json_genr(fd):

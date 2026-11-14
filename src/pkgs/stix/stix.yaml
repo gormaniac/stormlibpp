@@ -1,0 +1,77 @@
+name: stormlibpp-stix
+version: 0.1.2
+guid: ebe2e7b2bcdf4a8a9456934474b3e63d
+
+synapse_version: ">=2.162.0,<3.0.0"
+
+genopts:
+    dotstorm: true
+
+author:
+  url: https://github.com/gormaniac
+  name: John Gorman
+
+desc: A StormLib++ Synapse Rapid Power-Up for ingesting stix bundles.
+
+docs:
+  - title: README
+    path: README.md
+
+modules:
+  - name: slib.stix.lib
+  - name: slib.stix.admin
+
+commands:
+  - name: slib.stix.ingest
+    descr: |
+      Ingest a stix bundle.
+
+      Examples:
+
+        // Ingest a remote STIX bundle
+        stix.ingest --url "https://127.0.0.1/stix.json"
+
+        // Ingest a STIX bundle that already exists in the runtime as "$bundle"
+        stix.ingest --obj $bundle
+
+        // Ingest an it:sec:stix:bundle that has a STIX bundle saved in node data as "stix:bundle"
+        it:sec:stix:bundle:id=1234 | stix.ingest
+
+    cmdargs:
+      - - --url
+        - type: str
+          default: ""
+          help: A URL pointing to a STIX bundle JSON.
+
+      - - --obj
+        - type: data
+          default: {}
+          help: A data object containing a STIX bundle.
+
+      - - --yield
+        - type: bool
+          default: false
+          action: store_true
+          help: Yield the newly created nodes.
+
+      - - --debug
+        - type: bool
+          default: false
+          action: store_true
+          help: Enable debug output.
+  
+    cmdinputs:
+      - form: it:sec:stix:bundle
+        help: A bundle to ingest from its stix:bundle node data, if --url and --obj aren't used.
+      # output:
+      #   - hash:md5
+      #   - hash:sha1
+      #   - hash:sha256
+      #   - inet:cidr4
+      #   - inet:ipv4
+      #   - inet:ipv6
+      #   - inet:fqdn
+      #   - inet:email
+      #   - inet:server
+      #   - inet:url
+      #   - file:path

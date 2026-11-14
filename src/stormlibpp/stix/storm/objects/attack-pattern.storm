@@ -1,1 +1,28 @@
-// TODO - Figure out what these look like.
+/*
+Example Stix 2.1 "attack-pattern" object:
+{
+    "type": "attack-pattern",
+    "spec_version": "2.1",
+    "id": "attack-pattern--0c7b5b88-8ff7-4a4d-aa9d-feb398cd0061",
+    "created": "2016-05-12T08:17:27.000Z",
+    "modified": "2016-05-12T08:17:27.000Z",
+    "name": "Spear Phishing",
+    "description": "This type of attack targets specific individuals instead of a wide group of people. Attackers most often gather information about the target beforehand.",
+    "kill_chain_phases": [
+        { "kill_chain_name": "mitre-attack", "phase_name": "initial-access" }
+    ],
+    "external_references": [
+        { "source_name": "mitre-attack", "external_id": "T1566" }
+    ]
+}
+*/
+
+// TODO - If external_references is a MITRE attack reference, we should try lifting and using that node first.
+// TODO - Do we want to save Kill Chain anywhere?
+[ ou:technique=(stix, attack-pattern, $object.id)
+    :name?=$object.name
+    :desc?=$object.description
+]
+[ <(refs)+ { it:sec:stix:bundle:id=$bundle.id } ]
+$node.data.set(`stix:object:bundle:{$bundle.id}`, $object)
+return($node)

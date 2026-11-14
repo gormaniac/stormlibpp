@@ -1,0 +1,40 @@
+init {
+    $dnslib = $lib.import(slib.dns.request.lib)
+    // TODO - cast query to an inet:fqdn (or an inet:ipv4 for ptr?) so we can error on bad input
+    $queryOpt = $cmdopts.query
+    // TODO - validate type on init
+    $typeOpt = $cmdopts.type
+}
+
+// Use the value in --query if it is passed
+if ( $queryOpt != '' ) {
+    // We spin when --query is used because this isn't meant to accept inbound nodes.
+    | spin |
+
+    // TODO - Make the yields optional
+    for $answer in $dnslib.doQuery($queryOpt, type=$typeOpt) {
+        yield $answer
+    }
+}
+else {
+    $query = ''
+
+    switch $node.form() {
+        "inet:ipv4": {
+            if ($typeOpt = 'PTR') {
+                $query = $node.repr()
+            }
+        }
+        "inet:fqdn": {
+            $query = $node.value()
+        }
+    }
+
+    if ($query != '') {
+        for $answer in $dnslib.doQuery($query, type=$typeOpt) {
+            // TODO - Is it better to store the answer in a set?
+            // I think this could exponentially increase the pipeline
+            yield $answer
+        }
+    }
+}

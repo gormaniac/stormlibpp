@@ -1,0 +1,14 @@
+init {
+    $lookupLib = $lib.import(slib.lookup.lib)
+    $inputItems = $cmdopts.items
+    $readOnly = $cmdopts.read_only
+}
+
+for $item in $inputItems {
+    if $readOnly {
+        yield $lookupLib.lookupOnly($item)
+    }
+    else {
+        yield $lookupLib.lookupOrCreate($item)
+    }
+}

@@ -1,0 +1,1 @@
+yield $n1node [ +(attributed-to)> { yield $n2node } ]

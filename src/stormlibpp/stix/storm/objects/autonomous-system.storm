@@ -1,5 +1,5 @@
 [
-    inet:as=$object.number
+    inet:asn=$object.number
     :name?=$object.name
 ]
 [ <(refs)+ { it:sec:stix:bundle:id=$bundle.id } ]

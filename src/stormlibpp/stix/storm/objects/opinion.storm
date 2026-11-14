@@ -1,8 +1,7 @@
-// TODO - Figure out if content is the right key here.
 [
     meta:note=(stix, note, $object.id)
-    :type=stix.opinion
-    :text=$object.content
+    :type=`stix.opinion.{$object.opinion}`
+    :text?=$object.explanation
     :created=$object.created
     :updated=$object.modified
 ]

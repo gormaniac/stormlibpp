@@ -1,5 +1,4 @@
-if ($object.hashes != $lib.null) {
-    ($ok, $hash) = $lib.trycast(file:bytes, $object.hashes."SHA-256")
+    ($ok, $hash) = $lib.trycast(hash:sha256, $object.hashes."SHA-256")
     if $ok {
         $guid = `sha256:{$hash}`
     } else {
@@ -16,11 +15,15 @@ if ($object.hashes != $lib.null) {
         :sha512?=$object.hashes."SHA-512"
     ]
 
-    if (($object.parent_directory_ref != $lib.null) and ($object.name != $lib.null)) {
-        {[( file:filepath=((file, $guid), (path, `{$object.parent_directory_ref/$object.name}`)) )]}
-    }
+    // TODO - Somehow check if a file-parser is installed and use those model extensions to save more about the file?
+
+    { for $directory in $bundle.objects {
+        if ($directory.id = $object.parent_directory_ref and $directory.type = "directory" and $object.name != $lib.null) {
+            [ file:filepath=($guid, `{$directory.path}/{$object.name}`) ]
+            [ <(refs)+ { it:sec:stix:bundle:id=$bundle.id } ]
+        }
+    } }
     // TODO - Do something with windows-pebinary-ext extension
     [ <(refs)+ { it:sec:stix:bundle:id=$bundle.id } ]
     $node.data.set(`stix:object:bundle:{$bundle.id}`, $object)
     return($node)
-}

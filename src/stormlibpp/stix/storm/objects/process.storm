@@ -1,1 +1,24 @@
-// TODO - Figure out what these look like.
+/*
+Example Stix 2.1 "process" object:
+{
+    "type": "process",
+    "spec_version": "2.1",
+    "id": "process--f7a5c7bb-8c4a-4d55-9c39-7cf6e4e5c1c8",
+    "pid": 1221,
+    "created_time": "2016-01-20T14:11:25.55Z",
+    "cwd": "/tmp",
+    "command_line": "./gedit-bin --new-window",
+    "binary_ref": "file--3128d3ac-6b0e-4f1b-8f6c-cee29d9a6b78"
+}
+
+Mapped to it:exec:proc. Working directory and process-specific references
+are preserved in node data rather than conflated with the executable path.
+*/
+[ it:exec:proc=(stix, process, $object.id)
+    :pid?=$object.pid
+    :time?=$object.created_time
+    :cmd?=$object.command_line
+]
+[ <(refs)+ { it:sec:stix:bundle:id=$bundle.id } ]
+$node.data.set(`stix:object:bundle:{$bundle.id}`, $object)
+return($node)

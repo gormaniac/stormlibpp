@@ -3,6 +3,7 @@ switch $object.identity_class {
     organization: {[ ps:contact=(stix, identity, $object.id) :orgname?=$object.name ]}
     individual: {[ ps:contact=(stix, identity, $object.id) :name?=$object.name ]}
     system: {[ it:host=(stix, identity, $object.id) :name?=$object.name ]}
+    *: {[ ps:contact=(stix, identity, $object.id) :name?=$object.name ]}
 }
 [ <(refs)+ { it:sec:stix:bundle:id=$bundle.id } ]
 $node.data.set(`stix:object:bundle:{$bundle.id}`, $object)

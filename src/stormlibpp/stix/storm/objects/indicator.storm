@@ -1,3 +1,4 @@
+// TODO - Need to save the "description" as a meta:note.
 $guid = $lib.guid(stix, indicator, $object.id)
 switch $object.pattern_type {
 

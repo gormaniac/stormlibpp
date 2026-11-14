@@ -1,1 +1,30 @@
-// TODO - Figure out what these look like.
+/*
+Example Stix 2.1 "email-message" object:
+{
+    "type": "email-message",
+    "spec_version": "2.1",
+    "id": "email-message--0c57a304-cf87-4d60-b7c8-a68f927b9e8b",
+    "is_multipart": false,
+    "date": "2004-04-19T12:22:23.000Z",
+    "from_ref": "email-addr--9a1f0a6e-de26-5578-93b1-3d4e6d8c1234",
+    "to_refs": ["email-addr--d1b3fdb1-6b21-5da2-9dcf-89ecc98cca1f"],
+    "subject": "Did you see this?",
+    "body": "Check out this attachment, I think it is a picture of the aliens!"
+}
+
+Mapped to inet:email:message. NOTE: from_ref/to_refs/cc_refs/bcc_refs point
+at other Stix objects (email-addr). Per-object storm callbacks only receive
+$object + $bundle and have no access to nodes already built for other Stix
+objects (no nodesbyid), so those refs are intentionally left unresolved here
+- same limitation documented in file.storm for parent_directory_ref.
+
+TODO - Do we want our stix tol to post-process nodes like this to resolve internal object references?
+*/
+[ inet:email:message=(stix, email-message, $object.id)
+    :subject?=$object.subject
+    :date?=$object.date
+    :body?=$object.body
+]
+[ <(refs)+ { it:sec:stix:bundle:id=$bundle.id } ]
+$node.data.set(`stix:object:bundle:{$bundle.id}`, $object)
+return($node)

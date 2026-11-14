@@ -1,1 +1,30 @@
-// TODO - Figure out what these look like.
+/*
+Example Stix 2.1 "observed-data" object:
+{
+    "type": "observed-data",
+    "spec_version": "2.1",
+    "id": "observed-data--b67d30ff-02ac-498a-92f9-32f845f448cf",
+    "created": "2016-04-06T19:58:16.000Z",
+    "modified": "2016-04-06T19:58:16.000Z",
+    "first_observed": "2016-03-01T00:00:00.000Z",
+    "last_observed": "2016-03-01T00:00:00.000Z",
+    "number_observed": 1,
+    "object_refs": [
+        "ipv4-addr--efcd5e80-570c-4107-b6fb-963f78038002"
+    ]
+}
+
+Mapped to meta:note (same fallback used for note.storm/opinion.storm/
+grouping.storm), since Synapse has no single form matching this generic
+"observation event" concept. number_observed is preserved via the raw Stix
+object stashed in nodedata below. object_refs are auto-linked as refs edges
+by the Stix ingest engine itself - no manual handling needed here.
+*/
+[ meta:note=(stix, observed-data, $object.id)
+    :type=stix.observed-data
+    .seen?=$object.first_observed
+    .seen?=$object.last_observed
+]
+[ <(refs)+ { it:sec:stix:bundle:id=$bundle.id } ]
+$node.data.set(`stix:object:bundle:{$bundle.id}`, $object)
+return($node)
