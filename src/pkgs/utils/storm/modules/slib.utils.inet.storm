@@ -1,0 +1,42 @@
+// slib.utils.inet - Shared network modeling for StormLib++ packages.
+
+// The number of an ASN given as an int or a string like "15169", "AS15169" or
+// "AS15169 Google LLC" (ip-api.com's "as" field). Returns null if there's no number.
+function asnNum(valu) {
+    if ($valu = null) { return() }
+    $text = $lib.cast(str, $valu).strip()
+    $m = $lib.regex.search('^(?:[Aa][Ss])?([0-9]+)(?:\s|$)', $text)
+    if ($m = null) { return() }
+    ($ok, $num) = $lib.trycast(inet:asn, $m.0)
+    if $ok { return($num) }
+    return()
+}
+
+// Set an ou:org's :names and :orgtype. A function, so the org stays out of the caller's pipeline.
+function _editOrg(org, names, orgtype) {
+    yield $org
+    if $names { [ :names?=$names ] }
+    if $orgtype { [ :orgtype?=$orgtype ] }
+    return()
+}
+
+// Make (or update) the inet:asn for asn, and yield it.
+//
+// asn is anything asnNum() accepts. If orgname is given, the ASN's :owner is set to the
+// ou:org with that name ($lib.gen.orgByName), and that org gets the given :names and :orgtype.
+// Returns null, and makes nothing, if asn has no ASN number.
+function asnNode(asn, orgname=(null), names=(null), orgtype=(null)) {
+    $num = $asnNum($asn)
+    if ($num = null) { return() }
+
+    $org = (null)
+    if $orgname {
+        $org = $lib.gen.orgByName($orgname, try=(true))
+    }
+
+    if ($org and ($names or $orgtype)) { $_editOrg($org, $names, $orgtype) }
+
+    [ inet:asn=$num ]
+    if $org { [ :owner=$org ] }
+    return($node)
+}

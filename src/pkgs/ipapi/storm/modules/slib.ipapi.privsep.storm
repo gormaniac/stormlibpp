@@ -1,0 +1,139 @@
+// Privileged (asroot) code for slib.ipapi: the ip-api.com request, its rate limiting, and the tag
+// settings. Users only need the slib.ipapi.user perm, not perms on the globals used here.
+
+// ip-api.com's free endpoint is HTTP only.
+$URL = "http://ip-api.com/json"
+$FIELDS = "status,message,country,countryCode,region,regionName,city,zip,lat,lon,timezone,isp,org,as,asname,mobile,proxy,hosting,query"
+
+// When the rate limit window resets (epoch millis), shared by every query on this Cortex.
+$RLKEY = "slib:ipapi:ratelimit:until"
+
+// Seconds to wait if ip-api.com rate limits a query without a usable X-Ttl header.
+$DEFAULT_TTL = (60)
+
+// How many times one query waits out a rate limit (HTTP 429) before it gives up.
+$MAX_RETRIES = (5)
+
+function getIpApiTag() {
+    $tagPrefix = $lib.globals.get("slib:ipapi:tag:prefix")
+    $tagEnabled = $lib.globals.get("slib:ipapi:tag:enabled")
+    if ($tagPrefix and $tagEnabled) {
+        return($tagPrefix)
+    }
+    elif ($tagEnabled and $tagPrefix = (null)) {
+        $lib.raise(BadConfValu, "The slib.ipapi tag prefix is not set. Please set it with the slib.ipapi.admin.settag command.")
+    }
+
+    return((null))
+}
+
+// A response header by name, ignoring case. Returns null if it's missing.
+function _header(headers, name) {
+    $name = $name.lower()
+    for ($key, $valu) in $headers {
+        if ($key.lower() = $name) { return($valu) }
+    }
+    return()
+}
+
+// A decimal digit string as an int (leading zeros are fine).
+function _dec(text) {
+    $text = $text.lstrip("0")
+    if (not $text) { return((0)) }
+    return($lib.cast(int, $text))
+}
+
+// The X-Ttl header (seconds, maybe fractional) in millis, or DEFAULT_TTL if it's missing or not
+// a number.
+function _ttl(headers) {
+    $valu = $_header($headers, "X-Ttl")
+    if ($valu != null and $lib.regex.matches('^[0-9]+(\.[0-9]+)?$', $valu)) {
+        $parts = $valu.split(".")
+        $millis = ($_dec($parts.0) * 1000)
+        if ($lib.len($parts) > 1) {
+            $millis = ($millis + $_dec($parts.1.ljust(3, "0").slice(0, 3)))
+        }
+        return($millis)
+    }
+    return(($DEFAULT_TTL * 1000))
+}
+
+// Hold every query on this Cortex until ip-api.com's rate limit window resets, in millis.
+function _block(millis) {
+    $until = ($lib.time.now() + $millis)
+    $current = $lib.globals.get($RLKEY)
+    if ($current = null or $until > $current) {
+        $lib.globals.set($RLKEY, $until)
+    }
+}
+
+// Sleep until the rate limit window resets, if a query hit the limit.
+function _wait() {
+    $until = $lib.globals.get($RLKEY)
+    if ($until = null) { return() }
+    $delta = ($until - $lib.time.now())
+    if ($delta > 0) {
+        $lib.time.sleep(`{($delta / 1000)}.{$lib.cast(str, ($delta % 1000)).rjust(3, "0")}`)
+    }
+}
+
+function _fail(mesg) {
+    return(({"status": (false), "mesg": $mesg, "data": (null)}))
+}
+
+// Query ip-api.com for an IP address. Returns {"status", "mesg", "data"}.
+//
+// ip-api.com allows 45 requests a minute. Every response says how many are left (X-Rl) and when
+// the window resets (X-Ttl): when none are left, every query on this Cortex waits for the reset.
+// A query that's rate limited anyway (HTTP 429), ex. by another client on the same IP, waits for
+// the reset and tries again, up to MAX_RETRIES times.
+function query(ipaddr) {
+    $tries = (0)
+    while (true) {
+        $_wait()
+
+        $resp = $lib.inet.http.get(`{$URL}/{$ipaddr}?fields={$FIELDS}`)
+
+        if ($resp.code = 429) {
+            $_block($_ttl($resp.headers))
+            $tries = ($tries + 1)
+            if ($tries > $MAX_RETRIES) {
+                return($_fail(`ip-api.com is still rate limiting queries for IP address: {$ipaddr}, gave up after {$MAX_RETRIES} retries`))
+            }
+            continue
+        }
+
+        if ($resp.code != 200) {
+            if ($resp.code = -1) {
+                $err = $resp.reason
+            } else {
+                $err = `HTTP {$resp.code} {$resp.reason}`
+            }
+            return($_fail(`An HTTP error occurred while trying to query ip-api.com for IP address: {$ipaddr} - {$err}`))
+        }
+
+        $left = $_header($resp.headers, "X-Rl")
+        if ($left != null and $lib.regex.matches('^[0-9]+$', $left) and $_dec($left) <= 1) {
+            $_block($_ttl($resp.headers))
+        }
+
+        try {
+            $data = $resp.json()
+        } catch * as err {
+            return($_fail(`ip-api.com returned invalid JSON for IP address: {$ipaddr} - {$err.mesg}`))
+        }
+
+        if ($data.status != "success") {
+            return($_fail(`ip-api.com returned a {$data.status} status for IP address: {$ipaddr} - {$data.message}`))
+        }
+
+        // The modeling code reads ip-api.com's "as" field as "as_". ip-api.com sends "" for IPs
+        // with no ASN, so default to that if the field is missing.
+        $asfield = $data."as"
+        if ($asfield = null) { $asfield = "" }
+        $data.as_ = $asfield
+        $data."as" = $lib.undef
+
+        return(({"status": (true), "mesg": `Successfully queried ip-api.com for IP address: {$ipaddr}`, "data": $data}))
+    }
+}
