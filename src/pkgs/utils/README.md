@@ -11,6 +11,19 @@ A Synapse Rapid Power-Up that brings useful library code into a Synapse Cortex. 
         $token = $utils.getUserOrSystemOpt("slib:ipinfo:token")
         ```
 
+## `slib.utils.inet`
+
+Network modeling shared by StormLib++ packages (`slib.ipapi` and `ipinfo`).
+
+- `asnNum(valu)` - The ASN number in an int or a string like `15169`, `AS15169` or
+  `AS15169 Google LLC`. Returns `null` if there isn't one.
+- `asnNode(asn, orgname=(null), names=(null), orgtype=(null))` - Make the `inet:asn` and return
+  it. With `orgname`, its `:owner` is the `ou:org` with that name (`$lib.gen.orgByName`), which
+  also gets `names` and `orgtype`. Makes nothing and returns `null` if `asn` has no ASN number.
+    ```
+    $inet = $lib.import(slib.utils.inet)
+    yield $inet.asnNode("AS15169 Google LLC", orgname="Google LLC", orgtype=company.isp)
+    ```
 ## `slib.utils.x509`
 
 A pure Storm X.509 certificate parser (RFC 5280), for packages that need certificate details

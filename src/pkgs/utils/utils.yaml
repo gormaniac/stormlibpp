@@ -20,3 +20,4 @@ docs:
 modules:
   - name: slib.utils
   - name: slib.utils.x509
+  - name: slib.utils.inet

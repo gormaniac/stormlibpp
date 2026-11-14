@@ -1,0 +1,5 @@
+init {
+    $ipapiAdminLib = $lib.import("slib.ipapi.admin")
+}
+
+$ipapiAdminLib.disableTagPrefix()
