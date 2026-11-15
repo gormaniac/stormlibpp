@@ -1,0 +1,18 @@
+interactions:
+- request:
+    body: null
+    headers: {}
+    method: GET
+    uri: http://ip-api.com/json/1.2.3.4?fields=status,message,country,countryCode,region,regionName,city,zip,lat,lon,timezone,isp,org,as,asname,mobile,proxy,hosting,query
+  response:
+    body:
+      string: Internal Server Error
+    headers:
+      Content-Type:
+      - text/plain; charset=utf-8
+      Content-Length:
+      - '21'
+    status:
+      code: 500
+      message: Internal Server Error
+version: 1

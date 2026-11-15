@@ -1,0 +1,6 @@
+init {
+    $ipapiAdminLib = $lib.import("slib.ipapi.admin")
+    $prefixOpt = $cmdopts.prefix
+}
+
+$ipapiAdminLib.setTagPrefix($prefixOpt)

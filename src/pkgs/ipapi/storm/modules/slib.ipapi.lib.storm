@@ -1,0 +1,103 @@
+// Query ip-api.com for an IP address. Returns {"status", "mesg", "data"}: status is true and data
+// is ip-api.com's result (with its "as" field named "as_") when the query worked.
+function query(query) {
+    return($lib.import(slib.ipapi.privsep).query($query))
+}
+
+function buildGeoTelemNode (ipNode, placeNode, data) {
+    $countryNode = $lib.gen.polCountryByIso2($data.countryCode, try=$lib.true)
+
+    [ geo:telem=({"node": ([$ipNode.form(), $ipNode.value()]), "place": $placeNode})
+        :time=($lib.time.now())
+        :place:name = $placeNode.props.name
+        :place:latlong = $placeNode.props.latlong
+        :place:country ?= $countryNode
+        :place:country:code ?= $data.countryCode
+        :desc = (`IP geolocation data for {$ipNode.form()}={$ipNode.repr()} at the coordinates {$data.lat}, {$data.lon} per ip-api.com.`)
+    ]
+
+    return((null))
+}
+
+function buildPlaceNode(data) {
+    $nameParts = ([])
+    for $part in ($data.city, $data.regionName, $data.country) {
+        if $part { $nameParts.append($part) }
+    }
+    $placeName = (', ').join($nameParts)
+
+    [
+        geo:place=($data.lat, $data.lon, $data.city)
+        :latlong=($data.lat, $data.lon)
+        :name?=$placeName
+        :type=ip.geoloc.city
+        :desc=(`{$placeName} at the coordinates {$data.lat}, {$data.lon} per ip geolocation data.`)
+    ]
+
+    return($node)
+}
+
+// Build a loc value (ex. "us.va.ashburn") from the country code, region, and city.
+// Each part must be under the one before it, so stop at the first missing part.
+function buildLoc(data) {
+    $locParts = ([])
+    for $part in ($data.countryCode, $data.region, $data.city) {
+        // A "." would split the part into extra levels of the loc hierarchy.
+        if $part { $part = $part.replace(".", "").strip() }
+        if (not $part) { break }
+        $locParts.append($part)
+    }
+    if (not $locParts) { return((null)) }
+    return(('.').join($locParts))
+}
+
+function buildASNNode(data) {
+    $names = ([])
+    for $name in ($data.asname, $data.as_, $data.as_.strip("AS").split(" ").0) {
+        if $name { $names.append($name) }
+    }
+    return($lib.import(slib.utils.inet).asnNode($data.as_, orgname=$data.isp, names=$names, orgtype=company.isp))
+}
+
+function modelResult(data, tagPrefix) {
+    $locNode = $buildPlaceNode($data)
+    $asnNode = $buildASNNode($data)
+
+    // Synapse also parses IPv4 strings as valid inet:ipv6 values (::ffff:x.x.x.x),
+    // so only fall back to inet:ipv6 when the query is not a valid IPv4.
+    ($isIpv4, $ipv4) = $lib.trycast(inet:ipv4, $data.query)
+    if $isIpv4 {
+        $ipForm = inet:ipv4
+    } else {
+        $ipForm = inet:ipv6
+    }
+
+    [
+        *$ipForm?=$data.query
+        :asn?=$asnNode
+        :latlong?=($data.lat, $data.lon)
+        :place?=$locNode
+        :loc?=$buildLoc($data)
+    ]
+
+    // TODO - add tag timestamps here
+    if ($tagPrefix != null) {
+        if ($data.hosting) {
+            $hostingTag = `{$tagPrefix}.hosting`
+            [+#$hostingTag]
+        }
+        if ($data.proxy) {
+            $proxyTag = `{$tagPrefix}.proxy`
+            [+#$proxyTag]
+        }
+        if ($data.mobile) {
+            $mobileTag = `{$tagPrefix}.mobile`
+            [+#$mobileTag]
+        }
+    }
+
+    $buildGeoTelemNode($node, $locNode, $data)
+
+    // TODO - edge to the meta:source
+    // TODO - build a 2nd org for the IP WhoIS organization if different that get's edged to the ASN org node (<contains? <uses?) and IP node (<owns)
+}
