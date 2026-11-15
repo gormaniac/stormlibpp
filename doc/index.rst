@@ -8,6 +8,8 @@ Welcome to StormLib++'s documentation!
    :caption: Contents:
 
    stormlibpp
+   stormgen_design
+   changelog
    contributing
    pkgs/index
 

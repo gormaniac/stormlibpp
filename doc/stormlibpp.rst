@@ -76,6 +76,18 @@ stormlibpp.stormpkg module
    :undoc-members:
    :show-inheritance:
 
+stormlibpp.stormgen package
+---------------------------
+
+.. automodule:: stormlibpp.stormgen
+   :members: parse, extract, convert, compile_storm, apply, StormExpression
+   :undoc-members:
+   :show-inheritance:
+
+.. automodule:: stormlibpp.stormgen.compiler
+   :members: StormProgram
+   :show-inheritance:
+
 stormlibpp.telepath module
 --------------------------
 

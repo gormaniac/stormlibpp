@@ -1,0 +1,3 @@
+include CHANGELOG.md
+include doc/stormgen_design.md
+include tests/data/stormgen-example.md
