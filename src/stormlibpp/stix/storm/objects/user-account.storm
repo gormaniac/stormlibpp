@@ -18,7 +18,7 @@ if (($object.account_type != $lib.null) and ($object.account_login != $lib.null)
     } else {
         [
             auth:creds=(stix, "user-account", $object.id)
-            :user=$object.account_login
+            :user?=$object.account_login
             :passwd?=$object.credential
         ]
     }
