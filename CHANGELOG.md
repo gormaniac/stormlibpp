@@ -8,7 +8,7 @@
   - `retn()`, `retnGenr()` and `errRetn()`, the same wrapping as functions.
   - `SvcError`, the base for errors whose message is meant for the Storm user.
   - `safeJoin()`, `checkName()` and `checkGuid()`, for values from Storm that end up in a file path.
-- Add `stormlibpp.testing`, a pytest plugin for Storm service and package test suites (enable it with `pytest_plugins = ["stormlibpp.testing"]`, install with the `testing` extra). It moves the Synapse deprecation harness out of each project's `conftest.py`, now also fails the run for deprecations logged outside of a test (ex. a deprecated import at collection time; set `stormlibpp_outside_deprecations = warn` to only list them), and adds `localhost` to `NO_PROXY` for fake upstream servers.
+- Add `stormlibpp.testing`, a pytest plugin for Storm service and package test suites (enable it with `pytest_plugins = ["stormlibpp.testing"]`, install with the `testing` extra). It moves the Synapse deprecation harness out of each project's `conftest.py`, now also fails the run for deprecations logged outside of a test (ex. a deprecated import at collection time; set `stormlibpp_outside_deprecations = warn` to only list them, which the terminal summary says when it fails a run), and adds `localhost` to `NO_PROXY` for fake upstream servers.
 - Add `stormlibpp.testing.checks`: `assertVersionsMatch()` checks a service's version in `pyproject.toml`, `__init__.py`, its Storm package prototypes and `uv.lock`; `stormLint()` runs Synapse's Storm linter; `assertMainHelp()` checks `python -m <module> --help` works.
 - StormLib++'s own tests use the new plugin.
 ### Fixes

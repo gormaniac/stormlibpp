@@ -134,10 +134,16 @@ class TestPlugin:
         result.assert_outcomes(passed=1)
         assert result.ret == pytest.ExitCode.TESTS_FAILED
         result.stdout.fnmatch_lines(
-            ["*outside of tests (failing the run)*", "*old.import.time*"]
+            [
+                "*outside of tests (failing the run)*",
+                "*old.import.time*",
+                '*set stormlibpp_outside_deprecations = "warn"*-o stormlibpp_outside_deprecations=warn*',
+            ]
         )
 
     def test_outside_warn(self, pytester):
         result = self._outside(pytester, ini="warn")
         assert result.ret == pytest.ExitCode.OK
+        # The hint is only for runs that fail.
+        result.stdout.no_fnmatch_line("*set stormlibpp_outside_deprecations*")
         result.stdout.fnmatch_lines(["*Synapse deprecations outside of tests*"])

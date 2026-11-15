@@ -130,6 +130,12 @@ def pytest_terminal_summary(terminalreporter, exitstatus, config) -> None:
         )
         for mesg in sorted(_SYN_DEPRS.outside):
             terminalreporter.line(mesg)
+        if fail:
+            terminalreporter.line("")
+            terminalreporter.line(
+                'To only list these, set stormlibpp_outside_deprecations = "warn" in your '
+                "pytest config, or run with -o stormlibpp_outside_deprecations=warn."
+            )
 
 
 def _allowed(request: pytest.FixtureRequest) -> bool:
