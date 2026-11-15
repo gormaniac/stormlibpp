@@ -21,11 +21,11 @@ example.com
 ```
 
 #### :place
-You can code block on one line for ease of use
-```AU```
+An inline code span can supply a value on one line. A place reference must be a GUID; this is an example `geo:place` identity.
+```0123456789abcdef0123456789abcdef```
 
-#### :loc="-27.4820,153.0136"
-Or you can place the value directly in the heading.
+#### :loc="au"
+Or you can place a Storm value directly in the heading. Locations use hierarchical country codes, not coordinates.
 
 ### 1.1.1.1
 

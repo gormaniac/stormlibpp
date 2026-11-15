@@ -1,8 +1,82 @@
 # Stormgen Design Notes
 
-Stormgen is a tool that will be able to convert structured Markdown documentation into Storm node tuples that can be used with a Synapse Cortex's proxy methods to create or update nodes.
+Stormgen converts structured Markdown documentation into packed node data or compiled Storm that can create and update nodes, tags and edges in a Synapse Cortex.
 
 An example document can be found in `tests/data/stormgen-example.md` that demonstrates (almost) all of stormgen's expected features.
+
+## Implementation status
+
+Markdown extraction, constant-safe node conversion, Storm compilation, asynchronous application, optional documentation notes and the compiler CLI are implemented. Images, attachments, report publication and review tooling remain outside this implementation.
+
+Extraction is available offline:
+
+```python
+from stormlibpp import stormgen
+
+doc = stormgen.parse(markdown_text)
+nodes = stormgen.extract(doc)
+for node in nodes:
+    node.extract()
+    print(node.form, node.valu, node.props, node.tags, node.edges)
+```
+
+The entry modes retain their existing API names:
+
+- `full` (default): form headings at `form_level` (default 2), with node headings immediately below.
+- `forms`: a required `form` argument and level-1 node headings; non-heading preamble content is rejected.
+- `embedded`: every bounded `Nodes` region, including `Nodes (form)` regions. `nodes_header` customizes the heading name. Regions end at the next heading of the same or shallower level. A supplied `form` is the fallback for a plain nodes heading.
+
+`form_level=4` supports non-default form levels in full-document mode through `extract`, `convert`, `compile_storm` and `apply`. Extracted nodes preserve source order and own only their headings and descendants within their form or embedded region. Repeated `parse()` and node `extract()` calls do not accumulate duplicates.
+
+Structural headings must use ATX syntax (`#`, `##`, etc.). Setext headings underlined with `=` or `-` are explicitly rejected with `ValueError`, rather than silently ignored.
+
+Heading comments start at the last unescaped ` // ` separator. Escape a literal separator as `\//`; the existing doubled-backslash spelling `\\//` is also supported. Escapes survive inline Markdown formatting, and the resulting literal separator is not reinterpreted as a Storm comment during conversion or compilation.
+
+Property values use the first direct fenced or indented code block, otherwise a flat Markdown list, otherwise a standalone inline-code line, otherwise an assignment in the property heading. Inline code inside prose is ignored. A code block's structural final newline is removed; internal newlines are retained. The one-line backtick examples in the fixture are inline code spans, not fenced blocks, and are explicitly supported even when they follow prose without a blank line.
+
+Unlabelled code blocks and inline-code values remain literal text, except that constant Storm-list syntax in code blocks is recognized, including `(first, second)`, `([1, 2])` and `($lib.true, $lib.false, $lib.null)`. Builtin boolean/null constants resolve recursively inside nested constant lists without executing a runtime; quoted builtin names remain strings. A `text` fence forces literal interpretation. Markdown lists contain literal strings. Inline assignments and code fences labelled `storm` produce `StormExpression` objects containing unevaluated source; use a `storm` fence for runtime expressions, including lists containing runtime values. Primary headings and edge target values also remain source text. Extraction never evaluates Storm or validates values against a live Synapse model.
+
+Tags expose `name`, optional `interval`, and `props`. Edge statements expose `verb`, `reverse` and ordered `(form, value)` targets. Lists directly under `Edges` remain documentation, not statements. Missing values and malformed structural tag/edge/list definitions raise `ValueError` with the relevant heading or target. Unknown node sections and descendants below property headings are ignored.
+
+### Conversion, compilation and application
+
+`convert(doc)` returns offline `StormNode` objects for literal and constant values. Property-name colons and tag-name hashes are removed in packed data; universal-property dots are retained. Array values become tuples, and constant tag intervals are normalized to milliseconds. Other values are not normalized against a model. Constants are resolved through Synapse's expression AST without executing arbitrary code. Bare numbers retain Storm's semantics: `42` is text, while `(42)` is numeric. Generated or composite primary values, runtime expressions, edges and `comments=True` require `apply` and raise a capability error during offline conversion rather than being silently omitted. Existing positional arguments and the custom extractor hook are preserved; a custom extractor must accept the `form_level` keyword when a non-default level is requested.
+
+```python
+literal_doc = stormgen.parse("## inet:fqdn\n### example.com\n")
+packed_nodes = [node.pack() for node in stormgen.convert(literal_doc)]
+
+program = stormgen.compile_storm(doc)
+result = await cortex.callStorm(program.text, opts={"vars": program.vars})
+
+nodes = await stormgen.apply(doc, cortex, comments=True, opts={"vars": {"label": "example"}})
+```
+
+`compile_storm` returns a `StormProgram` with `text` and `vars`; these must be passed together. `program.to_storm()` returns standalone source containing its literal data. Literal Markdown values are bound as data, not interpolated into executable source. Primary values use Storm value syntax when valid, with ordinary free-text headings safely bound as literal text. Malformed explicit expressions and malformed form headings are rejected before submission.
+
+`apply` accepts a caller-provided object implementing `callStorm`, including a Cortex, Telepath proxy or `HttpCortex`. It preserves caller options without modifying them, handles HTTP response envelopes and restores packed tuple representations. Names beginning with `stormgen_` are reserved for generated variables. Runtime expressions may refer to caller variables. Edge-target expressions are evaluated in the source node's context before entering the target subquery; wildcard edge targets generate fresh nodes.
+
+Definitions execute in document order, once per definition even if the caller supplies input node idens. GUID seeds and explicit identities resolve through Synapse; wildcard GUIDs are generated once for each applicable definition and reused for its edits and edges. Edge target definitions may create nodes that later definitions update. The returned list preserves definition order and contains final normalized source-node states, including repeated identities. Explicit updates do not remove unspecified properties, tags or edges. Syntax/structural errors are detected before execution where possible; model, permission and runtime failures propagate. Application is not guaranteed atomic, so a failure may leave earlier edits applied.
+
+With `comments=True`, direct narrative under each node heading becomes a `meta:note` with an outgoing `about` edge to that source node. Headings, code blocks and descendant documentation are excluded. A note identity is seeded from the source ndef and rendered narrative, so reapplying identical documentation does not create duplicate notes. Changed narrative creates a new note; old notes are not automatically deleted. The default `comments=False` creates no notes.
+
+**Trust boundary:** documents containing Storm expressions are executable input. Only compile/apply trusted documents under appropriately scoped Cortex permissions; syntax validation is not a sandbox.
+
+### Compiler CLI
+
+The CLI prints standalone Storm to standard output and never connects to a Cortex:
+
+```sh
+python -m stormlibpp.stormgen tests/data/stormgen-example.md
+python -m stormlibpp.stormgen nodes.md --doc-type forms --form inet:fqdn
+python -m stormlibpp.stormgen - --doc-type embedded --nodes-header Nodes --comments
+```
+
+Options include `--doc-type`, `--form`, `--form-level`, `--nodes-header` and `--comments`. A file argument of `-` reads standard input. Input and compilation errors produce a nonzero exit status.
+
+The canonical example uses the custom string tag property `tlp`, which must already be defined in the target Cortex. The integration test registers it explicitly. Example GUIDs and data are illustrative; wildcard nodes and newly introduced edge targets are intentional.
+
+The regression suite is `tests/test_stormgen.py`; run `python -m pytest tests/test_stormgen.py -q` in the project environment. It covers extraction, typed constants, compilation, in-memory Cortex application, both edge directions, source-dependent targets, GUID generation/seeds, HTTP-shaped responses, option preservation, notes, literal-data safety, Unicode, errors and the CLI. The canonical example is tested both for extraction and live application. Verification uses Marko 2.2.5 and Synapse 2.257.0; older supported dependency versions have not been certified by these runs. The manual scripts read the same fixture and do not execute during test collection.
 
 ## Use case
 
@@ -99,8 +173,6 @@ This design proposes 3 different ways to gain an entrypoint into the markdown de
 
 Once stormgen knows how to find markdown definitions of nodes, it extracts all of them and creates node definitions ("ndefs") for each one. Ndefs will eventually be created in Synapse in the top-bottom order that they appear in the markdown document. Unfortunately this means that if one node depends on another, it must be placed after the markdown definition of the node it depends on.
 
-Stormgen does support 
-
 ### Heading rules
 
 Any free text under a heading must be treated as documentation content and not contents of the thing that the header defines. Contents of the actual thing a header defines must be included in a Markdown code block under that heading or as an additional heading.
@@ -144,54 +216,3 @@ Nodes should be parsed based on the following rules:
 - `edge statement`: A special heading+list pair that will be turned into edges of one type (the value of the heading) between the node being defined and the form/valu pairs in the list.
 - `edge documentation`: An arbitrary list under an edges heading that documents the possible edges types that the source node may use.
 - `source node`: The node being defined in the current context.
-
-
-# Appendix
-Saving this code for now
-```python
-class Section:
-    """All Markdown tokens between two headings of the same level.
-    
-    ``Section``s are organized into a list of ``Part``s. Each part
-    is all content between two headings including the first heading.
-
-    A "root section" is a ``Section`` that exists because there is no top level
-    heading in the original Markdown document. This section cannot have a level
-    because there is no heading, so ``level`` will equal 0.
-
-    A root section is created when no ``heading`` is passed to the constructor.
-    """
-
-    def __init__(self, heading: marko.block.Heading | None = None) -> None:
-        self.heading = heading
-        self.cur = Part(self.heading)
-        self.level = 0
-        self.parts: list[Part] = [self.cur]
-
-        self.root = True if heading is None else False
-        """The root section holds all blocks that exists before any headings."""
-
-        if not self.root:
-            self.level = heading.level
-
-    def add_part(self, heading: marko.block.Heading):
-        # The first part will always be in the list.
-        if self.cur not in self.parts:
-            self.parts.append(self.cur)
-        self.cur = Part(heading)
-
-    def add_block(self, block: marko.block.BlockElement):
-        self.cur.add_block(block)
-
-def parse(self) -> list[Section]:
-    section = Section()
-    for child in self.ast.children:
-        if isinstance(child, marko.block.Heading):
-            if section.level <= child.level:
-                self.sections.append(section)
-                section = Section(heading=child)
-            else:
-                section.add_part(child)
-        section.add_block(child)
-    return
-```

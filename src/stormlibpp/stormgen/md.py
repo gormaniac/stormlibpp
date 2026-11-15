@@ -7,6 +7,23 @@ import marko.inline
 import marko.md_renderer
 
 
+def text_from_element(element: marko.element.Element) -> str:
+    """Extract text recursively, including nested inline formatting."""
+    children = getattr(element, "children", [])
+    if isinstance(children, str):
+        return children
+    return "".join(text_from_element(child) for child in children)
+
+
+def _heading_leaves(element: marko.element.Element):
+    children = getattr(element, "children", [])
+    if isinstance(children, str):
+        yield children, isinstance(element, marko.inline.Literal) and children == "/"
+    else:
+        for child in children:
+            yield from _heading_leaves(child)
+
+
 def title_from_heading(heading: marko.block.Heading) -> str:
     """Get the title string from a Heading block.
 
@@ -20,9 +37,19 @@ def title_from_heading(heading: marko.block.Heading) -> str:
     str
         The Heading's title.
     """
-    title = ""
-    for item in heading.children:
-        title += item.children
+    leaves = list(_heading_leaves(heading))
+    title = "".join(text for text, escaped in leaves)
+    escaped_separators = set()
+    offset = 0
+    for text, escaped in leaves:
+        if escaped:
+            if offset > 0 and title[offset - 1:offset + 3] == " // ":
+                escaped_separators.add(offset)
+            elif offset > 1 and title[offset - 2:offset + 2] == " // ":
+                escaped_separators.add(offset - 1)
+        offset += len(text)
+    for offset in sorted(escaped_separators, reverse=True):
+        title = title[:offset] + "\\" + title[offset:]
     return title
 
 

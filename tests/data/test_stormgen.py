@@ -1,16 +1,16 @@
-import stormlibpp.stormgen
+"""Optional manual inspection of the canonical Stormgen fixture."""
 
-fd = open("../tests/data/stormgen-example.md", "r")
-text = fd.read()
-fd.close()
+from pathlib import Path
 
-sdoc = stormlibpp.stormgen.StormGenDoc(text)
-sdoc.parse()
-extractor = stormlibpp.stormgen.DocExtractor(sdoc)
-nodes = extractor.extract()
-for node in nodes:
-    node.extract()
-    print(node, node.parts)
+import stormlibpp.stormgen as stormgen
 
-n = nodes[0]
-n.props
+
+def main():
+    doc = stormgen.parse(Path(__file__).with_name("stormgen-example.md").read_text())
+    for node in stormgen.extract(doc):
+        node.extract()
+        print(node, node.props, node.tags, node.edges)
+
+
+if __name__ == "__main__":
+    main()
