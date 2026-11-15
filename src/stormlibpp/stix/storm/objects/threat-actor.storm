@@ -1,0 +1,13 @@
+/*
+Resolved: yes, this mirrors the exact mapping Vertex uses in their own
+default Stix ingest config (synapse.lib.stormlib.stix.stixingest) for
+threat-actor -> ps:contact, so this is the intentional/confirmed choice.
+*/
+[ ps:contact=(stix, threat-actor, $object.id)
+    :name?=$object.name
+    :desc?=$object.description
+    :names?=$object.aliases
+]
+[ <(refs)+ { it:sec:stix:bundle:id=$bundle.id } ]
+$node.data.set(`stix:object:bundle:{$bundle.id}`, $object)
+return($node)

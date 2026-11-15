@@ -1,5 +1,8 @@
 ## Unreleased
 ### Features
+- Add `stormlibpp.stix.BundleConf` to build standalone STIX import configs from Storm files, with 38 object mappings, six relationship mappings, and source-object node data.
+- Release `stormlibpp-stix` version `0.2.0`. Built packages download the config from their matching repository release instead of following `main`; custom config and URL overrides remain supported.
+- Attach `stix_import_conf.json` to GitHub Releases and add automated config-freshness, Cortex ingest, release-pinning, and distribution-content checks.
 - Adds version 1.0.0 of the `slib.ipapi` Rapid Power-Up, which enriches IPs from ip-api.com. It replaces the `slib.ipapi` Storm Service from the stormsvcs repo with the same commands, perms and settings, but no service to deploy. ip-api.com's rate limit (45 requests a minute) is now shared by every query on the Cortex through its rate limit headers, and rate limited queries wait and retry. To upgrade, remove the service with `service.del` and load the package.
 - Adds `slib.utils.inet` to the utils package, with the ASN and owner org modeling that `slib.ipapi` and `ipinfo` share.
 - Adds a pure Storm X.509 certificate parser to the utils package, `slib.utils.x509`, and bumps slib.utils to 0.2.0. It parses certificates and CT precertificate TBSCertificates (DER, PEM or base64) into Storm primitives, including the RFC 5280 extensions (subjectDirectoryAttributes is kept raw), RFC 6962 SCT lists and RSA-PSS/EC/EdDSA/DSA keys, and lists recoverable DER and RFC 5280 deviations as warnings. Its output matches Python cryptography on a corpus of real root CA and CT certificates.
@@ -12,6 +15,10 @@
 - Add `stormlibpp.testing.checks`: `assertVersionsMatch()` checks a service's version in `pyproject.toml`, `__init__.py`, its Storm package prototypes and `uv.lock`; `stormLint()` runs Synapse's Storm linter; `assertMainHelp()` checks `python -m <module> --help` works.
 - StormLib++'s own tests use the new plugin.
 ### Fixes
+- Isolate config-builder state and make repeated loads atomic and idempotent. Fix Storm syntax and runtime mappings, preserve metadata on reused software nodes, and reject artifact hash mismatches.
+- Correct the STIX command examples to use `slib.stix.ingest`.
+- STIX ingest no longer fails on optional fields: `malware-analysis` objects without `result` or `result_name`, and `user-account` objects without `account_login`.
+- STIX ingest saves the bundle as node data when the `it:sec:stix:bundle` node already exists, not only when it is created.
 - ipinfo (0.1.2) models ASNs with `slib.utils.inet`, and no longer makes an `ou:org` with an empty name when ipinfo.io has no AS name.
 
 ## v0.12.1 - 2026-11-01

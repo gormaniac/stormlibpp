@@ -1,0 +1,38 @@
+/*
+Fleshed out: added :desc and .seen (first_seen/last_seen) on the created/
+existing ou:org node, matching the convention used in campaign.storm.
+*/
+($ok, $name) = $lib.trycast(ou:name, $object.name)
+if $ok {
+
+    ou:name=$name -> ou:org
+    { for $alias in $object.aliases { [ :names?+=$alias ] } }
+    [
+        :desc?=$object.description
+        .seen?=$object.first_seen
+        .seen?=$object.last_seen
+    ]
+    [ <(refs)+ { it:sec:stix:bundle:id=$bundle.id } ]
+    $node.data.set(`stix:object:bundle:{$bundle.id}`, $object)
+    return($node)
+
+    // NOTE: this looks unreachable (code after an unconditional return($node)
+    // above), but it likely relies on Storm's node-stream semantics: the
+    // "ou:name=$name -> ou:org" pivot lifts zero nodes when no matching org
+    // exists yet, so the operators above never fire for an empty stream and
+    // this block becomes the effective "create new ou:org" fallback. Flagged
+    // for confirmation with a real Cortex (see
+    // stormlibpp.tmpcortex.getTempCortexWithArgs) - the same pattern also
+    // appears in malware.storm/tool.storm/software.storm/artifact.storm.
+    [
+        ou:org=*
+        :name=$name
+        :desc?=$object.description
+        .seen?=$object.first_seen
+        .seen?=$object.last_seen
+    ]
+    { for $alias in $object.aliases { [ :names?+=$alias ] } }
+    [ <(refs)+ { it:sec:stix:bundle:id=$bundle.id } ]
+    $node.data.set(`stix:object:bundle:{$bundle.id}`, $object)
+    return($node)
+}

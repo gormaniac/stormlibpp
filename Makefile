@@ -10,8 +10,12 @@ change-version: # Change the version of this project (requires VERSION=#.#.#)
 	pipenv run python3 scripts/changever.py $(VERSION)
 
 .PHONY: build
-build: # Build the Python package tarball and wheel
+build: build-stix # Build the Python package tarball and wheel
 	pipenv run python3 -m build .
+
+.PHONY: build-stix
+build-stix: # Rebuild the standalone STIX import configuration
+	pipenv run python3 scripts/build_stix_conf.py
 
 .PHONY: build-storm
 build-storm: # Build all Storm packages in this project

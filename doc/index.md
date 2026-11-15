@@ -56,6 +56,7 @@ Home <self>
 
 installation
 contributing
+stix
 pkgs/index
 ```
 

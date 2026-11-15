@@ -1,5 +1,5 @@
 [build-system]
-requires = ["setuptools"]
+requires = ["setuptools>=77"]
 build-backend = "setuptools.build_meta"
 
 [project]
@@ -7,6 +7,8 @@ name = "stormlibpp"
 version = "0.12.1"
 description = "The StormLib++ Python package"
 readme = "README.md"
+license = "MIT AND Apache-2.0"
+license-files = ["LICENSE", "NOTICE", "LICENSES/Apache-2.0.txt"]
 requires-python = ">=3.11"
 
 # Fill in dependencies here.
@@ -21,9 +23,6 @@ testing = ["pytest"]
 
 [[project.authors]]
 name = "John Gorman"
-
-[project.license]
-file = "LICENSE"
 
 [project.urls]
 Homepage = "https://github.com/gormaniac/stormlibpp"

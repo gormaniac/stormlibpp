@@ -1,0 +1,32 @@
+/*
+Example Stix 2.1 "location" object (real sample, trimmed, from
+tests/data/cisa_stix_bun.json):
+{
+    "type": "location",
+    "spec_version": "2.1",
+    "id": "location--34610caa-9135-4875-ac37-4746088dd006",
+    "created": "2024-02-02T15:11:50.25412Z",
+    "modified": "2024-02-02T15:11:50.25412Z",
+    "name": "203.95.8.98",
+    "description": "Domain Name: pdsguam.biz\r\nRegistrar: GoDaddy.com, LLC ... (truncated whois text)",
+    "region": "northern-america",
+    "country": "US"
+}
+
+Mapped to geo:place, which mirrors the reverse (export) mapping already used
+by synapse.lib.stormlib.stix for geo:place <-> location. That reverse mapping
+reads :loc/:latlong, so this sets the same props from the Stix side.
+*/
+[ geo:place=(stix, location, $object.id)
+    :name?=$object.name
+    :desc?=$object.description
+]
+if ($object.country != $lib.null) {
+    [ :loc?=$object.country.lower() ]
+}
+if (($object.latitude != $lib.null) and ($object.longitude != $lib.null)) {
+    [ :latlong?=($object.latitude, $object.longitude) ]
+}
+[ <(refs)+ { it:sec:stix:bundle:id=$bundle.id } ]
+$node.data.set(`stix:object:bundle:{$bundle.id}`, $object)
+return($node)

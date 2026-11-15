@@ -1,0 +1,31 @@
+/*
+Example Stix 2.1 "grouping" object:
+{
+    "type": "grouping",
+    "spec_version": "2.1",
+    "id": "grouping--84e4d88f-44ea-4bcd-bbf3-b2c1c320bcb3",
+    "created": "2020-01-16T20:28:23.000Z",
+    "modified": "2020-01-16T20:28:23.000Z",
+    "name": "Malware Campaign Grouping",
+    "description": "A grouping of objects related to a single malware campaign.",
+    "context": "malware-analysis",
+    "object_refs": [
+        "malware--16d2358f-a3e1-4fca-b839-e33566a069b5",
+        "indicator--c410e480-e42b-47d1-9476-85307c12bcda"
+    ]
+}
+
+Mapped to meta:note, matching the existing note.storm/opinion.storm pattern
+for generic container/narrative Stix objects. object_refs do NOT need manual
+handling - the Stix ingest engine (LibStixImport.ingest) automatically adds
+"refs" edges for the literal "object_refs" field after all objects are built.
+*/
+[ meta:note=(stix, grouping, $object.id)
+    :type=`stix.grouping.{$object.context}`
+    :text?=$object.description
+    :created?=$object.created
+    :updated?=$object.modified
+]
+[ <(refs)+ { it:sec:stix:bundle:id=$bundle.id } ]
+$node.data.set(`stix:object:bundle:{$bundle.id}`, $object)
+return($node)
