@@ -6,6 +6,18 @@ Contributions are welcome, please open any PR you wish in this project's [Github
 
 - TBD
 
+## GitHub CI
+
+The project uses CI to perform the building/releasing/testing tasks automagically. CI relies on the Makefile to make sure all tasks are standardized across automation and local use.
+
+Each PR runs a build and test job. This allows you to make sure your code works and builds properly before merges. Each build job also builds this docs site to make sure nothing broke on that front.
+
+The CI *does not* publish to PyPi, the project maintainer will own the PyPi release process.
+
+### Releases
+
+When a git tag is created and pushed to GitHub, the CI publishes a new GitHub release as well. This can be done using the `make release VERSION=x.x.x` command, it pushes to the current branch for you. 
+
 ## The Makefile
 
 Most of this project's repeatable tasks are managed by the `Makefile`. There is a `make help` command that can be run to display a list of available make commands and a simple help message describing what they do.

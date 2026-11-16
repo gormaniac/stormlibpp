@@ -9,6 +9,7 @@ HTTP. For example, the ``hstorm`` CLI replaces a ``Cortex`` object with an
 import aiohttp
 import collections.abc
 import json
+from typing import Self
 
 import synapse.lib.msgpack as s_msgpack
 
@@ -122,14 +123,30 @@ class HttpCortex:
             self.url, raise_for_status=True, read_timeout=0
         )
 
-    async def __aenter__(self):
-        await self.login()
+    async def __aenter__(self) -> Self:
+        await self.login(close=True)
         return self
 
-    async def __aexit__(self, *args, **kwargs):
+    async def __aexit__(self, *args, **kwargs) -> None:
         await self.stop()
 
-    def _prep_payload(self, text: str, opts: dict | None = None):
+    def _prep_payload(self, text: str, opts: dict | None = None) -> dict:
+        """Get a Storm payload dict, using this class' default opts if none passed.
+
+        Parameters
+        ----------
+        text : str
+            The Storm code to send in the payload.
+        opts : dict | None, optional
+            Storm options to send in the payload. Uses the class' ``default_opts``
+            property if None. By default None.
+
+        Returns
+        -------
+        dict
+            The prepped payload contain the Storm code and options.
+        """
+
         if not opts:
             opts = self.default_opts
         return {"query": text, "opts": opts}
@@ -140,7 +157,7 @@ class HttpCortex:
         items: list[NodeTuple],
         *,
         viewiden: str | None = None
-    ):
+    ) -> dict:
         """Feed node tuples to the Cortex.
 
         Parameters
@@ -185,7 +202,7 @@ class HttpCortex:
                 f"Unable to feed nodes to {self.url}: {err}", err
             ) from err
 
-    async def callStorm(self, text: str, opts: dict | None = None):
+    async def callStorm(self, text: str, opts: dict | None = None) -> dict:
         """Execute a Storm query and return the value passed to a Storm return() call.
 
         Parameters
@@ -263,8 +280,7 @@ class HttpCortex:
         except Exception as err:
             raise HttpCortexError(f"Unable to export nodes: {err}", err) from err
 
-    # TODO - Support API key base authentication
-    async def login(self):
+    async def login(self, close=False):
         """Login to the Cortex with the user/pass (or API key) supplied at instantiation.
 
         If a user/pass is supplied, cookie based authentication is used.
@@ -280,7 +296,21 @@ class HttpCortex:
         If an API key is passed at instantiation, the user/pass combo is ignored 
         and the ``ClientSession`` is configured to send the API key value in the
         ``X-API-KEY`` header with every request.
+
+        Parameters
+        ----------
+        close : bool
+            Close the underlying session when logins fail, by default False.
         """
+
+        try:
+            await self._login()
+        except Exception as err:
+            if close:
+                await self.stop()
+            raise err
+
+    async def _login(self):
 
         if self.token:
             self.sess.headers.add("X-API-KEY", self.token)
@@ -314,7 +344,7 @@ class HttpCortex:
         else:
             raise HttpCortexLoginError(f"No user/pass or API key passed to HTTPCortex!")
 
-    async def stop(self):
+    async def stop(self) -> None:
         """Stop this instance by closing its HTTP session."""
 
         await self.sess.close()

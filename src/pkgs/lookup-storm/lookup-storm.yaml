@@ -13,6 +13,10 @@ author:
 
 desc: A StormLib++ Rapid Power-Up that provides a simple string lookup interface to yield nodes without a form.
 
+docs:
+  - title: README
+    path: README.md
+
 modules:
   - name: slib.lookup.lib
 

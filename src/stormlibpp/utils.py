@@ -2,6 +2,7 @@
 
 
 import argparse
+from collections.abc import Iterator
 import csv
 import getpass
 import json
@@ -71,7 +72,7 @@ def chk_storm_syntax(storm: str) -> None:
         raise errors.StormSyntaxError("Storm Syntax Error!", err) from err
 
 
-def csv_genr(fd: str) -> list:
+def csv_genr(fd: str) -> Iterator[list[str]]:
     """Read a CSV from fd and yield each row."""
 
     for row in csv.reader(fd):

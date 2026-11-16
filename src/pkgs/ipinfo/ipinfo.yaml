@@ -1,0 +1,45 @@
+name: ipinfo
+version: 0.1.0
+guid: dc7758a3c88f1a77f89bd9dd39791026
+
+synapse_minversion: [2, 127, 0]
+
+genopts:
+    dotstorm: true
+
+author:
+  url: https://github.com/gormaniac
+  name: John Gorman
+
+desc: A Rapid Power-Up that calls the IpInfo.io Lite API to retrieve information about IP addresses.
+
+docs:
+  - title: README
+    path: README.md
+
+modules:
+  - name: slib.ipinfo.lib
+
+commands:
+  - name: slib.ipinfo
+    descr: |
+      Query the IpInfo.io Lite API for information about the input IP addresses.
+
+      Yields inet:ipv4 nodes.
+
+      Examples:
+
+        // Lift some inet:ipv4 nodes and query ipinfo.io for information.
+        inet:ipv4 | limit 5 | slib.ipinfo
+
+        // Use a string argument to query for a specific IP address.
+        slib.ipinfo --query 8.8.8.8
+
+    cmdargs:
+      - - --query
+        - type: str
+          default: ''
+          help: |
+            An IP address string to query for.
+
+            Ignores any nodes in the pipeline and uses only the string passed to this arg.

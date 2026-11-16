@@ -13,6 +13,10 @@ author:
 
 desc: A Rapid Power-Up that provides DNS over HTTPS using Cloudflare's 1.1.1.1 service.
 
+docs:
+  - title: README
+    path: README.md
+
 modules:
   - name: slib.dns.request.lib
 

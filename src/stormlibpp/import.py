@@ -90,12 +90,13 @@ from .utils import (
 DESCRIPTION = """
 Recursively execute all Storm scripts in a folder (or folders) on a Synapse Cortex.
 
-Data can optionally be imported from .csv, .json, and .txt files, like with csvtool.
+Data can optionally be imported from .csv, .json, and .txt files, like with Synapse's
+csvtool but with more file types supported.
 
 If no data is given for a Storm script, it is executed as is.
 
 See the stormlibpp.import docs for feature specifics:
-https://gormo.co/stormlibpp/stormlibpp.html#module-stormlibpp.import
+https://gormo.co/docs/stormlibpp/stormlibpp.html#module-stormlibpp.import
 """
 
 
@@ -116,7 +117,23 @@ async def import_storm_text(
     stormopts: StormOpts,
     print_skips: list,
     logfd: io.BufferedRandom,
-):
+) -> None:
+    """Run Storm code on a Cortex and handle the messages for CLI output and logging.  
+
+    Parameters
+    ----------
+    core : Cortex
+        The Cortex to run the Storm code on.
+    text : StormCode
+        The Storm code to execute.
+    stormopts : StormOpts
+        The Storm options to pass to the runtime - can be used to pass data
+        or variables to the Storm script's runtime.
+    print_skips : list
+        A list of Storm message types to skip printing.
+    logfd : io.BufferedRandom
+        A file descriptor to log JSON Storm messages to.
+    """
     async for msg in core.storm(text, opts=stormopts):
         handle_msg(msg, print_skips=print_skips, logfd=logfd)
 
@@ -127,13 +144,73 @@ async def import_storml_file(
     stormopts: StormOpts,
     print_skips: list,
     logfd: io.BufferedRandom,
-):
+) -> None:
+    """
+    Run a "Storm Lines" script on a Cortex and handle the returned messages.
+
+    A Storm Lines (.storml) script is a Storm script where each line is executed 
+    in its own Storm runtime. Allowing for multiple nodes to be imported in a single
+    script without worrying about the nodes in the pipeline.
+
+    An example would be to keep a list of related canonical node definitions in a
+    single file, and import them all at once. Like this::
+
+        // This is a Storm Lines script
+        [ syn:tag=some.tag :doc="Some tag that's important" :Title="Some tag" ]
+        [ syn:tag=other.tag :doc="Another tag that's important" :Title="Other tag" ]
+
+    Arguments passed to this function are the same as those passed to ``import_storm_text``.
+    So each line in the Storm Lines script gets the same StormOpts dict passed to it.
+
+    Parameters
+    ----------
+    core : Cortex
+        The Cortex to run the Storm code on.
+    storm_script : str
+        The path to the Storm Lines script file.
+    stormopts : StormOpts
+        The Storm options to pass to the runtime - can be used to pass data
+        or variables to the Storm script's runtime.
+    print_skips : list
+        A list of Storm message types to skip printing.
+    logfd : io.BufferedRandom
+        A file descriptor to log JSON Storm messages to.
+    """
     with open(storm_script, "r") as fd:
         for line in txt_genr(fd):
+            # Skip comments and blank lines
+            if line.strip().startswith("//") or line.strip() == "":
+                continue
             await import_storm_text(core, line, stormopts, print_skips, logfd)
 
 
 class Importer:
+    """Importer class for adding data to a Cortex.
+
+    Parameters
+    ----------
+    core : Cortex
+        The Cortex instance to add data to.
+    files : list[str]
+        A list of file paths containing the data to import.
+    ftype : str
+        The type of the files (e.g., "csv", "txt", "json").
+    text : StormCode
+        The Storm code to execute for each row of data.
+    stormopts : dict, optional
+        Storm options to pass to the runtime, by default {}.
+    outp : _type_, optional
+        Output handler, by default OUTP
+    header : bool, optional
+        Whether the files have a header row, by default False.
+    debug : bool, optional
+        Enable debug mode, by default False.
+    logfd : io.BufferedRandom, optional
+        File descriptor to log JSON Storm messages to, by default None.
+    splices : bool, optional
+        Whether to use "splices" edit format, by default False.
+    """
+
     genrs = {
         "csv": csv_genr,
         "txt": txt_genr,
@@ -153,6 +230,7 @@ class Importer:
         logfd=None,
         splices=False,
     ) -> None:
+        
         self.file_type = ftype
         self.text = text
         self.core = core
@@ -174,7 +252,7 @@ class Importer:
         for path in self.files:
             with open(path, "r", encoding="utf8") as fd:
                 if self.header and self.file_type in ("csv", "txt"):
-                    fd.readline()
+                    fd.readline()   ## Skip the header line
 
                 for rows in s_common.chunks(self.genrs[self.file_type](fd), 1000):
                     yield rows
@@ -358,7 +436,13 @@ async def import_data(
             with open(storm_script, "r") as fd:
                 text = fd.read()
 
+            # Use "Importer" if there's data files for this script,
+            # otherwise just run the script.
             if file_infos := find_data_files(storm_script, data_files):
+                # TODO - Aggregate all "fpath"s of each ftype and pass them to Importer together.
+                # This was the original use case and this was changed to support multiple types
+                # of data files for a single Storm script. Importer already loops over all files
+                # passed to it.
                 for file_info in file_infos:
                     fpath, ftype = file_info
                     await Importer(
@@ -375,7 +459,7 @@ async def import_data(
             else:
                 if storm_script.endswith(".storml"):
                     # NOTE - This will wind up opening and closing the file twice.
-                    # Do we want that? Maybe we do because we won't get here much?
+                    # Do we want that? Maybe we don't care because we won't get here much?
                     await import_storml_file(
                         core, storm_script, stormopts, print_skips, logfd=logfd
                     )

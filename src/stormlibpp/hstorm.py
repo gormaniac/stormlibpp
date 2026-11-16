@@ -24,14 +24,26 @@ import argparse
 import sys
 
 from ._args import USER_PARSER, VERIFY_PARSER
+from .errors import HttpCortexLoginError
 from .httpcore import HttpCortex
 from .output import OUTP
 from .stormcli import start_storm_cli
 from .utils import get_cortex_creds
 
 
-def get_args(argv: list[str]):
-    """Build an argument parser for this script and parse the passed in args."""
+def get_args(argv: list[str]) -> argparse.Namespace:
+    """Build an argument parser for this script and parse the passed in args.
+
+        Parameters
+    ----------
+    argv : list[str]
+        The unparsed CLI arguments for this script.
+
+    Returns
+    -------
+    argparse.Namespace
+        The parsed arguments used by this script.
+    """
 
     args = argparse.ArgumentParser(
         prog="stormlibpp.hstorm",
@@ -52,7 +64,7 @@ def get_args(argv: list[str]):
     return args.parse_args(argv)
 
 
-async def main(argv: list[str]):
+async def main(argv: list[str]) -> None | str:
     """The main functionality of the HTTP Storm CLI.
 
     Parameters
@@ -65,10 +77,13 @@ async def main(argv: list[str]):
 
     username, password = get_cortex_creds(args.user)
 
-    async with HttpCortex(
-        args.cortex, username, password, ssl_verify=not args.no_verify
-    ) as hcore:
-        await start_storm_cli(hcore, outp=OUTP, opts=args, onecmd=args.onecmd)
+    try:
+        async with HttpCortex(
+            args.cortex, username, password, ssl_verify=not args.no_verify
+        ) as hcore:
+            await start_storm_cli(hcore, outp=OUTP, opts=args, onecmd=args.onecmd)
+    except HttpCortexLoginError as err:
+        return str(err)
 
 
 if __name__ == "__main__":

@@ -6,12 +6,12 @@ import pathlib
 
 
 PATTERNS = {
-    "TODO": re.compile(r"((#\s(TODO)\s-\s)(.+$))"),
-    "NOTE": re.compile(r"((#\s(NOTE)\s-\s)(.+$))"),
-    "FIXME": re.compile(r"((#\s(FIXME)\s-\s)(.+$))"),
-    "BUG": re.compile(r"((#\s(BUG)\s-\s)(.+$))"),
-    "HACK": re.compile(r"((#\s(HACK)\s-\s)(.+$))"),
-    "ALL": re.compile(r"((#\s([A-Z]+|\!\!\!|\?\?\?)\s-\s)(.+$))"),
+    "TODO": re.compile(r"(((?:#|//)\s(TODO)\s-\s)(.+$))", re.MULTILINE),
+    "NOTE": re.compile(r"(((?:#|//)\s(NOTE)\s-\s)(.+$))", re.MULTILINE),
+    "FIXME": re.compile(r"(((?:#|//)\s(FIXME)\s-\s)(.+$))", re.MULTILINE),
+    "BUG": re.compile(r"(((?:#|//)\s(BUG)\s-\s)(.+$))", re.MULTILINE),
+    "HACK": re.compile(r"(((?:#|//)\s(HACK)\s-\s)(.+$))", re.MULTILINE),
+    "ALL": re.compile(r"(((?:#|//)\s([A-Z]+|\!\!\!|\?\?\?)\s-\s)(.+$))", re.MULTILINE),
 }
 
 
@@ -24,7 +24,7 @@ class CodeTags:
         return f'CodeTags(filename="{self.filename}")'
     
     def __str__(self) -> str:
-        out = io.StringIO(f"Code tags in {self.filename}:\n")
+        out = io.StringIO(f"{self.filename}:\n")
         for tag, comments in self.tags.items():
             print(tag, file=out)
             for comment in comments:
@@ -37,7 +37,7 @@ class CodeTags:
         if tag_name not in self.tags:
             self.tags[tag_name] = list()
 
-        self.tags[tag_name].apppend(comment)
+        self.tags[tag_name].append(comment)
 
     @classmethod
     def find(
@@ -70,7 +70,7 @@ class CodeTags:
                 fdata = fd.read()
                 for pattern in patterns:
                     for match_obj in pattern.finditer(fdata):
-                        code_tags.add(match_obj.group(2), match_obj.group(3))
+                        code_tags.add(match_obj.group(3), match_obj.group(4))
         except (IOError, re.error) as e:
             raise RuntimeError(f"Unable to find code tags in {filename}: {e}")
         
@@ -90,10 +90,12 @@ def find_code_tags(
 
     for dpath, _, fnames in os.walk(folder):
 
-        if (".git" in dpath) or ("doc" in dpath):
+        if (".git" in dpath) or ("doc" in dpath) or ("__pycache__" in dpath):
             continue
 
         for fname in fnames:
+            if (fname.endswith(".yaml") or fname.endswith(".json")):
+                continue
             fullpath = os.path.join(dpath, fname)
             yield CodeTags.find(fullpath, only=only, normal=normal, all=all)
 
@@ -102,7 +104,7 @@ def main():
     """The main function."""
 
     parser = argparse.ArgumentParser(
-        description="Convert this Python project template into a named Python project."
+        description="Find all PEP-350 code tags in the project."
     )
     parser.add_argument(
         "-t",
@@ -123,9 +125,11 @@ def main():
         normal = True
     else:
         normal = False
-    
-    folder = pathlib.Path(__file__).parent.parent.resolve()
 
+    folder = pathlib.Path(__file__).parent.parent.resolve()/"src"
+
+    # FIXME - For some reason filenames are being cut off in output
+    # TODO - Figure out how to skip files with no tags found
     for code_tags in find_code_tags(folder, only=args.tag, normal=normal, all=args.all):
         code_tags.print()
 

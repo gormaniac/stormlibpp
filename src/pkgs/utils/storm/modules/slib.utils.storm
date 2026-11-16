@@ -1,0 +1,13 @@
+// Get an option by value from the user or system config. If the option is not found, return a null value.
+// Checks user config first, then system config second.
+function getUserOrSystemOpt(optName) {
+    if ($lib.user.vars.get($optName) != $lib.null) {
+        return($lib.user.vars.get($optName))
+    }
+    elif ($lib.globals.get($optName) != $lib.null) {
+        return($lib.globals.get($optName))
+    }
+    else {
+        return(null)
+    }
+}

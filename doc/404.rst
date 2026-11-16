@@ -1,0 +1,7 @@
+:layout: 404
+:orphan:
+
+Page Not Found
+==============
+
+This is not the page you're looking for.
