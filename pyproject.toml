@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "stormlibpp"
-version = "1.0.0"
+version = "1.1.0"
 description = "The StormLib++ Python package"
 readme = "README.md"
 license = "MIT AND Apache-2.0"

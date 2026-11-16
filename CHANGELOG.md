@@ -1,5 +1,9 @@
 ## Unreleased
 ### Features
+### Fixes
+
+## v1.1.0 - 2026-11-16
+### Features
 - Release `slib.ipapi` version `1.1.0`, with the changes the `slib.ipapi` 0.3.0 Storm Service got in the stormsvcs repo after this package was ported from it:
   - Inbound nodes are queried in batches of up to 100 with ip-api.com's `/batch` endpoint, which has its own rate limit.
   - Models reverse DNS (`:dns:rev`), `inet:asn:name`, the IP's WHOIS org (`-(owns)>`), `geo:place:loc`, `-(seen)>` edges from the package's `meta:source`, and one `geo:telem` per IP and place.
