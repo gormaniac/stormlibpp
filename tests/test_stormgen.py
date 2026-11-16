@@ -542,6 +542,7 @@ def test_cli_errors(args, monkeypatch, capsys):
     (r'"Keep \// this text"', "Keep // this text"),
     (r"Keep // earlier separator \// literal separator", "Keep"),
     (r"https:\/\/example.com", "https://example.com"),
+    (r"Keep \// // annotation", "Keep //"),
 ])
 def test_heading_comment_escapes_survive_markdown(heading, expected):
     doc = stormgen.parse(f"## it:dev:str\n### {heading}\n")
