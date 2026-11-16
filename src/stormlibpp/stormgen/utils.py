@@ -85,4 +85,6 @@ def strip_comment(text: str) -> str:
         text = " // ".join(text.split(" // ")[:-1]).strip()
     if esc in text:
         text = text.replace(esc, sep)
+    if text.endswith(" \\//"):
+        text = text[:-3] + "//"
     return text
