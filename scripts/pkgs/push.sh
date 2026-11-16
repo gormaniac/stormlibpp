@@ -17,5 +17,5 @@ make build-storm
 for pkg in $(ls src/pkgs/)
 do
     echo "Pushing the $pkg Storm Package to $CORTEX"
-    pipenv run python3 -m synapse.tools.genpkg --push "$CORTEX" "dist/$pkg.json"
+    pipenv run python3 -m synapse.tools.storm.pkg.gen --push "$CORTEX" "dist/$pkg.json"
 done

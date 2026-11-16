@@ -1,0 +1,16 @@
+($ok, $name) = $lib.trycast(it:prod:softname, $object.name)
+if $ok {
+    it:prod:softname=$name -> it:prod:soft
+    [ <(refs)+ { it:sec:stix:bundle:id=$bundle.id } ]
+    $node.data.set(`stix:object:bundle:{$bundle.id}`, $object)
+    return($node)
+    [
+        it:prod:soft=*
+        :name=$name
+        :cpe?=$object.cpe
+    ]
+    // TODO - Figure out how to save the software vender
+    [ <(refs)+ { it:sec:stix:bundle:id=$bundle.id } ]
+    $node.data.set(`stix:object:bundle:{$bundle.id}`, $object)
+    return($node)
+}

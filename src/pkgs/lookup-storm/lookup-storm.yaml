@@ -1,8 +1,8 @@
 name: lookup-storm
-version: 1.0.0
+version: 1.0.1
 guid: c11ed838aeda991409415059e3b5beb2
 
-synapse_minversion: [2, 127, 0]
+synapse_version: ">=2.162.0,<3.0.0"
 
 genopts:
     dotstorm: true
@@ -60,18 +60,3 @@ commands:
           default: false
           action: store_true
           help: Don't create nodes if they don't already exist.
-    
-    forms:
-      input: []
-      output:
-        - hash:md5
-        - hash:sha1
-        - hash:sha256
-        - inet:cidr4
-        - inet:ipv4
-        - inet:ipv6
-        - inet:fqdn
-        - inet:email
-        - inet:server
-        - inet:url
-        - file:path

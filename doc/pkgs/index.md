@@ -31,5 +31,5 @@ Bleeding edge versions of any Power-Up can always be downloaded and built by clo
 ```bash
 git clone https://github.com/gormaniac/stormlibpp
 # Install the Synapse Python packge if needed
-python3 -m synapse.tools.genpkg --no-docs --push "<Cortex Telepath URL>" stormlibpp/src/pkgs/dnsstorm/dnsstorm.yaml
+python3 -m synapse.tools.storm.pkg.gen --no-docs --push "<Cortex Telepath URL>" stormlibpp/src/pkgs/dnsstorm/dnsstorm.yaml
 ```

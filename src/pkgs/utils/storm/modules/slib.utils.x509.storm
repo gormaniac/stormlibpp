@@ -1,0 +1,1684 @@
+// slib.utils.x509 - Parse X.509 certificates (RFC 5280) in pure Storm.
+//
+// Entry points:
+//   parse(valu)        Parse a certificate, or a bare TBSCertificate (CT precertificate entry).
+//                      valu is DER bytes, a PEM string, or a base64 string.
+//   load(valu)         Return the DER bytes of valu (bytes, PEM or base64).
+//   isTbs(byts)        Whether DER bytes are a bare TBSCertificate instead of a Certificate.
+//   identities(sans, cns)
+//                      Split SANs and subject CNs into crypto:x509:cert:identities:* values.
+//
+// parse() returns only Storm primitives: bytes are lowercase hex, times are epoch millis.
+// Malformed DER the parser can't recover from raises BadCert. Recoverable deviations from
+// DER or RFC 5280 (ex. a non-minimal length, a duplicate extension, a UTCTime without seconds)
+// don't raise, they're listed in the result's "warnings". Errors inside one extension are
+// listed in that extension's "error" and in "warnings", and the rest of the certificate is
+// still parsed.
+
+// ---------------------------------------------------------------------------------------
+// Tables
+// ---------------------------------------------------------------------------------------
+
+// Names for OIDs, so output reads like cryptography's x509 module. Anything else is shown
+// as its dotted string.
+$OIDNAMES = ({
+    // Name attributes
+    "2.5.4.3": "commonName", "2.5.4.4": "surname", "2.5.4.5": "serialNumber",
+    "2.5.4.6": "countryName", "2.5.4.7": "localityName", "2.5.4.8": "stateOrProvinceName",
+    "2.5.4.9": "streetAddress", "2.5.4.10": "organizationName",
+    "2.5.4.11": "organizationalUnitName", "2.5.4.12": "title", "2.5.4.15": "businessCategory",
+    "2.5.4.16": "postalAddress", "2.5.4.17": "postalCode", "2.5.4.42": "givenName",
+    "2.5.4.43": "initials", "2.5.4.44": "generationQualifier",
+    "2.5.4.45": "x500UniqueIdentifier", "2.5.4.46": "dnQualifier", "2.5.4.65": "pseudonym",
+    "2.5.4.97": "organizationIdentifier",
+    "0.9.2342.19200300.100.1.1": "userID", "0.9.2342.19200300.100.1.25": "domainComponent",
+    "1.2.840.113549.1.9.1": "emailAddress", "1.2.840.113549.1.9.2": "unstructuredName",
+    "1.2.840.113549.1.9.7": "challengePassword",
+    "1.3.6.1.4.1.311.60.2.1.1": "jurisdictionLocalityName",
+    "1.3.6.1.4.1.311.60.2.1.2": "jurisdictionStateOrProvinceName",
+    "1.3.6.1.4.1.311.60.2.1.3": "jurisdictionCountryName",
+    // Signature algorithms
+    "1.2.840.113549.1.1.2": "md2WithRSAEncryption", "1.2.840.113549.1.1.4": "md5WithRSAEncryption",
+    "1.2.840.113549.1.1.5": "sha1WithRSAEncryption", "1.3.14.3.2.29": "sha1WithRSA",
+    "1.2.840.113549.1.1.14": "sha224WithRSAEncryption",
+    "1.2.840.113549.1.1.11": "sha256WithRSAEncryption",
+    "1.2.840.113549.1.1.12": "sha384WithRSAEncryption",
+    "1.2.840.113549.1.1.13": "sha512WithRSAEncryption", "1.2.840.113549.1.1.10": "rsassaPss",
+    "2.16.840.1.101.3.4.3.13": "sha3_224WithRSAEncryption",
+    "2.16.840.1.101.3.4.3.14": "sha3_256WithRSAEncryption",
+    "2.16.840.1.101.3.4.3.15": "sha3_384WithRSAEncryption",
+    "2.16.840.1.101.3.4.3.16": "sha3_512WithRSAEncryption",
+    "1.2.840.10045.4.1": "ecdsa-with-SHA1", "1.2.840.10045.4.3.1": "ecdsa-with-SHA224",
+    "1.2.840.10045.4.3.2": "ecdsa-with-SHA256", "1.2.840.10045.4.3.3": "ecdsa-with-SHA384",
+    "1.2.840.10045.4.3.4": "ecdsa-with-SHA512",
+    "2.16.840.1.101.3.4.3.9": "ecdsa-with-SHA3-224", "2.16.840.1.101.3.4.3.10": "ecdsa-with-SHA3-256",
+    "2.16.840.1.101.3.4.3.11": "ecdsa-with-SHA3-384", "2.16.840.1.101.3.4.3.12": "ecdsa-with-SHA3-512",
+    "1.2.840.10040.4.3": "dsa-with-sha1", "2.16.840.1.101.3.4.3.1": "dsa-with-sha224",
+    "2.16.840.1.101.3.4.3.2": "dsa-with-sha256",
+    "1.2.643.2.2.3": "GOST R 34.11-94 with GOST R 34.10-2001",
+    "1.2.643.7.1.1.3.2": "GOST R 34.10-2012 with GOST R 34.11-2012 (256 bit)",
+    "1.2.643.7.1.1.3.3": "GOST R 34.10-2012 with GOST R 34.11-2012 (512 bit)",
+    "1.2.156.10197.1.501": "SM2-with-SM3",
+    "2.16.840.1.101.3.4.3.17": "ML-DSA-44", "2.16.840.1.101.3.4.3.18": "ML-DSA-65",
+    "2.16.840.1.101.3.4.3.19": "ML-DSA-87",
+    // Public key algorithms
+    "1.2.840.113549.1.1.1": "rsaEncryption", "1.2.840.10040.4.1": "dsaEncryption",
+    "1.2.840.10045.2.1": "id-ecPublicKey", "1.3.132.1.12": "id-ecDH", "1.3.132.1.13": "id-ecMQV",
+    "1.3.101.110": "X25519", "1.3.101.111": "X448", "1.3.101.112": "ed25519", "1.3.101.113": "ed448",
+    // Hashes and mask generation
+    "1.2.840.113549.2.2": "md2", "1.2.840.113549.2.5": "md5", "1.3.14.3.2.26": "sha1",
+    "2.16.840.1.101.3.4.2.4": "sha224", "2.16.840.1.101.3.4.2.1": "sha256",
+    "2.16.840.1.101.3.4.2.2": "sha384", "2.16.840.1.101.3.4.2.3": "sha512",
+    "2.16.840.1.101.3.4.2.5": "sha512_224", "2.16.840.1.101.3.4.2.6": "sha512_256",
+    "2.16.840.1.101.3.4.2.7": "sha3_224", "2.16.840.1.101.3.4.2.8": "sha3_256",
+    "2.16.840.1.101.3.4.2.9": "sha3_384", "2.16.840.1.101.3.4.2.10": "sha3_512",
+    "1.2.840.113549.1.1.8": "mgf1",
+    // Extensions
+    "2.5.29.9": "subjectDirectoryAttributes", "2.5.29.14": "subjectKeyIdentifier",
+    "2.5.29.15": "keyUsage", "2.5.29.16": "privateKeyUsagePeriod", "2.5.29.17": "subjectAltName",
+    "2.5.29.18": "issuerAltName", "2.5.29.19": "basicConstraints", "2.5.29.30": "nameConstraints",
+    "2.5.29.31": "cRLDistributionPoints", "2.5.29.32": "certificatePolicies",
+    "2.5.29.33": "policyMappings", "2.5.29.35": "authorityKeyIdentifier",
+    "2.5.29.36": "policyConstraints", "2.5.29.37": "extendedKeyUsage", "2.5.29.46": "freshestCRL",
+    "2.5.29.54": "inhibitAnyPolicy", "1.3.6.1.5.5.7.1.1": "authorityInfoAccess",
+    "1.3.6.1.5.5.7.1.11": "subjectInfoAccess", "1.3.6.1.5.5.7.1.24": "TLSFeature",
+    "1.3.6.1.5.5.7.1.3": "qcStatements", "1.3.6.1.5.5.7.48.1.5": "OCSPNoCheck",
+    "1.3.6.1.4.1.11129.2.4.2": "signedCertificateTimestampList",
+    "1.3.6.1.4.1.11129.2.4.3": "ctPoison", "1.3.6.1.4.1.311.21.7": "msCertificateTemplate",
+    "1.3.6.1.4.1.311.20.2": "msCertificateTemplateName", "1.3.36.8.3.3": "Admissions",
+    "2.16.840.1.113730.1.1": "netscapeCertType",
+    // Extended key usages
+    "2.5.29.37.0": "anyExtendedKeyUsage", "1.3.6.1.5.5.7.3.1": "serverAuth",
+    "1.3.6.1.5.5.7.3.2": "clientAuth", "1.3.6.1.5.5.7.3.3": "codeSigning",
+    "1.3.6.1.5.5.7.3.4": "emailProtection", "1.3.6.1.5.5.7.3.8": "timeStamping",
+    "1.3.6.1.5.5.7.3.9": "OCSPSigning", "1.3.6.1.5.5.7.3.17": "ipsecIKE",
+    "1.3.6.1.5.2.3.4": "pkInitClientAuth", "1.3.6.1.5.2.3.5": "pkInitKDC",
+    "1.3.6.1.4.1.311.20.2.2": "msSmartcardLogin",
+    "1.3.6.1.4.1.11129.2.4.4": "certificateTransparency",
+    "1.3.6.1.4.1.311.10.3.3": "msServerGatedCrypto", "2.16.840.1.113730.4.1": "nsServerGatedCrypto",
+    // Access methods and policy qualifiers
+    "1.3.6.1.5.5.7.48.1": "OCSP", "1.3.6.1.5.5.7.48.2": "caIssuers",
+    "1.3.6.1.5.5.7.48.3": "timeStamping", "1.3.6.1.5.5.7.48.5": "caRepository",
+    "1.3.6.1.5.5.7.2.1": "id-qt-cps", "1.3.6.1.5.5.7.2.2": "id-qt-unotice",
+    // Policies
+    "2.5.29.32.0": "anyPolicy", "2.23.140.1.1": "extended-validation",
+    "2.23.140.1.2.1": "domain-validated", "2.23.140.1.2.2": "organization-validated",
+    "2.23.140.1.2.3": "individual-validated", "2.23.140.1.4.1": "code-signing",
+    // Other names
+    "1.3.6.1.4.1.311.20.2.3": "userPrincipalName", "1.3.6.1.5.5.7.8.7": "SRVName",
+    "1.3.6.1.5.5.7.8.9": "SmtpUTF8Mailbox", "1.3.6.1.5.5.7.8.4": "permanentIdentifier",
+})
+
+// The RFC 4514 attribute type names. Every other attribute is written with its dotted OID.
+$RFC4514 = ({
+    "2.5.4.3": "CN", "2.5.4.7": "L", "2.5.4.8": "ST", "2.5.4.10": "O", "2.5.4.11": "OU",
+    "2.5.4.6": "C", "2.5.4.9": "STREET", "0.9.2342.19200300.100.1.25": "DC",
+    "0.9.2342.19200300.100.1.1": "UID",
+})
+
+// Keys for a name's "attrs" dict. Every other attribute is keyed by its dotted OID.
+$ATTRKEYS = ({
+    "2.5.4.3": "cn", "2.5.4.10": "o", "2.5.4.11": "ou", "2.5.4.6": "c", "2.5.4.8": "st",
+    "2.5.4.7": "l", "2.5.4.9": "street", "2.5.4.17": "postalcode",
+    "1.2.840.113549.1.9.1": "email", "2.5.4.5": "serialnumber",
+    "0.9.2342.19200300.100.1.25": "dc", "2.5.4.15": "businesscategory",
+    "1.3.6.1.4.1.311.60.2.1.3": "jurisdiction:c", "1.3.6.1.4.1.311.60.2.1.2": "jurisdiction:st",
+    "1.3.6.1.4.1.311.60.2.1.1": "jurisdiction:l", "2.5.4.97": "organizationidentifier",
+    "2.5.4.42": "givenname", "2.5.4.4": "surname", "2.5.4.12": "title",
+    "0.9.2342.19200300.100.1.1": "uid",
+})
+
+// The hash each signature algorithm uses (names like cryptography's hash names).
+$SIGHASH = ({
+    "1.2.840.113549.1.1.2": "md2", "1.2.840.113549.1.1.4": "md5", "1.2.840.113549.1.1.5": "sha1",
+    "1.3.14.3.2.29": "sha1", "1.2.840.113549.1.1.14": "sha224", "1.2.840.113549.1.1.11": "sha256",
+    "1.2.840.113549.1.1.12": "sha384", "1.2.840.113549.1.1.13": "sha512",
+    "2.16.840.1.101.3.4.3.13": "sha3-224", "2.16.840.1.101.3.4.3.14": "sha3-256",
+    "2.16.840.1.101.3.4.3.15": "sha3-384", "2.16.840.1.101.3.4.3.16": "sha3-512",
+    "1.2.840.10045.4.1": "sha1", "1.2.840.10045.4.3.1": "sha224", "1.2.840.10045.4.3.2": "sha256",
+    "1.2.840.10045.4.3.3": "sha384", "1.2.840.10045.4.3.4": "sha512",
+    "2.16.840.1.101.3.4.3.9": "sha3-224", "2.16.840.1.101.3.4.3.10": "sha3-256",
+    "2.16.840.1.101.3.4.3.11": "sha3-384", "2.16.840.1.101.3.4.3.12": "sha3-512",
+    "1.2.840.10040.4.3": "sha1", "2.16.840.1.101.3.4.3.1": "sha224",
+    "2.16.840.1.101.3.4.3.2": "sha256",
+})
+
+// Hash algorithm OIDs, for RSASSA-PSS parameters.
+$HASHES = ({
+    "1.2.840.113549.2.2": "md2", "1.2.840.113549.2.5": "md5", "1.3.14.3.2.26": "sha1",
+    "2.16.840.1.101.3.4.2.4": "sha224", "2.16.840.1.101.3.4.2.1": "sha256",
+    "2.16.840.1.101.3.4.2.2": "sha384", "2.16.840.1.101.3.4.2.3": "sha512",
+    "2.16.840.1.101.3.4.2.5": "sha512-224", "2.16.840.1.101.3.4.2.6": "sha512-256",
+    "2.16.840.1.101.3.4.2.7": "sha3-224", "2.16.840.1.101.3.4.2.8": "sha3-256",
+    "2.16.840.1.101.3.4.2.9": "sha3-384", "2.16.840.1.101.3.4.2.10": "sha3-512",
+})
+
+// Named elliptic curves: [name, key size in bits].
+$CURVES = ({
+    "1.2.840.10045.3.1.1": ["secp192r1", 192], "1.3.132.0.33": ["secp224r1", 224],
+    "1.2.840.10045.3.1.7": ["secp256r1", 256], "1.3.132.0.34": ["secp384r1", 384],
+    "1.3.132.0.35": ["secp521r1", 521], "1.3.132.0.10": ["secp256k1", 256],
+    "1.3.36.3.3.2.8.1.1.7": ["brainpoolP256r1", 256],
+    "1.3.36.3.3.2.8.1.1.11": ["brainpoolP384r1", 384],
+    "1.3.36.3.3.2.8.1.1.13": ["brainpoolP512r1", 512],
+    "1.3.132.0.1": ["sect163k1", 163], "1.3.132.0.15": ["sect163r2", 163],
+    "1.3.132.0.26": ["sect233k1", 233], "1.3.132.0.27": ["sect233r1", 233],
+    "1.3.132.0.16": ["sect283k1", 283], "1.3.132.0.17": ["sect283r1", 283],
+    "1.3.132.0.36": ["sect409k1", 409], "1.3.132.0.37": ["sect409r1", 409],
+    "1.3.132.0.38": ["sect571k1", 571], "1.3.132.0.39": ["sect571r1", 571],
+    "1.2.156.10197.1.301": ["sm2", 256],
+})
+
+// keyUsage bit names (RFC 5280 4.2.1.3), in bit order.
+$KEYUSAGE = (
+    "digital_signature", "content_commitment", "key_encipherment", "data_encipherment",
+    "key_agreement", "key_cert_sign", "crl_sign", "encipher_only", "decipher_only",
+)
+
+// CRL reason flag names (RFC 5280 4.2.1.13), in bit order.
+$REASONS = (
+    "unused", "key_compromise", "ca_compromise", "affiliation_changed", "superseded",
+    "cessation_of_operation", "certificate_hold", "privilege_withdrawn", "aa_compromise",
+)
+
+// GeneralName CHOICE tags (RFC 5280 4.2.1.6), mapped to crypto:x509:san types where one exists.
+$GNTYPES = ("othername", "email", "dns", "x400address", "dirname", "edipartyname", "uri", "ip", "registeredid")
+
+// Universal tags.
+$T_BOOL = (1)
+$T_INT = (2)
+$T_BITS = (3)
+$T_OCTETS = (4)
+$T_NULL = (5)
+$T_OID = (6)
+$T_ENUM = (10)
+$T_UTF8 = (12)
+$T_SEQ = (16)
+$T_SET = (17)
+$T_UTCTIME = (23)
+$T_GENTIME = (24)
+
+// ---------------------------------------------------------------------------------------
+// DER
+// ---------------------------------------------------------------------------------------
+
+function _fail(mesg) {
+    $lib.raise(BadCert, $mesg)
+}
+
+function _warn(ctx, mesg) {
+    if (not $ctx.warnings.has($mesg)) { $ctx.warnings.append($mesg) }
+}
+
+function _byte(ctx, off) {
+    return($ctx.byts.unpack(">B", $off).0)
+}
+
+// Read the TLV at off, which must end by end. Returns a dict with the tag's class
+// (0 universal, 1 application, 2 context, 3 private), whether it's constructed, its number,
+// and its start, content and end offsets.
+function tlv(ctx, off, end) {
+    if ($off >= $end) { $_fail(`Truncated DER at offset {$off}: no tag`) }
+
+    $first = $ctx.byts.unpack(">B", $off).0
+    $cls = ($first / 64)
+    $cons = (($first / 32) % 2 = 1)
+    $tag = ($first % 32)
+    $pos = ($off + 1)
+
+    // High tag number form (X.690 8.1.2.4).
+    if ($tag = 31) {
+        $tag = (0)
+        $count = (0)
+        while (true) {
+            if ($pos >= $end) { $_fail(`Truncated DER at offset {$off}: unterminated tag number`) }
+            $byte = $ctx.byts.unpack(">B", $pos).0
+            if ($count = 0 and $byte = 128) {
+                $_warn($ctx, `Non-minimal tag number encoding at offset {$off}`)
+            }
+            $tag = (($tag * 128) + ($byte % 128))
+            $pos = ($pos + 1)
+            $count = ($count + 1)
+            if ($byte < 128) { break }
+        }
+        if ($tag < 31) { $_warn($ctx, `High tag number form used for tag {$tag} at offset {$off}`) }
+    }
+
+    if ($pos >= $end) { $_fail(`Truncated DER at offset {$off}: no length`) }
+    $lbyte = $ctx.byts.unpack(">B", $pos).0
+    $pos = ($pos + 1)
+
+    if ($lbyte = 128) {
+        $_fail(`Indefinite length at offset {$off}, which DER doesn't allow`)
+    }
+
+    if ($lbyte > 128) {
+        $nbytes = ($lbyte - 128)
+        if ($nbytes > 8) { $_fail(`Length of {$nbytes} bytes at offset {$off} is too large`) }
+        if (($pos + $nbytes) > $end) { $_fail(`Truncated DER at offset {$off}: short length`) }
+        $size = (0)
+        $i = (0)
+        while ($i < $nbytes) {
+            $size = (($size * 256) + $ctx.byts.unpack(">B", ($pos + $i)).0)
+            $i = ($i + 1)
+        }
+        if ($ctx.byts.unpack(">B", $pos).0 = 0 or $size < 128) {
+            $_warn($ctx, `Non-minimal length encoding at offset {$off}`)
+        }
+        $pos = ($pos + $nbytes)
+    } else {
+        $size = $lbyte
+    }
+
+    $stop = ($pos + $size)
+    if ($stop > $end) { $_fail(`Truncated DER at offset {$off}: content runs past its parent`) }
+
+    return(({"cls": $cls, "cons": $cons, "tag": $tag, "start": $off, "off": $pos, "end": $stop}))
+}
+
+// The TLVs inside a constructed TLV.
+// Low tag numbers with short or 1-2 byte long form lengths are decoded inline, since Storm
+// function calls are expensive. Everything else goes through tlv().
+function kids(ctx, node) {
+    $retn = ([])
+    $byts = $ctx.byts
+    $pos = $node.off
+    $end = $node.end
+    while ($pos < $end) {
+        $kid = (null)
+        if (($pos + 2) <= $end) {
+            ($first, $lbyte) = $byts.unpack(">BB", $pos)
+            if (($first % 32) != 31) {
+                $stop = (null)
+                if ($lbyte < 128) {
+                    $off = ($pos + 2)
+                    $stop = ($off + $lbyte)
+                } elif ($lbyte = 129 and ($pos + 3) <= $end) {
+                    $b2 = $byts.unpack(">B", ($pos + 2)).0
+                    if ($b2 >= 128) {
+                        $off = ($pos + 3)
+                        $stop = ($off + $b2)
+                    }
+                } elif ($lbyte = 130 and ($pos + 4) <= $end) {
+                    $len2 = $byts.unpack(">H", ($pos + 2)).0
+                    if ($len2 >= 256) {
+                        $off = ($pos + 4)
+                        $stop = ($off + $len2)
+                    }
+                }
+                if ($stop != null and $stop <= $end) {
+                    $kid = ({"cls": ($first / 64), "cons": (($first / 32) % 2 = 1), "tag": ($first % 32), "start": $pos, "off": $off, "end": $stop})
+                }
+            }
+        }
+        if ($kid = null) { $kid = $tlv($ctx, $pos, $end) }
+        $retn.append($kid)
+        $pos = $kid.end
+    }
+    return($retn)
+}
+
+function _what(node) {
+    $classes = ("universal", "application", "context", "private")
+    $cls = $classes.($node.cls)
+    return(`{$cls} tag {$node.tag}`)
+}
+
+// Fail unless node is the given universal tag (and constructed for SEQUENCE/SET).
+function expect(node, tag, what) {
+    if ($node.cls != 0 or $node.tag != $tag) {
+        $_fail(`Expected {$what}, got {$_what($node)} at offset {$node.start}`)
+    }
+    if (($tag = $T_SEQ or $tag = $T_SET) and not $node.cons) {
+        $_fail(`Expected a constructed {$what} at offset {$node.start}`)
+    }
+    if ($tag != $T_SEQ and $tag != $T_SET and $node.cons) {
+        $_fail(`Constructed (BER) {$what} at offset {$node.start}, which DER doesn't allow`)
+    }
+    return($node)
+}
+
+function isCtx(node, tag) {
+    return(($node.cls = 2 and $node.tag = $tag))
+}
+
+function content(ctx, node) {
+    return($ctx.byts.slice($node.off, $node.end))
+}
+
+function raw(ctx, node) {
+    return($ctx.byts.slice($node.start, $node.end))
+}
+
+function hex(ctx, node) {
+    return($lib.hex.encode($ctx.byts.slice($node.off, $node.end)))
+}
+
+function rawHex(ctx, node) {
+    return($lib.hex.encode($ctx.byts.slice($node.start, $node.end)))
+}
+
+// Check an INTEGER's content is DER (non-empty and minimal), and return its hex.
+function _intHex(ctx, node) {
+    if ($node.end = $node.off) { $_fail(`Empty INTEGER at offset {$node.start}`) }
+    $text = $lib.hex.encode($ctx.byts.slice($node.off, $node.end))
+    if ($lib.len($text) > 2) {
+        $next = $lib.hex.toint($text.slice(2, 4))
+        if (($text.slice(0, 2) = "00" and $next < 128) or ($text.slice(0, 2) = "ff" and $next >= 128)) {
+            $_warn($ctx, `Non-minimal INTEGER encoding at offset {$node.start}`)
+        }
+    }
+    return($text)
+}
+
+function int(ctx, node) {
+    return($lib.hex.toint($_intHex($ctx, $node), signed=(true)))
+}
+
+// An INTEGER as the minimal big endian two's complement hex Synapse uses for serials.
+// Positive values have no leading zero byte (00a3 -> a3).
+function intHexMin(ctx, node) {
+    $text = $_intHex($ctx, $node)
+    while ($lib.len($text) > 2) {
+        $head = $text.slice(0, 2)
+        $next = $lib.hex.toint($text.slice(2, 4))
+        if ($head = "00") {
+            $text = $text.slice(2)
+        } elif ($head = "ff" and $next >= 128) {
+            $text = $text.slice(2)
+        } else {
+            break
+        }
+    }
+    return($text)
+}
+
+function bool(ctx, node) {
+    if (($node.end - $node.off) != 1) { $_fail(`BOOLEAN at offset {$node.start} isn't one byte`) }
+    $valu = $ctx.byts.unpack(">B", $node.off).0
+    if ($valu != 0 and $valu != 255) {
+        $_warn($ctx, `BOOLEAN at offset {$node.start} isn't 0x00 or 0xff`)
+    }
+    return(($valu != 0))
+}
+
+// A BIT STRING as {"unused": <int>, "byts": <bytes>}.
+function bits(ctx, node) {
+    if ($node.end = $node.off) { $_fail(`Empty BIT STRING at offset {$node.start}`) }
+    $unused = $ctx.byts.unpack(">B", $node.off).0
+    if ($unused > 7) { $_fail(`BIT STRING at offset {$node.start} has {$unused} unused bits`) }
+    $byts = $ctx.byts.slice(($node.off + 1), $node.end)
+    $size = $lib.len($byts)
+    if ($size = 0 and $unused != 0) {
+        $_fail(`Empty BIT STRING at offset {$node.start} has unused bits`)
+    }
+    if ($unused > 0 and $size > 0) {
+        $last = $byts.unpack(">B", ($size - 1)).0
+        if (($last % (2 ** $unused)) != 0) {
+            $_warn($ctx, `BIT STRING at offset {$node.start} has non-zero unused bits`)
+        }
+    }
+    return(({"unused": $unused, "byts": $byts}))
+}
+
+// Whether bit indx (0 is the most significant bit of the first byte) is set.
+function bitSet(byts, indx) {
+    $offs = ($indx / 8)
+    if ($offs >= $lib.len($byts)) { return((false)) }
+    $byte = $byts.unpack(">B", $offs).0
+    return((($byte / (2 ** (7 - ($indx % 8)))) % 2 = 1))
+}
+
+// Decode an OBJECT IDENTIFIER (X.690 8.19) to its dotted string. Arcs can be any size.
+$OIDCACHE = ({})
+
+function oid(ctx, node) {
+    $key = $lib.hex.encode($ctx.byts.slice($node.off, $node.end))
+    $cached = $OIDCACHE.$key
+    if $cached { return($cached) }
+    $nwarn = $lib.len($ctx.warnings)
+    if ($node.end = $node.off) { $_fail(`Empty OBJECT IDENTIFIER at offset {$node.start}`) }
+    $arcs = ([])
+    $valu = (0)
+    $fresh = (true)
+    $pos = $node.off
+    while ($pos < $node.end) {
+        $byte = $ctx.byts.unpack(">B", $pos).0
+        if ($fresh and $byte = 128) {
+            $_warn($ctx, `Non-minimal OBJECT IDENTIFIER arc at offset {$node.start}`)
+        }
+        $valu = (($valu * 128) + ($byte % 128))
+        $fresh = (false)
+        if ($byte < 128) {
+            if ($lib.len($arcs) = 0) {
+                // The first subidentifier is X * 40 + Y. X is 0 or 1 (Y < 40), or 2 (any Y).
+                if ($valu < 40) {
+                    $arcs.append((0)) $arcs.append($valu)
+                } elif ($valu < 80) {
+                    $arcs.append((1)) $arcs.append(($valu - 40))
+                } else {
+                    $arcs.append((2)) $arcs.append(($valu - 80))
+                }
+            } else {
+                $arcs.append($valu)
+            }
+            $valu = (0)
+            $fresh = (true)
+        }
+        $pos = ($pos + 1)
+    }
+    if (not $fresh) { $_fail(`Truncated OBJECT IDENTIFIER at offset {$node.start}`) }
+    $dotted = (".").join($arcs)
+    if ($lib.len($ctx.warnings) = $nwarn and $lib.len($OIDCACHE) < 10000) { $OIDCACHE.$key = $dotted }
+    return($dotted)
+}
+
+function oidName(valu) {
+    $label = $OIDNAMES.$valu
+    if ($label) { return($label) }
+    return($valu)
+}
+
+// Decode the ASN.1 string types. Returns null for a tag that isn't a string type.
+function str(ctx, node) {
+    if ($node.cls != 0 or $node.cons) { return() }
+    $byts = $ctx.byts.slice($node.off, $node.end)
+    switch $node.tag {
+        // UTF8String
+        "12": { $enc = "utf8" }
+        // NumericString, PrintableString, IA5String, VisibleString
+        "18": { $enc = "ascii" }
+        "19": { $enc = "ascii" }
+        "22": { $enc = "ascii" }
+        "26": { $enc = "ascii" }
+        // TeletexString (T.61), VideotexString, GraphicString, GeneralString. T.61 is decoded as
+        // Latin-1, the same as OpenSSL and cryptography.
+        "20": { $enc = "latin-1" }
+        "21": { $enc = "latin-1" }
+        "25": { $enc = "latin-1" }
+        "27": { $enc = "latin-1" }
+        // UniversalString (UCS-4) and BMPString (UCS-2)
+        "28": { $enc = "utf-32-be" }
+        "30": { $enc = "utf-16-be" }
+        *: { return() }
+    }
+    try {
+        return($byts.decode($enc, errors=strict))
+    } catch * as err {
+        $_warn($ctx, `String at offset {$node.start} isn't valid {$enc}, decoded with replacements`)
+        if ($enc = "ascii") { return($byts.decode("latin-1")) }
+        return($byts.decode($enc, errors=replace))
+    }
+}
+
+function reqStr(ctx, node, what) {
+    $valu = $str($ctx, $node)
+    if ($valu = null) { $_fail(`Expected a string for {$what}, got {$_what($node)} at offset {$node.start}`) }
+    return($valu)
+}
+
+// IA5String-like content of an IMPLICIT tagged value (ex. dNSName).
+function ia5(ctx, node) {
+    $byts = $ctx.byts.slice($node.off, $node.end)
+    try {
+        return($byts.decode("ascii", errors=strict))
+    } catch * as err {
+        $_warn($ctx, `IA5String at offset {$node.start} has non-ASCII bytes`)
+        return($byts.decode("latin-1"))
+    }
+}
+
+// ---------------------------------------------------------------------------------------
+// Time
+// ---------------------------------------------------------------------------------------
+
+// Days since 1970-01-01 of a proleptic Gregorian date (H. Hinnant's days_from_civil).
+function _days(year, month, day) {
+    if ($month <= 2) { $year = ($year - 1) }
+    $era = ($year / 400)
+    $yoe = ($year - ($era * 400))
+    if ($month > 2) { $mp = ($month - 3) } else { $mp = ($month + 9) }
+    $doy = ((((153 * $mp) + 2) / 5) + $day - 1)
+    $doe = (($yoe * 365) + ($yoe / 4) - ($yoe / 100) + $doy)
+    return((($era * 146097) + $doe - 719468))
+}
+
+// A decimal digit string as an int (leading zeros are fine).
+function _dec(text) {
+    $text = $text.lstrip("0")
+    if (not $text) { return((0)) }
+    return($lib.cast(int, $text))
+}
+
+function _monthDays(year, month) {
+    if ($month = 2) {
+        if (($year % 4 = 0 and $year % 100 != 0) or $year % 400 = 0) { return((29)) }
+        return((28))
+    }
+    if ($month = 4 or $month = 6 or $month = 9 or $month = 11) { return((30)) }
+    return((31))
+}
+
+// Parse a UTCTime or GeneralizedTime to epoch millis.
+// RFC 5280 requires YYMMDDHHMMSSZ (UTCTime, 1950-2049) and YYYYMMDDHHMMSSZ (GeneralizedTime).
+// The other X.680 forms (no seconds, fractions, offsets, local time) are accepted with a warning.
+function time(ctx, node, validity=(false)) {
+    $text = $ia5($ctx, $node)
+
+    // Fast path for the RFC 5280 forms, using Synapse's own time parsing.
+    if ($node.cls = 0 and $node.tag = $T_UTCTIME and $lib.len($text) = 13 and $text.endswith("Z")) {
+        if ($_dec($text.slice(0, 2)) >= 50) { $century = "19" } else { $century = "20" }
+        ($ok, $millis) = $lib.trycast(time, `{$century}{$text.slice(0, 12)}`)
+        if ($ok and $text.slice(10, 12) != "60") { return($millis) }
+    } elif ($node.cls = 0 and $node.tag = $T_GENTIME and $lib.len($text) = 15 and $text.endswith("Z") and $_dec($text.slice(0, 4)) >= 2050) {
+        ($ok, $millis) = $lib.trycast(time, $text.slice(0, 14))
+        if ($ok and $text.slice(12, 14) != "60") { return($millis) }
+    }
+
+    $where = `at offset {$node.start}`
+
+    if ($node.cls = 0 and $node.tag = $T_UTCTIME) {
+        $m = $lib.regex.search("^([0-9]{2})([0-9]{2})([0-9]{2})([0-9]{2})([0-9]{2})([0-9]{2})?(Z|[+-][0-9]{4})?$", $text)
+        if ($m = null) { $_fail(`Invalid UTCTime "{$text}" {$where}`) }
+        $year = $_dec($m.0)
+        // RFC 5280 4.1.2.5.1: YY >= 50 is 19YY, YY < 50 is 20YY.
+        if ($year >= 50) { $year = ($year + 1900) } else { $year = ($year + 2000) }
+        ($mon, $day, $hour, $min, $sec, $zone) = ($m.1, $m.2, $m.3, $m.4, $m.5, $m.6)
+        $frac = (null)
+    } elif ($node.cls = 0 and $node.tag = $T_GENTIME) {
+        $m = $lib.regex.search("^([0-9]{4})([0-9]{2})([0-9]{2})([0-9]{2})([0-9]{2})?([0-9]{2})?([.,][0-9]+)?(Z|[+-][0-9]{4})?$", $text)
+        if ($m = null) { $_fail(`Invalid GeneralizedTime "{$text}" {$where}`) }
+        $year = $_dec($m.0)
+        ($mon, $day, $hour, $min, $sec, $frac, $zone) = ($m.1, $m.2, $m.3, $m.4, $m.5, $m.6, $m.7)
+        if ($frac != null) { $_warn($ctx, `GeneralizedTime with fractional seconds {$where}`) }
+        // RFC 5280 4.1.2.5: validity dates through 2049 MUST be UTCTime.
+        if ($validity and $year < 2050) { $_warn($ctx, `GeneralizedTime used for a year before 2050 {$where}`) }
+    } else {
+        $_fail(`Expected a UTCTime or GeneralizedTime, got {$_what($node)} {$where}`)
+    }
+
+    if ($min = null) { $_warn($ctx, `Time without minutes {$where}`) $min = "00" }
+    if ($sec = null) { $_warn($ctx, `Time without seconds {$where}`) $sec = "00" }
+
+    ($mon, $day, $hour, $min, $sec) = ($_dec($mon), $_dec($day), $_dec($hour), $_dec($min), $_dec($sec))
+
+    if ($mon < 1 or $mon > 12 or $day < 1 or $day > $_monthDays($year, $mon) or $hour > 23 or $min > 59 or $sec > 60) {
+        $_fail(`Time "{$text}" {$where} is out of range`)
+    }
+    if ($sec = 60) { $_warn($ctx, `Leap second in time {$where}`) }
+
+    $millis = (((((($_days($year, $mon, $day) * 24) + $hour) * 60) + $min) * 60) + $sec)
+    $millis = ($millis * 1000)
+
+    if ($frac != null) {
+        $digits = $frac.slice(1, 4)
+        while ($lib.len($digits) < 3) { $digits = `{$digits}0` }
+        $millis = ($millis + $_dec($digits))
+    }
+
+    if ($zone = null) {
+        $_warn($ctx, `Local time without a time zone {$where}, read as UTC`)
+    } elif ($zone != "Z") {
+        $_warn($ctx, `Time with a UTC offset instead of Z {$where}`)
+        $offs = ((($_dec($zone.slice(1, 3)) * 60) + $_dec($zone.slice(3, 5))) * 60000)
+        if ($zone.slice(0, 1) = "+") { $millis = ($millis - $offs) } else { $millis = ($millis + $offs) }
+    }
+
+    return($millis)
+}
+
+// ---------------------------------------------------------------------------------------
+// Names (RFC 5280 4.1.2.4, RFC 4514)
+// ---------------------------------------------------------------------------------------
+
+$NUL = $lib.hex.decode("00").decode()
+$BACKSLASH = "\\"
+// Values that need escaping: one of \ " + , ; < > NUL, or a leading # or space, or a trailing space.
+// It has a group, since $lib.regex.search() returns the match's groups.
+$ESCAPERE = ("").join(("([", $BACKSLASH, $BACKSLASH, '"+,;<>', $NUL, "]|^[# ]| $)"))
+
+// Escape an attribute value for an RFC 4514 string, the same way cryptography does.
+function escapeDn(valu) {
+    if (not $valu) { return("") }
+    if (not $lib.regex.search($ESCAPERE, $valu)) { return($valu) }
+    $bs = "\\"
+    $valu = $valu.replace($bs, `{$bs}{$bs}`)
+    $valu = $valu.replace("\"", `{$bs}"`)
+    for $char in ("+", ",", ";", "<", ">") { $valu = $valu.replace($char, `{$bs}{$char}`) }
+    $valu = $valu.replace($NUL, `{$bs}00`)
+    $first = $valu.slice(0, 1)
+    if ($first = "#" or ($first = " " and $lib.len($valu) > 1)) { $valu = `{$bs}{$valu}` }
+    if ($valu.endswith(" ")) { $valu = `{$valu.slice(0, -1)}{$bs} ` }
+    return($valu)
+}
+
+// Parse a RelativeDistinguishedName (a SET of AttributeTypeAndValue, or an IMPLICIT tag of one).
+// Returns {"avas": [{"oid", "name", "valu"}], "dn": <RFC 4514 string>}.
+function rdn(ctx, node) {
+    $avas = ([])
+    $strs = ([])
+    $atvs = $kids($ctx, $node)
+    if ($lib.len($atvs) = 0) { $_warn($ctx, `Empty RelativeDistinguishedName at offset {$node.start}`) }
+    for $atv in $atvs {
+        if ($atv.tag != $T_SEQ or $atv.cls != 0 or not $atv.cons) { $expect($atv, $T_SEQ, "an AttributeTypeAndValue") }
+        $pair = $kids($ctx, $atv)
+        if ($lib.len($pair) != 2) { $_fail(`AttributeTypeAndValue at offset {$atv.start} doesn't have 2 elements`) }
+        if ($pair.0.tag != $T_OID or $pair.0.cls != 0 or $pair.0.cons) { $expect($pair.0, $T_OID, "an attribute type") }
+        $type = $OIDCACHE.($lib.hex.encode($ctx.byts.slice($pair.0.off, $pair.0.end)))
+        if (not $type) { $type = $oid($ctx, $pair.0) }
+        $vnode = $pair.1
+
+        // UTF8String and PrintableString are decoded inline (the common case), the rest by str().
+        $valu = (null)
+        if ($vnode.cls = 0 and not $vnode.cons and ($vnode.tag = 19 or $vnode.tag = 12)) {
+            try {
+                $valu = $ctx.byts.slice($vnode.off, $vnode.end).decode("utf8", errors=strict)
+            } catch * as err {
+                $valu = (null)
+            }
+        }
+        if ($valu = null) { $valu = $str($ctx, $vnode) }
+        if ($valu != null) {
+            if ($valu and $lib.regex.search($ESCAPERE, $valu)) { $dnvalu = $escapeDn($valu) } else { $dnvalu = $valu }
+        } elif ($vnode.cls = 0 and $vnode.tag = $T_BITS) {
+            // x500UniqueIdentifier and friends: # and the hex of the BIT STRING's content (its
+            // unused bits byte and the bits), the same as cryptography.
+            $bits($ctx, $vnode)
+            $valu = $lib.hex.encode($ctx.byts.slice($vnode.off, $vnode.end))
+            $dnvalu = `#{$valu}`
+        } else {
+            // RFC 4514 2.4: any other type is # and the hex of its BER encoding.
+            $valu = $lib.hex.encode($ctx.byts.slice($vnode.start, $vnode.end))
+            $dnvalu = `#{$valu}`
+            $_warn($ctx, `Attribute {$type} at offset {$atv.start} isn't a string`)
+        }
+
+        $short = $RFC4514.$type
+        if (not $short) { $short = $type }
+        $strs.append(`{$short}={$dnvalu}`)
+        $label = $OIDNAMES.$type
+        if (not $label) { $label = $type }
+        $avas.append(({"oid": $type, "name": $label, "valu": $valu}))
+    }
+    return(({"avas": $avas, "dn": ("+").join($strs)}))
+}
+
+// Parse a Name. Returns {"dn": <RFC 4514 string>, "attrs": {<key>: [<values>]},
+// "rdns": [[{"oid", "name", "valu"}]], "der": <hex>}.
+$NAMECACHE = ({})
+
+function name(ctx, node) {
+    if ($node.tag != $T_SEQ or $node.cls != 0 or $node.cons != (true)) { $expect($node, $T_SEQ, "a Name") }
+    $der = $lib.hex.encode($ctx.byts.slice($node.start, $node.end))
+    $cached = $NAMECACHE.$der
+    if $cached { return($cached) }
+    $nwarn = $lib.len($ctx.warnings)
+
+    $rdns = ([])
+    $attrs = ({})
+    $parts = ([])
+
+    for $set in $kids($ctx, $node) {
+        if ($set.tag != $T_SET or $set.cls != 0 or not $set.cons) { $expect($set, $T_SET, "a RelativeDistinguishedName") }
+        $info = $rdn($ctx, $set)
+        for $ava in $info.avas {
+            $key = $ATTRKEYS.($ava.oid)
+            if (not $key) { $key = $ava.oid }
+            if (not $attrs.$key) { $attrs.$key = ([]) }
+            $attrs.$key.append($ava.valu)
+        }
+        $rdns.append($info.avas)
+        $parts.append($info.dn)
+    }
+
+    $parts.reverse()
+    $retn = ({"dn": (",").join($parts), "attrs": $attrs, "rdns": $rdns, "der": $der})
+    if ($lib.len($ctx.warnings) = $nwarn and $lib.len($NAMECACHE) < 1000) { $NAMECACHE.$der = $retn }
+    return($retn)
+}
+
+// ---------------------------------------------------------------------------------------
+// GeneralName (RFC 5280 4.2.1.6)
+// ---------------------------------------------------------------------------------------
+
+function _hexGroups(byts) {
+    $groups = ([])
+    $i = (0)
+    while ($i < $lib.len($byts)) {
+        $groups.append($byts.unpack(">H", $i).0)
+        $i = ($i + 2)
+    }
+    return($groups)
+}
+
+function _ipv4(byts) {
+    return((".").join($byts.unpack(">4B")))
+}
+
+// Format a 16 byte IPv6 address per RFC 5952 (lowercase, no leading zeros, the longest run of
+// two or more zero groups (the first on a tie) as "::", IPv4-mapped addresses as ::ffff:a.b.c.d).
+function ipv6(byts) {
+    $groups = $_hexGroups($byts)
+
+    if ($byts.slice(0, 12) = $lib.hex.decode("00000000000000000000ffff")) {
+        return(`::ffff:{$_ipv4($byts.slice(12, 16))}`)
+    }
+
+    $best = (-1)
+    $bestlen = (0)
+    $i = (0)
+    while ($i < 8) {
+        if ($groups.$i = 0) {
+            $j = $i
+            while ($j < 8 and $groups.$j = 0) { $j = ($j + 1) }
+            if (($j - $i) > $bestlen) { $best = $i $bestlen = ($j - $i) }
+            $i = $j
+        } else {
+            $i = ($i + 1)
+        }
+    }
+
+    $strs = ([])
+    for $g in $groups {
+        $text = $lib.hex.fromint($g, 2).lstrip("0")
+        if (not $text) { $text = "0" }
+        $strs.append($text)
+    }
+
+    if ($bestlen < 2) { return((":").join($strs)) }
+
+    $head = (":").join($strs.slice(0, $best))
+    $tail = (":").join($strs.slice(($best + $bestlen)))
+    return(`{$head}::{$tail}`)
+}
+
+// A netmask as a prefix length, or null if its bits aren't contiguous.
+function _prefix(byts) {
+    $size = (0)
+    $done = (false)
+    $i = (0)
+    while ($i < ($lib.len($byts) * 8)) {
+        if ($bitSet($byts, $i)) {
+            if ($done) { return() }
+            $size = ($size + 1)
+        } else {
+            $done = (true)
+        }
+        $i = ($i + 1)
+    }
+    return($size)
+}
+
+function _ip(ctx, node) {
+    $byts = $ctx.byts.slice($node.off, $node.end)
+    $size = $lib.len($byts)
+    if ($size = 4) { return($_ipv4($byts)) }
+    if ($size = 16) { return($ipv6($byts)) }
+    // Name constraints use an address and a netmask (RFC 5280 4.2.1.10).
+    if ($size = 8 or $size = 32) {
+        $half = ($size / 2)
+        $addr = $byts.slice(0, $half)
+        $mask = $byts.slice($half)
+        if ($half = 4) { $addr = $_ipv4($addr) } else { $addr = $ipv6($addr) }
+        $plen = $_prefix($mask)
+        if ($plen = null) {
+            $_warn($ctx, `Non-contiguous netmask in iPAddress at offset {$node.start}`)
+            if ($half = 4) { return(`{$addr}/{$_ipv4($mask)}`) }
+            return(`{$addr}/{$ipv6($mask)}`)
+        }
+        return(`{$addr}/{$plen}`)
+    }
+    $_warn($ctx, `iPAddress at offset {$node.start} is {$size} bytes`)
+    return($lib.hex.encode($byts))
+}
+
+// Parse a GeneralName. Returns [<type>, <value>]. The types match crypto:x509:san
+// (dns, email, uri, ip, dirname, registeredid, othername). othername values are
+// "<type-id>:<hex of the value's DER>", the same as cryptography's OtherName.
+function generalName(ctx, node) {
+    if ($node.cls != 2 or $node.tag > 8) {
+        $_fail(`Unknown GeneralName {$_what($node)} at offset {$node.start}`)
+    }
+    $type = $GNTYPES.($node.tag)
+    switch $node.tag {
+        "0": {
+            $parts = $kids($ctx, $node)
+            if ($lib.len($parts) != 2 or not ($parts.1.cls = 2 and $parts.1.tag = 0) or not $parts.1.cons) {
+                $_fail(`Malformed otherName at offset {$node.start}`)
+            }
+            if ($parts.0.tag != $T_OID or $parts.0.cls != 0 or $parts.0.cons != (false)) { $expect($parts.0, $T_OID, "an otherName type-id") }
+            $typeid = $oid($ctx, $parts.0)
+            $inner = $kids($ctx, $parts.1)
+            if ($lib.len($inner) != 1) { $_fail(`Malformed otherName value at offset {$node.start}`) }
+            return(($type, `{$typeid}:{$lib.hex.encode($ctx.byts.slice($inner.0.start, $inner.0.end))}`))
+        }
+        "1": { return(($type, $ia5($ctx, $node))) }
+        "2": { return(($type, $ia5($ctx, $node))) }
+        "6": { return(($type, $ia5($ctx, $node))) }
+        "4": {
+            $inner = $kids($ctx, $node)
+            if ($lib.len($inner) != 1) { $_fail(`Malformed directoryName at offset {$node.start}`) }
+            return(($type, $name($ctx, $inner.0).dn))
+        }
+        "7": { return(($type, $_ip($ctx, $node))) }
+        "8": {
+            if ($node.cons) { $_fail(`Constructed registeredID at offset {$node.start}`) }
+            return(($type, $oid($ctx, $node)))
+        }
+        // x400Address and ediPartyName are kept as the hex of their content.
+        *: { return(($type, $lib.hex.encode($ctx.byts.slice($node.off, $node.end)))) }
+    }
+}
+
+function generalNames(ctx, node) {
+    $retn = ([])
+    for $kid in $kids($ctx, $node) { $retn.append($generalName($ctx, $kid)) }
+    return($retn)
+}
+
+// ---------------------------------------------------------------------------------------
+// Algorithms and keys
+// ---------------------------------------------------------------------------------------
+
+// Parse an AlgorithmIdentifier. Returns {"oid", "name", "params": <node or null>}.
+function algo(ctx, node) {
+    if ($node.tag != $T_SEQ or $node.cls != 0 or $node.cons != (true)) { $expect($node, $T_SEQ, "an AlgorithmIdentifier") }
+    $parts = $kids($ctx, $node)
+    if ($lib.len($parts) < 1 or $lib.len($parts) > 2) {
+        $_fail(`AlgorithmIdentifier at offset {$node.start} has {$lib.len($parts)} elements`)
+    }
+    if ($parts.0.tag != $T_OID or $parts.0.cls != 0 or $parts.0.cons != (false)) { $expect($parts.0, $T_OID, "an algorithm OID") }
+    $algoid = $oid($ctx, $parts.0)
+    $params = (null)
+    if ($lib.len($parts) = 2) { $params = $parts.1 }
+    return(({"oid": $algoid, "name": $oidName($algoid), "params": $params}))
+}
+
+// The bit length of a non-negative integer, given as hex.
+function _bitlen(text) {
+    $text = $text.lstrip("0")
+    if (not $text) { return((0)) }
+    $top = $lib.hex.toint(`0{$text.slice(0, 1)}`)
+    $nbits = (0)
+    while ($top > 0) { $top = ($top / 2) $nbits = ($nbits + 1) }
+    return(((($lib.len($text) - 1) * 4) + $nbits))
+}
+
+// Parse RSASSA-PSS-params (RFC 4055 3.1). Missing fields take their DEFAULTs.
+function _pss(ctx, node) {
+    $retn = ({"hash": "sha1", "mgf": "mgf1", "mgfhash": "sha1", "salt": 20, "trailer": 1})
+    if ($node = null or ($node.cls = 0 and $node.tag = $T_NULL)) { return($retn) }
+    if ($node.tag != $T_SEQ or $node.cls != 0 or $node.cons != (true)) { $expect($node, $T_SEQ, "RSASSA-PSS-params") }
+    for $kid in $kids($ctx, $node) {
+        $inner = $kids($ctx, $kid)
+        if ($lib.len($inner) != 1 or $kid.cls != 2) { $_fail(`Malformed RSASSA-PSS-params at offset {$node.start}`) }
+        switch $kid.tag {
+            "0": {
+                $hash = $algo($ctx, $inner.0).oid
+                $label = $HASHES.$hash
+                if (not $label) { $label = $hash }
+                $retn.hash = $label
+            }
+            "1": {
+                $mgf = $algo($ctx, $inner.0)
+                $retn.mgf = $mgf.name
+                if ($mgf.params) {
+                    $hash = $algo($ctx, $mgf.params).oid
+                    $label = $HASHES.$hash
+                    if (not $label) { $label = $hash }
+                    $retn.mgfhash = $label
+                }
+            }
+            "2": { $retn.salt = $int($ctx, $expect($inner.0, $T_INT, "a saltLength")) }
+            "3": { $retn.trailer = $int($ctx, $expect($inner.0, $T_INT, "a trailerField")) }
+        }
+    }
+    return($retn)
+}
+
+function sigAlgo(ctx, node) {
+    $info = $algo($ctx, $node)
+    $retn = ({"oid": $info.oid, "name": $info.name, "hash": $SIGHASH.($info.oid)})
+    if ($info.oid = "1.2.840.113549.1.1.10") {
+        $retn.pss = $_pss($ctx, $info.params)
+        $retn.hash = $retn.pss.hash
+    } elif ($info.params != null and not ($info.params.cls = 0 and $info.params.tag = $T_NULL)) {
+        $retn.params = $lib.hex.encode($ctx.byts.slice($info.params.start, $info.params.end))
+    }
+    return($retn)
+}
+
+// Parse a SubjectPublicKeyInfo (RFC 5280 4.1.2.7, RFC 3279, RFC 5480, RFC 8410).
+function publicKey(ctx, node) {
+    if ($node.tag != $T_SEQ or $node.cls != 0 or $node.cons != (true)) { $expect($node, $T_SEQ, "a SubjectPublicKeyInfo") }
+    $parts = $kids($ctx, $node)
+    if ($lib.len($parts) != 2) { $_fail(`SubjectPublicKeyInfo at offset {$node.start} doesn't have 2 elements`) }
+
+    $info = $algo($ctx, $parts.0)
+    if ($parts.1.tag != $T_BITS or $parts.1.cls != 0 or $parts.1.cons != (false)) { $expect($parts.1, $T_BITS, "a subjectPublicKey") }
+    $keybits = $bits($ctx, $parts.1)
+    $spki = $ctx.byts.slice($node.start, $node.end)
+
+    $retn = ({
+        "algo": (null), "size": (null), "oid": $info.oid,
+        "spki": $lib.hex.encode($spki),
+        "sha256": $lib.crypto.hashes.sha256($spki),
+        "sha1": $lib.crypto.hashes.sha1($spki),
+        "key": $lib.hex.encode($keybits.byts),
+    })
+
+    $params = $info.params
+    $hasParams = ($params != null and not ($params.cls = 0 and $params.tag = $T_NULL))
+
+    switch $info.oid {
+        "1.2.840.113549.1.1.1": { $rsa = (true) }
+        "1.2.840.113549.1.1.10": { $rsa = (true) $retn.pss = $_pss($ctx, $params) }
+        *: { $rsa = (false) }
+    }
+
+    if $rsa {
+        // RSAPublicKey (RFC 8017 A.1.1) inside the BIT STRING.
+        $keyctx = ({"byts": $keybits.byts, "warnings": $ctx.warnings})
+        $seq = $expect($tlv($keyctx, (0), $lib.len($keybits.byts)), $T_SEQ, "an RSAPublicKey")
+        $nums = $kids($keyctx, $seq)
+        if ($lib.len($nums) != 2) { $_fail("RSAPublicKey doesn't have 2 elements") }
+        if ($nums.0.tag != $T_INT or $nums.0.cls != 0 or $nums.0.cons != (false)) { $expect($nums.0, $T_INT, "an RSA modulus") }
+        $mod = $_intHex($keyctx, $nums.0).lstrip("0")
+        if (not $mod) { $mod = "0" }
+        $retn.algo = rsa
+        $retn.size = $_bitlen($mod)
+        if ($nums.1.tag != $T_INT or $nums.1.cls != 0 or $nums.1.cons != (false)) { $expect($nums.1, $T_INT, "an RSA exponent") }
+        $retn.rsa = ({"mod": $mod, "exp": $int($keyctx, $nums.1)})
+        return($retn)
+    }
+
+    switch $info.oid {
+        "1.2.840.10045.2.1": { $ec = (true) }
+        "1.3.132.1.12": { $ec = (true) }
+        "1.3.132.1.13": { $ec = (true) }
+        *: { $ec = (false) }
+    }
+
+    if $ec {
+        $retn.algo = ec
+        $retn.point = $retn.key
+        if (not $hasParams) {
+            // implicitlyCA (NULL) or missing: the curve comes from the issuer.
+            $retn.curve = implicit
+        } elif ($params.cls = 0 and $params.tag = $T_OID) {
+            $curveoid = $oid($ctx, $params)
+            $curve = $CURVES.$curveoid
+            if $curve {
+                $retn.curve = $curve.0
+                $retn.size = $curve.1
+            } else {
+                $retn.curve = $curveoid
+            }
+        } elif ($params.cls = 0 and $params.tag = $T_SEQ) {
+            // specifiedCurve (RFC 3279 2.3.5). Use the field size for the key size.
+            $retn.curve = explicit
+            $ecparts = $kids($ctx, $params)
+            if ($lib.len($ecparts) >= 2) {
+                if ($ecparts.1.tag != $T_SEQ or $ecparts.1.cls != 0 or $ecparts.1.cons != (true)) { $expect($ecparts.1, $T_SEQ, "a FieldID") }
+                $field = $kids($ctx, $ecparts.1)
+                if ($lib.len($field) = 2) {
+                    if ($field.0.tag != $T_OID or $field.0.cls != 0 or $field.0.cons != (false)) { $expect($field.0, $T_OID, "a fieldType") }
+                    $ftype = $oid($ctx, $field.0)
+                    if ($ftype = "1.2.840.10045.1.1") {
+                        if ($field.1.tag != $T_INT or $field.1.cls != 0 or $field.1.cons != (false)) { $expect($field.1, $T_INT, "a prime") }
+                        $retn.size = $_bitlen($_intHex($ctx, $field.1))
+                    } elif ($ftype = "1.2.840.10045.1.2") {
+                        $char2 = $kids($ctx, $field.1)
+                        if ($lib.len($char2) > 0) { $retn.size = $int($ctx, $char2.0) }
+                    }
+                }
+            }
+        }
+        return($retn)
+    }
+
+    switch $info.oid {
+        "1.2.840.10040.4.1": {
+            $retn.algo = dsa
+            if $hasParams {
+                if ($params.tag != $T_SEQ or $params.cls != 0 or $params.cons != (true)) { $expect($params, $T_SEQ, "Dss-Parms") }
+                $pqg = $kids($ctx, $params)
+                if ($lib.len($pqg) = 3) {
+                    if ($pqg.0.tag != $T_INT or $pqg.0.cls != 0 or $pqg.0.cons != (false)) { $expect($pqg.0, $T_INT, "a DSA p") }
+                    $retn.size = $_bitlen($_intHex($ctx, $pqg.0))
+                }
+            }
+        }
+        "1.3.101.112": { $retn.algo = ed25519 $retn.size = (256) }
+        "1.3.101.113": { $retn.algo = ed448 $retn.size = (456) }
+        "1.3.101.110": { $retn.algo = x25519 $retn.size = (256) }
+        "1.3.101.111": { $retn.algo = x448 $retn.size = (448) }
+        *: {
+            $retn.algo = $info.name
+            if $hasParams { $retn.params = $lib.hex.encode($ctx.byts.slice($params.start, $params.end)) }
+        }
+    }
+    return($retn)
+}
+
+// ---------------------------------------------------------------------------------------
+// Extensions (RFC 5280 4.2, RFC 6962, RFC 7633)
+// ---------------------------------------------------------------------------------------
+
+// Parse the DER inside an extension's OCTET STRING with its own offsets.
+function _sub(ctx, byts) {
+    $subctx = ({"byts": $byts, "warnings": $ctx.warnings})
+    $node = $tlv($subctx, (0), $lib.len($byts))
+    if ($node.end != $lib.len($byts)) { $_warn($ctx, "Extension value has trailing data") }
+    return(($subctx, $node))
+}
+
+function _seqOf(ctx, node, what) {
+    $expect($node, $T_SEQ, $what)
+    return($kids($ctx, $node))
+}
+
+function _keyUsage(ctx, node) {
+    if ($node.tag != $T_BITS or $node.cls != 0 or $node.cons != (false)) { $expect($node, $T_BITS, "a KeyUsage") }
+    $info = $bits($ctx, $node)
+    $retn = ([])
+    // The first two bytes as one int, bit 0 is its most significant bit.
+    $byts = $info.byts
+    $valu = (0)
+    if ($lib.len($byts) > 0) { $valu = ($byts.unpack(">B", (0)).0 * 256) }
+    if ($lib.len($byts) > 1) { $valu = ($valu + $byts.unpack(">B", (1)).0) }
+    $bit = (32768)
+    for $label in $KEYUSAGE {
+        if (($valu / $bit) % 2 = 1) { $retn.append($label) }
+        $bit = ($bit / 2)
+    }
+    return($retn)
+}
+
+function _reasons(ctx, node) {
+    $info = $bits($ctx, $node)
+    $retn = ([])
+    // The first two bytes as one int, bit 0 is its most significant bit.
+    $byts = $info.byts
+    $valu = (0)
+    if ($lib.len($byts) > 0) { $valu = ($byts.unpack(">B", (0)).0 * 256) }
+    if ($lib.len($byts) > 1) { $valu = ($valu + $byts.unpack(">B", (1)).0) }
+    $bit = (32768)
+    for $label in $REASONS {
+        if (($valu / $bit) % 2 = 1) { $retn.append($label) }
+        $bit = ($bit / 2)
+    }
+    return($retn)
+}
+
+function _distPoints(ctx, node) {
+    $retn = ([])
+    if ($node.tag != $T_SEQ or $node.cls != 0 or $node.cons != (true)) { $expect($node, $T_SEQ, "CRLDistributionPoints") }
+    for $dp in $kids($ctx, $node) {
+        $point = ({"full": ([]), "relative": (null), "reasons": (null), "issuer": ([])})
+        if ($dp.tag != $T_SEQ or $dp.cls != 0 or $dp.cons != (true)) { $expect($dp, $T_SEQ, "a DistributionPoint") }
+        for $part in $kids($ctx, $dp) {
+            if ($part.cls != 2) { $_fail(`Unexpected {$_what($part)} in DistributionPoint`) }
+            switch $part.tag {
+                "0": {
+                    $choice = $kids($ctx, $part)
+                    if ($lib.len($choice) != 1) { $_fail("Malformed distributionPoint") }
+                    $choice = $choice.0
+                    if ($choice.cls = 2 and $choice.tag = 0) {
+                        $point.full = $generalNames($ctx, $choice)
+                    } elif ($choice.cls = 2 and $choice.tag = 1) {
+                        // nameRelativeToCRLIssuer is an IMPLICIT RelativeDistinguishedName.
+                        $point.relative = $rdn($ctx, $choice).dn
+                    } else {
+                        $_fail(`Unexpected {$_what($choice)} in distributionPoint`)
+                    }
+                }
+                "1": { $point.reasons = $_reasons($ctx, $part) }
+                "2": { $point.issuer = $generalNames($ctx, $part) }
+                *: { $_fail(`Unexpected {$_what($part)} in DistributionPoint`) }
+            }
+        }
+        $retn.append($point)
+    }
+    return($retn)
+}
+
+function _access(ctx, node) {
+    $retn = ([])
+    if ($node.tag != $T_SEQ or $node.cls != 0 or $node.cons != (true)) { $expect($node, $T_SEQ, "an AccessDescription list") }
+    for $desc in $kids($ctx, $node) {
+        if ($desc.tag != $T_SEQ or $desc.cls != 0 or $desc.cons != (true)) { $expect($desc, $T_SEQ, "an AccessDescription") }
+        $parts = $kids($ctx, $desc)
+        if ($lib.len($parts) != 2) { $_fail("AccessDescription doesn't have 2 elements") }
+        if ($parts.0.tag != $T_OID or $parts.0.cls != 0 or $parts.0.cons != (false)) { $expect($parts.0, $T_OID, "an accessMethod") }
+        $method = $oid($ctx, $parts.0)
+        $retn.append(({"method": $method, "name": $oidName($method), "location": $generalName($ctx, $parts.1)}))
+    }
+    return($retn)
+}
+
+function _displayText(ctx, node) {
+    return($reqStr($ctx, $node, "a DisplayText"))
+}
+
+function _policies(ctx, node) {
+    $retn = ([])
+    if ($node.tag != $T_SEQ or $node.cls != 0 or $node.cons != (true)) { $expect($node, $T_SEQ, "CertificatePolicies") }
+    for $info in $kids($ctx, $node) {
+        if ($info.tag != $T_SEQ or $info.cls != 0 or $info.cons != (true)) { $expect($info, $T_SEQ, "a PolicyInformation") }
+        $parts = $kids($ctx, $info)
+        if ($lib.len($parts) < 1) { $_fail("Empty PolicyInformation") }
+        if ($parts.0.tag != $T_OID or $parts.0.cls != 0 or $parts.0.cons != (false)) { $expect($parts.0, $T_OID, "a policyIdentifier") }
+        $polid = $oid($ctx, $parts.0)
+        $policy = ({"oid": $polid, "name": $oidName($polid), "cps": ([]), "notices": ([])})
+        if ($lib.len($parts) > 1) {
+            if ($parts.1.tag != $T_SEQ or $parts.1.cls != 0 or $parts.1.cons != (true)) { $expect($parts.1, $T_SEQ, "policyQualifiers") }
+            for $qual in $kids($ctx, $parts.1) {
+                if ($qual.tag != $T_SEQ or $qual.cls != 0 or $qual.cons != (true)) { $expect($qual, $T_SEQ, "a PolicyQualifierInfo") }
+                $qparts = $kids($ctx, $qual)
+                if ($lib.len($qparts) != 2) { $_fail("PolicyQualifierInfo doesn't have 2 elements") }
+                if ($qparts.0.tag != $T_OID or $qparts.0.cls != 0 or $qparts.0.cons != (false)) { $expect($qparts.0, $T_OID, "a policyQualifierId") }
+                $qid = $oid($ctx, $qparts.0)
+                if ($qid = "1.3.6.1.5.5.7.2.1") {
+                    $policy.cps.append($reqStr($ctx, $qparts.1, "a CPS URI"))
+                } elif ($qid = "1.3.6.1.5.5.7.2.2") {
+                    $notice = ({"org": (null), "numbers": ([]), "text": (null)})
+                    if ($qparts.1.tag != $T_SEQ or $qparts.1.cls != 0 or $qparts.1.cons != (true)) { $expect($qparts.1, $T_SEQ, "a UserNotice") }
+                    for $npart in $kids($ctx, $qparts.1) {
+                        if ($npart.cls = 0 and $npart.tag = $T_SEQ) {
+                            $ref = $kids($ctx, $npart)
+                            if ($lib.len($ref) != 2) { $_fail("NoticeReference doesn't have 2 elements") }
+                            $notice.org = $_displayText($ctx, $ref.0)
+                            if ($ref.1.tag != $T_SEQ or $ref.1.cls != 0 or $ref.1.cons != (true)) { $expect($ref.1, $T_SEQ, "noticeNumbers") }
+                            for $num in $kids($ctx, $ref.1) {
+                                $notice.numbers.append($int($ctx, $expect($num, $T_INT, "a notice number")))
+                            }
+                        } else {
+                            $notice.text = $_displayText($ctx, $npart)
+                        }
+                    }
+                    $policy.notices.append($notice)
+                } else {
+                    $_warn($ctx, `Unknown policy qualifier {$qid}`)
+                }
+            }
+        }
+        $retn.append($policy)
+    }
+    return($retn)
+}
+
+function _subtrees(ctx, node) {
+    $retn = ([])
+    for $tree in $kids($ctx, $node) {
+        if ($tree.tag != $T_SEQ or $tree.cls != 0 or $tree.cons != (true)) { $expect($tree, $T_SEQ, "a GeneralSubtree") }
+        $parts = $kids($ctx, $tree)
+        if ($lib.len($parts) < 1) { $_fail("Empty GeneralSubtree") }
+        $item = ({"name": $generalName($ctx, $parts.0), "min": 0, "max": (null)})
+        for $part in $parts.slice(1) {
+            if ($part.cls = 2 and $part.tag = 0) { $item.min = $lib.hex.toint($_intHex($ctx, $part), signed=(true)) }
+            elif ($part.cls = 2 and $part.tag = 1) { $item.max = $lib.hex.toint($_intHex($ctx, $part), signed=(true)) }
+        }
+        if ($item.min != 0) { $_warn($ctx, "GeneralSubtree minimum isn't 0") }
+        if ($item.max != null) { $_warn($ctx, "GeneralSubtree has a maximum") }
+        $retn.append($item)
+    }
+    return($retn)
+}
+
+// Parse a SignedCertificateTimestampList (RFC 6962 3.3), a TLS encoded list inside an
+// OCTET STRING.
+function _scts(ctx, node) {
+    if ($node.tag != $T_OCTETS or $node.cls != 0 or $node.cons != (false)) { $expect($node, $T_OCTETS, "a SignedCertificateTimestampList") }
+    $byts = $ctx.byts.slice($node.off, $node.end)
+    $size = $lib.len($byts)
+    if ($size < 2) { $_fail("Truncated SignedCertificateTimestampList") }
+    $total = $byts.unpack(">H", 0).0
+    if (($total + 2) != $size) { $_fail("SignedCertificateTimestampList length doesn't match") }
+    $retn = ([])
+    $pos = (2)
+    while ($pos < $size) {
+        if (($pos + 2) > $size) { $_fail("Truncated SignedCertificateTimestamp") }
+        $slen = $byts.unpack(">H", $pos).0
+        $start = ($pos + 2)
+        $stop = ($start + $slen)
+        if ($stop > $size or $slen < 47) { $_fail("Truncated SignedCertificateTimestamp") }
+        $version = $byts.unpack(">B", $start).0
+        $logid = $lib.hex.encode($byts.slice(($start + 1), ($start + 33)))
+        $ts = $byts.unpack(">Q", ($start + 33)).0
+        $extlen = $byts.unpack(">H", ($start + 41)).0
+        $sigpos = ($start + 43 + $extlen)
+        if (($sigpos + 4) > $stop) { $_fail("Truncated SignedCertificateTimestamp") }
+        $exts = $lib.hex.encode($byts.slice(($start + 43), $sigpos))
+        ($hashalg, $sigalg, $siglen) = $byts.unpack(">BBH", $sigpos)
+        if (($sigpos + 4 + $siglen) != $stop) { $_fail("SignedCertificateTimestamp signature length doesn't match") }
+        $retn.append(({
+            "version": $version, "logid": $logid, "timestamp": $ts, "extensions": $exts,
+            "hashalg": $hashalg, "sigalg": $sigalg,
+            "signature": $lib.hex.encode($byts.slice(($sigpos + 4), $stop)),
+        }))
+        $pos = $stop
+    }
+    return($retn)
+}
+
+// Parse one extension's value into retn (the certificate dict). ctx/node are the
+// extension value's own DER.
+function _extension(ctx, node, extoid, retn, ext) {
+    switch $extoid {
+        "2.5.29.17": { $retn.sans = $generalNames($ctx, $expect($node, $T_SEQ, "GeneralNames")) }
+        "2.5.29.18": { $retn.ians = $generalNames($ctx, $expect($node, $T_SEQ, "GeneralNames")) }
+        "2.5.29.19": {
+            $retn.ca = (false)
+            $retn.pathlen = (null)
+            if ($node.tag != $T_SEQ or $node.cls != 0 or $node.cons != (true)) { $expect($node, $T_SEQ, "BasicConstraints") }
+            for $part in $kids($ctx, $node) {
+                if ($part.cls = 0 and $part.tag = $T_BOOL) {
+                    $retn.ca = $bool($ctx, $part)
+                    if (not $retn.ca) { $_warn($ctx, "basicConstraints cA is encoded as its DEFAULT FALSE") }
+                } else {
+                    if ($part.tag != $T_INT or $part.cls != 0 or $part.cons != (false)) { $expect($part, $T_INT, "a pathLenConstraint") }
+                    $retn.pathlen = $int($ctx, $part)
+                }
+            }
+            if ($retn.pathlen != null and not $retn.ca) {
+                $_warn($ctx, "basicConstraints has a pathLenConstraint without cA")
+            }
+        }
+        "2.5.29.15": {
+            $retn.keyusage = $_keyUsage($ctx, $node)
+            if (not $retn.keyusage) { $_warn($ctx, "keyUsage has no bits set") }
+        }
+        "2.5.29.37": {
+            $retn.extkeyusage = ([])
+            if ($node.tag != $T_SEQ or $node.cls != 0 or $node.cons != (true)) { $expect($node, $T_SEQ, "ExtKeyUsageSyntax") }
+            for $kid in $kids($ctx, $node) {
+                if ($kid.tag != $T_OID or $kid.cls != 0 or $kid.cons != (false)) { $expect($kid, $T_OID, "a KeyPurposeId") }
+                $ekuoid = $oid($ctx, $kid)
+                $retn.extkeyusage.append(({"oid": $ekuoid, "name": $oidName($ekuoid)}))
+            }
+        }
+        "2.5.29.14": {
+            if ($node.tag != $T_OCTETS or $node.cls != 0 or $node.cons) { $expect($node, $T_OCTETS, "a SubjectKeyIdentifier") }
+            $retn.ski = $lib.hex.encode($ctx.byts.slice($node.off, $node.end))
+        }
+        "2.5.29.35": {
+            if ($node.tag != $T_SEQ or $node.cls != 0 or $node.cons != (true)) { $expect($node, $T_SEQ, "AuthorityKeyIdentifier") }
+            for $part in $kids($ctx, $node) {
+                if ($part.cls = 2 and $part.tag = 0) { $retn.aki = $lib.hex.encode($ctx.byts.slice($part.off, $part.end)) }
+                elif ($part.cls = 2 and $part.tag = 1) { $retn.akiissuer = $generalNames($ctx, $part) }
+                elif ($part.cls = 2 and $part.tag = 2) { $retn.akiserial = $intHexMin($ctx, $part) }
+                else { $_fail(`Unexpected {$_what($part)} in AuthorityKeyIdentifier`) }
+            }
+        }
+        "2.5.29.31": {
+            $retn.crldps = $_distPoints($ctx, $node)
+            for $dp in $retn.crldps {
+                for $gname in $dp.full { if ($gname.0 = "uri") { $retn.crls.append($gname.1) } }
+            }
+        }
+        "2.5.29.46": { $retn.freshestcrl = $_distPoints($ctx, $node) }
+        "1.3.6.1.5.5.7.1.1": {
+            $retn.aia = $_access($ctx, $node)
+            for $desc in $retn.aia {
+                if ($desc.location.0 = "uri") {
+                    if ($desc.method = "1.3.6.1.5.5.7.48.1") { $retn.ocsp.append($desc.location.1) }
+                    elif ($desc.method = "1.3.6.1.5.5.7.48.2") { $retn.caissuers.append($desc.location.1) }
+                }
+            }
+        }
+        "1.3.6.1.5.5.7.1.11": { $retn.sia = $_access($ctx, $node) }
+        "2.5.29.32": {
+            $retn.policyinfo = $_policies($ctx, $node)
+            $retn.policies = ([])
+            for $pol in $retn.policyinfo { $retn.policies.append($pol.oid) }
+        }
+        "2.5.29.30": {
+            $retn.nameconstraints = ({"permitted": ([]), "excluded": ([])})
+            if ($node.tag != $T_SEQ or $node.cls != 0 or $node.cons != (true)) { $expect($node, $T_SEQ, "NameConstraints") }
+            for $part in $kids($ctx, $node) {
+                if ($part.cls = 2 and $part.tag = 0) { $retn.nameconstraints.permitted = $_subtrees($ctx, $part) }
+                elif ($part.cls = 2 and $part.tag = 1) { $retn.nameconstraints.excluded = $_subtrees($ctx, $part) }
+                else { $_fail(`Unexpected {$_what($part)} in NameConstraints`) }
+            }
+            if (not $ext.critical) { $_warn($ctx, "nameConstraints isn't critical") }
+        }
+        "2.5.29.36": {
+            $retn.policyconstraints = ({"requireexplicit": (null), "inhibitmapping": (null)})
+            if ($node.tag != $T_SEQ or $node.cls != 0 or $node.cons != (true)) { $expect($node, $T_SEQ, "PolicyConstraints") }
+            for $part in $kids($ctx, $node) {
+                $valu = $lib.hex.toint($_intHex($ctx, $part), signed=(true))
+                if ($part.cls = 2 and $part.tag = 0) { $retn.policyconstraints.requireexplicit = $valu }
+                elif ($part.cls = 2 and $part.tag = 1) { $retn.policyconstraints.inhibitmapping = $valu }
+            }
+        }
+        "2.5.29.33": {
+            $retn.policymappings = ([])
+            if ($node.tag != $T_SEQ or $node.cls != 0 or $node.cons != (true)) { $expect($node, $T_SEQ, "PolicyMappings") }
+            for $map in $kids($ctx, $node) {
+                if ($map.tag != $T_SEQ or $map.cls != 0 or $map.cons != (true)) { $expect($map, $T_SEQ, "a policy mapping") }
+                $pair = $kids($ctx, $map)
+                if ($lib.len($pair) != 2) { $_fail("Policy mapping doesn't have 2 elements") }
+                $retn.policymappings.append(($oid($ctx, $pair.0), $oid($ctx, $pair.1)))
+            }
+        }
+        "2.5.29.54": { $retn.inhibitanypolicy = $int($ctx, $expect($node, $T_INT, "an InhibitAnyPolicy")) }
+        "2.5.29.16": {
+            $retn.privatekeyusage = ({"notbefore": (null), "notafter": (null)})
+            if ($node.tag != $T_SEQ or $node.cls != 0 or $node.cons != (true)) { $expect($node, $T_SEQ, "PrivateKeyUsagePeriod") }
+            for $part in $kids($ctx, $node) {
+                // [0] and [1] are IMPLICIT GeneralizedTimes.
+                $gtime = ({"cls": 0, "cons": (false), "tag": $T_GENTIME, "start": $part.start, "off": $part.off, "end": $part.end})
+                if ($part.cls = 2 and $part.tag = 0) { $retn.privatekeyusage.notbefore = $time($ctx, $gtime) }
+                elif ($part.cls = 2 and $part.tag = 1) { $retn.privatekeyusage.notafter = $time($ctx, $gtime) }
+                else { $_fail(`Unexpected {$_what($part)} in PrivateKeyUsagePeriod`) }
+            }
+        }
+        "1.3.6.1.5.5.7.1.24": {
+            $retn.tlsfeatures = ([])
+            if ($node.tag != $T_SEQ or $node.cls != 0 or $node.cons != (true)) { $expect($node, $T_SEQ, "a TLS Feature") }
+            for $kid in $kids($ctx, $node) {
+                $retn.tlsfeatures.append($int($ctx, $expect($kid, $T_INT, "a TLS feature")))
+            }
+        }
+        "1.3.6.1.4.1.11129.2.4.2": { $retn.scts = $_scts($ctx, $node) }
+        "1.3.6.1.4.1.11129.2.4.3": {
+            if ($node.tag != $T_NULL or $node.cls != 0 or $node.cons != (false)) { $expect($node, $T_NULL, "a CT poison NULL") }
+            $retn.precert = (true)
+            if (not $ext.critical) { $_warn($ctx, "CT poison extension isn't critical") }
+        }
+        "1.3.6.1.5.5.7.48.1.5": { $expect($node, $T_NULL, "an OCSPNoCheck NULL") $retn.ocspnocheck = (true) }
+        *: { return((false)) }
+    }
+    return((true))
+}
+
+function extensions(ctx, node, retn) {
+    $seen = ({})
+    if ($node.tag != $T_SEQ or $node.cls != 0 or $node.cons != (true)) { $expect($node, $T_SEQ, "Extensions") }
+    for $extnode in $kids($ctx, $node) {
+        if ($extnode.tag != $T_SEQ or $extnode.cls != 0 or not $extnode.cons) { $expect($extnode, $T_SEQ, "an Extension") }
+        $parts = $kids($ctx, $extnode)
+        if ($lib.len($parts) < 2 or $lib.len($parts) > 3) { $_fail(`Extension at offset {$extnode.start} has {$lib.len($parts)} elements`) }
+        if ($parts.0.tag != $T_OID or $parts.0.cls != 0 or $parts.0.cons) { $expect($parts.0, $T_OID, "an extnID") }
+        $extoid = $OIDCACHE.($lib.hex.encode($ctx.byts.slice($parts.0.off, $parts.0.end)))
+        if (not $extoid) { $extoid = $oid($ctx, $parts.0) }
+        $critical = (false)
+        $valunode = $parts.1
+        if ($lib.len($parts) = 3) {
+            if ($parts.1.tag != $T_BOOL or $parts.1.cls != 0 or $parts.1.cons != (false)) { $expect($parts.1, $T_BOOL, "an Extension critical flag") }
+            $critical = $bool($ctx, $parts.1)
+            if (not $critical) { $_warn($ctx, `Extension {$extoid} encodes critical as its DEFAULT FALSE`) }
+            $valunode = $parts.2
+        }
+        if ($valunode.tag != $T_OCTETS or $valunode.cls != 0 or $valunode.cons) { $expect($valunode, $T_OCTETS, "an extnValue") }
+        $byts = $ctx.byts.slice($valunode.off, $valunode.end)
+        $ext = ({"oid": $extoid, "name": $oidName($extoid), "critical": $critical, "value": $lib.hex.encode($byts), "parsed": (false)})
+        $retn.extensions.append($ext)
+
+        if $seen.$extoid {
+            // RFC 5280 4.2: a certificate MUST NOT include more than one instance of an extension.
+            $_warn($ctx, `Duplicate extension {$extoid}, only the first is used`)
+            continue
+        }
+        $seen.$extoid = (true)
+
+        try {
+            ($subctx, $subnode) = $_sub($ctx, $byts)
+            $ext.parsed = $_extension($subctx, $subnode, $extoid, $retn, $ext)
+        } catch * as err {
+            $ext.error = $err.mesg
+            $_warn($ctx, `Unable to parse extension {$extoid}: {$err.mesg}`)
+        }
+
+        if ($critical and not $ext.parsed) {
+            $retn.unhandled.append($extoid)
+        }
+    }
+}
+
+// ---------------------------------------------------------------------------------------
+// Certificates
+// ---------------------------------------------------------------------------------------
+
+function _input(valu) {
+    if ($lib.vars.type($valu) = "bytes") { return($valu) }
+    if ($lib.vars.type($valu) != "str") { $_fail(`Expected bytes or a string, got {$lib.vars.type($valu)}`) }
+
+    $text = $valu.strip()
+    if ($text.find("-----BEGIN") != null) {
+        $m = $lib.regex.search('-----BEGIN (?:X509 |TRUSTED )?CERTIFICATE-----([A-Za-z0-9+/=\s]*)-----END (?:X509 |TRUSTED )?CERTIFICATE-----', $text)
+        if ($m = null) { $_fail("No PEM certificate block found") }
+        $text = $m.0
+    }
+    $text = $lib.regex.replace('\s+', "", $text)
+    try {
+        return($lib.base64.decode($text, urlsafe=(false)))
+    } catch * as err {
+        $_fail(`Invalid base64: {$err.mesg}`)
+    }
+}
+
+// Return the DER bytes of valu (DER bytes, a PEM string, or a base64 string).
+function load(valu) {
+    return($_input($valu))
+}
+
+// Whether DER bytes are a bare TBSCertificate (a CT precertificate entry) instead of a
+// Certificate. A Certificate's first element is the TBSCertificate SEQUENCE, a
+// TBSCertificate's is its [0] version or its serial INTEGER.
+function isTbs(byts) {
+    $ctx = ({"byts": $byts, "warnings": ([])})
+    try {
+        $top = $tlv($ctx, (0), $lib.len($byts))
+        if ($top.cls != 0 or $top.tag != $T_SEQ or $top.off >= $top.end) { return((false)) }
+        $first = $tlv($ctx, $top.off, $top.end)
+    } catch * as err {
+        return((false))
+    }
+    return((($first.cls = 2 and $first.tag = 0) or ($first.cls = 0 and $first.tag = $T_INT)))
+}
+
+function _tbs(ctx, node, retn) {
+    if ($node.tag != $T_SEQ or $node.cls != 0 or $node.cons != (true)) { $expect($node, $T_SEQ, "a TBSCertificate") }
+    $parts = $kids($ctx, $node)
+    $i = (0)
+
+    // version [0] EXPLICIT Version DEFAULT v1
+    $retn.version = (0)
+    if ($lib.len($parts) > 0 and ($parts.0.cls = 2 and $parts.0.tag = 0)) {
+        $inner = $kids($ctx, $parts.0)
+        if ($lib.len($inner) != 1) { $_fail("Malformed version") }
+        if ($inner.0.tag != $T_INT or $inner.0.cls != 0 or $inner.0.cons != (false)) { $expect($inner.0, $T_INT, "a Version") }
+        $retn.version = $int($ctx, $inner.0)
+        if ($retn.version = 0) { $_warn($ctx, "version is encoded as its DEFAULT v1") }
+        if ($retn.version < 0 or $retn.version > 2) { $_warn($ctx, `Unknown certificate version {$retn.version}`) }
+        $i = (1)
+    }
+
+    if ($lib.len($parts) < ($i + 6)) { $_fail("TBSCertificate is missing required fields") }
+
+    if ($parts.($i).tag != $T_INT or $parts.($i).cls != 0 or $parts.($i).cons != (false)) { $expect($parts.($i), $T_INT, "a serialNumber") }
+    $retn.serial = $intHexMin($ctx, $parts.($i))
+    if ($lib.hex.toint($_intHex($ctx, $parts.($i)).slice(0, 2)) >= 128) {
+        $_warn($ctx, "Negative serial number")
+    }
+    if ($lib.len($retn.serial) > 40) { $_warn($ctx, "Serial number longer than 20 octets") }
+
+    $sigalgnode = $parts.($i + 1)
+    $retn.sigalgo = $sigAlgo($ctx, $sigalgnode)
+    $retn.issuer = $name($ctx, $parts.($i + 2))
+
+    if ($parts.($i + 3).tag != $T_SEQ or $parts.($i + 3).cls != 0 or $parts.($i + 3).cons != (true)) { $expect($parts.($i + 3), $T_SEQ, "a Validity") }
+    $validity = $kids($ctx, $parts.($i + 3))
+    if ($lib.len($validity) != 2) { $_fail("Validity doesn't have 2 elements") }
+    $retn.notbefore = $time($ctx, $validity.0, validity=(true))
+    $retn.notafter = $time($ctx, $validity.1, validity=(true))
+    if ($retn.notbefore > $retn.notafter) { $_warn($ctx, "notBefore is after notAfter") }
+
+    $retn.subject = $name($ctx, $parts.($i + 4))
+    $retn.pubkey = $publicKey($ctx, $parts.($i + 5))
+
+    for $part in $parts.slice(($i + 6)) {
+        if ($part.cls = 2 and $part.tag = 1) {
+            $retn.issueruid = $lib.hex.encode($bits($ctx, $part).byts)
+            if ($retn.version < 1) { $_warn($ctx, "issuerUniqueID in a v1 certificate") }
+        } elif ($part.cls = 2 and $part.tag = 2) {
+            $retn.subjectuid = $lib.hex.encode($bits($ctx, $part).byts)
+            if ($retn.version < 1) { $_warn($ctx, "subjectUniqueID in a v1 certificate") }
+        } elif ($part.cls = 2 and $part.tag = 3) {
+            if ($retn.version != 2) { $_warn($ctx, "Extensions in a certificate that isn't v3") }
+            $inner = $kids($ctx, $part)
+            if ($lib.len($inner) != 1) { $_fail("Malformed extensions") }
+            if ($kids($ctx, $inner.0).size() = 0) { $_warn($ctx, "Empty extensions") }
+            $extensions($ctx, $inner.0, $retn)
+        } else {
+            $_fail(`Unexpected {$_what($part)} in TBSCertificate`)
+        }
+    }
+    return($sigalgnode)
+}
+
+function _new(byts) {
+    return(({
+        "sha256": (null), "sha1": (null), "md5": (null), "size": (null), "tbs": (null),
+        "version": (null), "serial": (null), "subject": (null), "issuer": (null),
+        "notbefore": (null), "notafter": (null), "sigalgo": (null), "signature": (null),
+        "pubkey": (null), "selfsigned": (false),
+        "sans": ([]), "ca": (null), "pathlen": (null), "keyusage": ([]), "extkeyusage": ([]),
+        "ski": (null), "aki": (null), "crls": ([]), "ocsp": ([]), "caissuers": ([]),
+        "policies": ([]), "precert": (false),
+        "extensions": ([]), "unhandled": ([]), "warnings": ([]),
+    }))
+}
+
+// Parse a certificate (or a bare TBSCertificate, see isTbs).
+//
+// valu is DER bytes, a PEM string, or a base64 string. Returns a dict with:
+//   sha256, sha1, md5, size  The certificate's fingerprints and DER size (null for a TBSCertificate).
+//   tbs                      A TBSCertificate's SHA-256 (null for a certificate).
+//   version                  The raw version (0 is v1, 2 is v3).
+//   serial                   Minimal two's complement hex (positive serials have no leading 00).
+//   subject, issuer          {"dn": <RFC 4514>, "attrs": {<key>: [<values>]}, "rdns", "der"}.
+//   notbefore, notafter      Epoch millis.
+//   sigalgo                  {"oid", "name", "hash", "pss"?, "params"?}.
+//   signature                Hex (null for a TBSCertificate).
+//   pubkey                   {"algo", "size", "oid", "spki", "sha256", "sha1", "key", "rsa"?,
+//                            "curve"?, "point"?, "pss"?, "params"?}.
+//   selfsigned               The subject and issuer match, and the AKI (if any) is the SKI.
+//   sans, ca, pathlen, keyusage, extkeyusage, ski, aki, crls, ocsp, caissuers, policies,
+//   precert                  The commonly used extension values.
+//   ians, akiissuer, akiserial, crldps, freshestcrl, aia, sia, policyinfo, nameconstraints,
+//   policyconstraints, policymappings, inhibitanypolicy, privatekeyusage, tlsfeatures, scts,
+//   ocspnocheck, issueruid, subjectuid
+//                            Set when present.
+//   extensions               Every extension: {"oid", "name", "critical", "value", "parsed", "error"?}.
+//   unhandled                OIDs of critical extensions this parser doesn't understand.
+//   warnings                 Deviations from DER and RFC 5280 that didn't stop parsing.
+function parse(valu) {
+    $byts = $_input($valu)
+    $size = $lib.len($byts)
+    if ($size = 0) { $_fail("No certificate bytes") }
+
+    $retn = $_new($byts)
+    $ctx = ({"byts": $byts, "warnings": $retn.warnings})
+
+    $top = $expect($tlv($ctx, (0), $size), $T_SEQ, "a Certificate")
+    if ($top.end != $size) { $_warn($ctx, `{($size - $top.end)} bytes of trailing data after the certificate`) }
+
+    if $isTbs($byts) {
+        $_tbs($ctx, $top, $retn)
+        $retn.tbs = $lib.crypto.hashes.sha256($ctx.byts.slice($top.start, $top.end))
+    } else {
+        $parts = $kids($ctx, $top)
+        if ($lib.len($parts) != 3) { $_fail(`Certificate has {$lib.len($parts)} elements, not 3`) }
+        $tbsalgo = $_tbs($ctx, $parts.0, $retn)
+        $outer = $sigAlgo($ctx, $parts.1)
+        if ($ctx.byts.slice($parts.1.start, $parts.1.end) != $ctx.byts.slice($tbsalgo.start, $tbsalgo.end)) {
+            // RFC 5280 4.1.1.2: signatureAlgorithm MUST match the TBSCertificate's signature.
+            $_warn($ctx, "signatureAlgorithm doesn't match the TBSCertificate's signature field")
+        }
+        if ($parts.2.tag != $T_BITS or $parts.2.cls != 0 or $parts.2.cons != (false)) { $expect($parts.2, $T_BITS, "a signatureValue") }
+        $sig = $bits($ctx, $parts.2)
+        if ($sig.unused != 0) { $_warn($ctx, "signatureValue has unused bits") }
+        $retn.signature = $lib.hex.encode($sig.byts)
+
+        $der = $ctx.byts.slice($top.start, $top.end)
+        $retn.sha256 = $lib.crypto.hashes.sha256($der)
+        $retn.sha1 = $lib.crypto.hashes.sha1($der)
+        $retn.md5 = $lib.crypto.hashes.md5($der)
+        $retn.size = $lib.len($der)
+    }
+
+    $retn.selfsigned = ($retn.subject.dn = $retn.issuer.dn and ($retn.aki = null or $retn.aki = $retn.ski))
+    return($retn)
+}
+
+function _fqdn(valu) {
+    $valu = $valu.strip().lower().rstrip(".")
+    if ($valu.startswith("*.")) { $valu = $valu.slice(2) }
+    if ($valu and $valu.find(".") != null and $valu.find(" ") = null and $valu.find("*") = null) {
+        return($valu)
+    }
+    return()
+}
+
+// Returns (4, <ipv4>), (6, <ipv6>), or (null, null).
+function _ipAddr(valu) {
+    if ($valu.find(":") = null) {
+        ($ok, $norm) = $lib.trycast(inet:ipv4, $valu)
+        if $ok { return(((4), $lib.repr(inet:ipv4, $norm))) }
+    } else {
+        ($ok, $norm) = $lib.trycast(inet:ipv6, $valu)
+        if $ok { return(((6), $norm)) }
+    }
+    return(((null), (null)))
+}
+
+// Split SANs and the subject CNs into the crypto:x509:cert:identities:* props:
+// {"fqdns", "emails", "ipv4s", "ipv6s", "urls"}, each sorted and de-duplicated.
+// Wildcards (*.example.com) aren't valid inet:fqdn values, the base domain is used.
+function identities(sans, cns) {
+    $sets = ({"fqdns": ({}), "emails": ({}), "ipv4s": ({}), "ipv6s": ({}), "urls": ({})})
+
+    for ($kind, $valu) in $sans {
+        switch $kind {
+            dns: {
+                $fqdn = $_fqdn($valu)
+                if $fqdn { $sets.fqdns.$fqdn = (true) }
+            }
+            email: { $email = $valu.lower() $sets.emails.$email = (true) }
+            ip: {
+                ($ver, $addr) = $_ipAddr($valu)
+                if ($ver = 4) { $sets.ipv4s.$addr = (true) }
+                elif ($ver = 6) { $sets.ipv6s.$addr = (true) }
+            }
+            uri: { $sets.urls.$valu = (true) }
+            *: {}
+        }
+    }
+
+    for $valu in $cns {
+        if ($valu.find("@") != null) {
+            $email = $valu.lower()
+            $sets.emails.$email = (true)
+            continue
+        }
+        ($ver, $addr) = $_ipAddr($valu)
+        if ($ver = 4) { $sets.ipv4s.$addr = (true) }
+        elif ($ver = 6) { $sets.ipv6s.$addr = (true) }
+        else {
+            $fqdn = $_fqdn($valu)
+            if $fqdn { $sets.fqdns.$fqdn = (true) }
+        }
+    }
+
+    $retn = ({})
+    for ($key, $valus) in $sets {
+        $list = ([])
+        for ($valu, $_) in $valus { $list.append($valu) }
+        $list.sort()
+        $retn.$key = $list
+    }
+    return($retn)
+}

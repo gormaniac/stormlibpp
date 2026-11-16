@@ -1,3 +1,4 @@
+# TODO - Support JSON Lines files.
 """
 Recursively execute all Storm scripts in a folder (or folders) on a Synapse Cortex.
 
@@ -23,7 +24,7 @@ data file.
 
 For JSON data files, a "row" is a tuple with an identifier and the top-level
 object within the JSON object. If the JSON file defines a list, each item in the list
-is a the top-level object in the row. If the JSON file defines a standard object, each
+is the top-level object in the row. If the JSON file defines a standard object, each
 key of the JSON object is passed as the identifier, and the object the key references
 is the top-level object. See ``utils.json_genr`` for implementation details. For CSV
 and TXT files, each line is a "row" in the ``$rows`` variable. A JSON lines file should
@@ -96,7 +97,7 @@ csvtool but with more file types supported.
 If no data is given for a Storm script, it is executed as is.
 
 See the stormlibpp.import docs for feature specifics:
-https://gormo.co/docs/stormlibpp/stormlibpp.html#module-stormlibpp.import
+https://docs.gormo.co/stormlibpp/stormlibpp/#module-stormlibpp.import
 """
 
 
@@ -257,6 +258,7 @@ class Importer:
                 for rows in s_common.chunks(self.genrs[self.file_type](fd), 1000):
                     yield rows
 
+    # TODO - Name this something better... that conveys it does the import. 
     async def add_data(self):
         nodecount = 0
 
@@ -459,7 +461,8 @@ async def import_data(
             else:
                 if storm_script.endswith(".storml"):
                     # NOTE - This will wind up opening and closing the file twice.
-                    # Do we want that? Maybe we don't care because we won't get here much?
+                    # Do we want that? Maybe we do because we won't get here much?
+                    # Can always move this to the top of the for loop so they just run.
                     await import_storml_file(
                         core, storm_script, stormopts, print_skips, logfd=logfd
                     )

@@ -27,7 +27,7 @@ PKG_DEF = (
     {
         "name": "test.storm.svc",
         "version": (0, 0, 1),
-        "synapse_minversion": [2, 135, 0],
+        "synapse_version": ">=2.162.0,<3.0.0",
         "commands": (
             {
                 'name': f'test.storm.svc.cmd',

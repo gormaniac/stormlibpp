@@ -1,3 +1,7 @@
 include CHANGELOG.md
 include doc/stormgen_design.md
 include tests/data/stormgen-example.md
+recursive-include src/stormlibpp/*/storm/ *.storm README.md
+include scripts/build_stix_conf.py
+include data/stix_import_conf.json
+recursive-include tests/data *.json *.storm *.txt

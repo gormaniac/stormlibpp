@@ -17,6 +17,7 @@ StormLib\+\+ API Docs
    stormlibpp.import
    stormlibpp.node
    stormlibpp.output
+   stormlibpp.stix
    stormlibpp.stormcli
    stormlibpp.stormpkg
    stormlibpp.telepath

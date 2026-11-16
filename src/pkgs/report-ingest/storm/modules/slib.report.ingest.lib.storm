@@ -2,7 +2,7 @@ function doReportRequest(url) {
     $resp = $lib.inet.http.get($url)
     if ($resp.code != 200) {
         $lib.warn(`Error requesting the report URL "{$url}"\nHTTP Status Code: {$resp.code}`)
-        $lib.debug(`HTTP Error: {$resp.err}`)
+        if $lib.debug { $lib.print(`HTTP Error: {$resp.err}`) }
         $lib.raise(Error, "Could not get the report URL!")
     } else {
         return($resp.body)

@@ -12,7 +12,7 @@
 """Methods related to using the synapse.tools.storm Storm CLI."""
 
 
-import synapse.tools.storm as s_storm
+import synapse.tools.storm._cli as s_storm
 
 
 async def start_storm_cli(core, outp, opts, onecmd=[]):

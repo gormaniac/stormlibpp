@@ -107,10 +107,8 @@ class IpInfoTest(s_test.StormPkgTest):
             assert node[0][0] == 'inet:ipv4'
             assert node[1]['props']['asn'] == 15169
 
+            # An empty AS name makes no owner org.
             asnNode = await core.getNodeByNdef(('inet:asn', '15169'))
             assert asnNode is not None
-            assert isinstance(asnNode.props['owner'], str)
-
-            orgNode = await core.getNodeByNdef(('ou:org', asnNode.props['owner']))
-            assert orgNode is not None
-            assert orgNode.props.get('name') == ""
+            assert asnNode.props.get('owner') is None
+            assert len(await core.nodes('ou:org')) == 0

@@ -1,0 +1,86 @@
+/*
+Encryption: Stix "artifact" objects may set is_encrypted/
+encryption_algorithm/decryption_key. Actually decrypting arbitrary payloads
+would require a Storm Service. Per the Stix 2.1 spec, the "hashes" property
+of an encrypted artifact covers the *encrypted* bytes, so hashing/storing
+$bin as-is below is spec-correct even when is_encrypted is set - we just
+warn so this isn't mistaken for a decrypted payload.
+*/
+function get_file(url) {
+    $resp = $lib.inet.http.get($url)
+    if ($resp.code != 200) {
+        $lib.warn(`Error requesting the STIX import config from "{$url}"\nHTTP Status Code: {$resp.code}\nErr: {$resp.err}`)
+        return($lib.null)
+    } else {
+        return($resp.body)
+    }
+}
+
+function validate_file_hash(hashes, byts) {
+    $checked = $lib.false
+    for ($algo, $hash) in $hashes {
+        switch $algo {
+            "MD5": { $actual = $lib.crypto.hashes.md5($byts) }
+            "SHA-1": { $actual = $lib.crypto.hashes.sha1($byts) }
+            "SHA-256": { $actual = $lib.crypto.hashes.sha256($byts) }
+            "SHA-512": { $actual = $lib.crypto.hashes.sha512($byts) }
+            *: { continue }
+        }
+        $checked = $lib.true
+        if ($hash.lower() != $actual) {
+            return($lib.false)
+        }
+    }
+    return($checked)
+}
+
+function axon_available() {
+    $data = $lib.axon.metrics()
+    if $data {
+        return($lib.true)
+    }
+    return($lib.false)
+}
+
+if ($object.payload_bin != $lib.null) {
+    $bin = $lib.base64.decode($object.payload_bin)
+    if $object.is_encrypted {
+        $lib.warn(`Stix artifact {$object.id} is encrypted ({$object.encryption_algorithm}) - the stored/hashed bytes are ciphertext, not the decrypted payload.`)
+    }
+} else {
+    $bin = $get_file($object.url)
+    if ($bin = $lib.null) { return() }
+}
+if $object.hashes {
+    if (not $validate_file_hash($object.hashes, $bin)) {
+        $lib.warn(`STIX artifact {$object.id} failed hash verification.`)
+        return()
+    }
+}
+
+$sha256 = $lib.crypto.hashes.sha256($bin)
+$size = $lib.null
+if $axon_available() {
+    try {
+        ($size, $axonsha256) = $lib.axon.put($bin)
+    } catch * as err {
+        $lib.warn(`Unable to upload {$sha256} to the Axon.`)
+    }
+}
+
+file:bytes:sha256=$sha256
+[ <(refs)+ { it:sec:stix:bundle:id=$bundle.id } ]
+$node.data.set(`stix:object:bundle:{$bundle.id}`, $object)
+return($node)
+
+[
+    file:bytes=`sha256:{$sha256}`
+    :size?=$size
+    :md5?=$lib.crypto.hashes.md5($bin)
+    :sha1?=$lib.crypto.hashes.sha1($bin)
+    :sha256?=$lib.crypto.hashes.sha256($bin)
+    :sha512?=$lib.crypto.hashes.sha512($bin)
+]
+[ <(refs)+ { it:sec:stix:bundle:id=$bundle.id } ]
+$node.data.set(`stix:object:bundle:{$bundle.id}`, $object)
+return($node)

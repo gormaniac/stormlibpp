@@ -1,0 +1,172 @@
+{
+  "addbundle": true,
+  "bundle": {
+    "storm": "it:sec:stix:bundle:id=$bundle.id\n$node.data.set(stix:bundle, $bundle)\nreturn($node)\n[ it:sec:stix:bundle=({\"id\": $bundle.id})]\n$node.data.set(stix:bundle, $bundle)\nreturn($node)"
+  },
+  "objects": {
+    "artifact": {
+      "storm": "/*\nEncryption: Stix \"artifact\" objects may set is_encrypted/\nencryption_algorithm/decryption_key. Actually decrypting arbitrary payloads\nwould require a Storm Service. Per the Stix 2.1 spec, the \"hashes\" property\nof an encrypted artifact covers the *encrypted* bytes, so hashing/storing\n$bin as-is below is spec-correct even when is_encrypted is set - we just\nwarn so this isn't mistaken for a decrypted payload.\n*/\nfunction get_file(url) {\n    $resp = $lib.inet.http.get($url)\n    if ($resp.code != 200) {\n        $lib.warn(`Error requesting the STIX import config from \"{$url}\"\\nHTTP Status Code: {$resp.code}\\nErr: {$resp.err}`)\n        return($lib.null)\n    } else {\n        return($resp.body)\n    }\n}\n\nfunction validate_file_hash(hashes, byts) {\n    $checked = $lib.false\n    for ($algo, $hash) in $hashes {\n        switch $algo {\n            \"MD5\": { $actual = $lib.crypto.hashes.md5($byts) }\n            \"SHA-1\": { $actual = $lib.crypto.hashes.sha1($byts) }\n            \"SHA-256\": { $actual = $lib.crypto.hashes.sha256($byts) }\n            \"SHA-512\": { $actual = $lib.crypto.hashes.sha512($byts) }\n            *: { continue }\n        }\n        $checked = $lib.true\n        if ($hash.lower() != $actual) {\n            return($lib.false)\n        }\n    }\n    return($checked)\n}\n\nfunction axon_available() {\n    $data = $lib.axon.metrics()\n    if $data {\n        return($lib.true)\n    }\n    return($lib.false)\n}\n\nif ($object.payload_bin != $lib.null) {\n    $bin = $lib.base64.decode($object.payload_bin)\n    if $object.is_encrypted {\n        $lib.warn(`Stix artifact {$object.id} is encrypted ({$object.encryption_algorithm}) - the stored/hashed bytes are ciphertext, not the decrypted payload.`)\n    }\n} else {\n    $bin = $get_file($object.url)\n    if ($bin = $lib.null) { return() }\n}\nif $object.hashes {\n    if (not $validate_file_hash($object.hashes, $bin)) {\n        $lib.warn(`STIX artifact {$object.id} failed hash verification.`)\n        return()\n    }\n}\n\n$sha256 = $lib.crypto.hashes.sha256($bin)\n$size = $lib.null\nif $axon_available() {\n    try {\n        ($size, $axonsha256) = $lib.axon.put($bin)\n    } catch * as err {\n        $lib.warn(`Unable to upload {$sha256} to the Axon.`)\n    }\n}\n\nfile:bytes:sha256=$sha256\n[ <(refs)+ { it:sec:stix:bundle:id=$bundle.id } ]\n$node.data.set(`stix:object:bundle:{$bundle.id}`, $object)\nreturn($node)\n\n[\n    file:bytes=`sha256:{$sha256}`\n    :size?=$size\n    :md5?=$lib.crypto.hashes.md5($bin)\n    :sha1?=$lib.crypto.hashes.sha1($bin)\n    :sha256?=$lib.crypto.hashes.sha256($bin)\n    :sha512?=$lib.crypto.hashes.sha512($bin)\n]\n[ <(refs)+ { it:sec:stix:bundle:id=$bundle.id } ]\n$node.data.set(`stix:object:bundle:{$bundle.id}`, $object)\nreturn($node)\n"
+    },
+    "attack-pattern": {
+      "storm": "/*\nExample Stix 2.1 \"attack-pattern\" object:\n{\n    \"type\": \"attack-pattern\",\n    \"spec_version\": \"2.1\",\n    \"id\": \"attack-pattern--0c7b5b88-8ff7-4a4d-aa9d-feb398cd0061\",\n    \"created\": \"2016-05-12T08:17:27.000Z\",\n    \"modified\": \"2016-05-12T08:17:27.000Z\",\n    \"name\": \"Spear Phishing\",\n    \"description\": \"This type of attack targets specific individuals instead of a wide group of people. Attackers most often gather information about the target beforehand.\",\n    \"kill_chain_phases\": [\n        { \"kill_chain_name\": \"mitre-attack\", \"phase_name\": \"initial-access\" }\n    ],\n    \"external_references\": [\n        { \"source_name\": \"mitre-attack\", \"external_id\": \"T1566\" }\n    ]\n}\n*/\n\n// TODO - If external_references is a MITRE attack reference, we should try lifting and using that node first.\n// TODO - Do we want to save Kill Chain anywhere?\n[ ou:technique=(stix, attack-pattern, $object.id)\n    :name?=$object.name\n    :desc?=$object.description\n]\n[ <(refs)+ { it:sec:stix:bundle:id=$bundle.id } ]\n$node.data.set(`stix:object:bundle:{$bundle.id}`, $object)\nreturn($node)"
+    },
+    "autonomous-system": {
+      "storm": "[\n    inet:asn=$object.number\n    :name?=$object.name\n]\n[ <(refs)+ { it:sec:stix:bundle:id=$bundle.id } ]\n$node.data.set(`stix:object:bundle:{$bundle.id}`, $object)\nreturn($node)"
+    },
+    "campaign": {
+      "storm": "[ ou:campaign=(stix, campaign, $object.id)\n    :name?=$object.name\n    :desc?=$object.description\n    .seen?=$object.last_seen\n    .seen?=$object.first_seen\n]\n[ <(refs)+ { it:sec:stix:bundle:id=$bundle.id } ]\n$node.data.set(`stix:object:bundle:{$bundle.id}`, $object)\nreturn($node)"
+    },
+    "course-of-action": {
+      "storm": "[ risk:mitigation=(stix, course-of-action, $object.id)\n    :name?=$object.name\n    :desc?=$object.description\n]\n[ <(refs)+ { it:sec:stix:bundle:id=$bundle.id } ]\n$node.data.set(`stix:object:bundle:{$bundle.id}`, $object)\nreturn($node)"
+    },
+    "directory": {
+      "storm": "[ it:fs:file=(stix, directory, $object.id)\n    :path=$object.path\n    :ctime?=$object.ctime\n    :mtime?=$object.mtime\n    :atime?=$object.atime\n]\n[ <(refs)+ { it:sec:stix:bundle:id=$bundle.id } ]\n$node.data.set(`stix:object:bundle:{$bundle.id}`, $object)\nreturn($node)"
+    },
+    "domain-name": {
+      "storm": "function id_from_bundle(bun, obj_id) {\n    for $obj in $bun.objects {\n        if ($obj.id = $obj_id) {\n            return ($obj)\n        }\n    }\n}\n\nfunction find_resolves(refs) {\n    for $ref in $refs {\n        $resolves_obj = $id_from_bundle($bundle, $ref)\n        switch $resolves_obj.type {\n            ipv4-addr: { [ inet:dns:a=($object.value, $resolves_obj.value) ] }\n            ipv6-addr: { [ inet:dns:aaaa=($object.value, $resolves_obj.value) ] }\n            domain-name: { [ inet:dns:cname=($object.value, $resolves_obj.value) ] }\n        }\n        [ <(refs)+ { it:sec:stix:bundle:id=$bundle.id } ]\n        | spin\n    }\n    fini { return() }\n}\n\n[inet:fqdn=$object.value]\n\nif $object.resolves_to_refs {\n    { $find_resolves($object.resolves_to_refs) }\n}\n\n[ <(refs)+ { it:sec:stix:bundle:id=$bundle.id } ]\n$node.data.set(`stix:object:bundle:{$bundle.id}`, $object)\nreturn($node)"
+    },
+    "email-addr": {
+      "storm": "function addUser(n) {\n    [ inet:user?=$object.display_name ]\n    [ <(refs)+ {yield $n} ]\n    return()\n}\n\n[inet:email=$object.value]\n\nif $object.display_name {\n    $addUser($node)\n}\n\n[ <(refs)+ { it:sec:stix:bundle:id=$bundle.id } ]\n$node.data.set(`stix:object:bundle:{$bundle.id}`, $object)\nreturn($node)"
+    },
+    "email-message": {
+      "storm": "/*\nExample Stix 2.1 \"email-message\" object:\n{\n    \"type\": \"email-message\",\n    \"spec_version\": \"2.1\",\n    \"id\": \"email-message--0c57a304-cf87-4d60-b7c8-a68f927b9e8b\",\n    \"is_multipart\": false,\n    \"date\": \"2004-04-19T12:22:23.000Z\",\n    \"from_ref\": \"email-addr--9a1f0a6e-de26-5578-93b1-3d4e6d8c1234\",\n    \"to_refs\": [\"email-addr--d1b3fdb1-6b21-5da2-9dcf-89ecc98cca1f\"],\n    \"subject\": \"Did you see this?\",\n    \"body\": \"Check out this attachment, I think it is a picture of the aliens!\"\n}\n\nMapped to inet:email:message. NOTE: from_ref/to_refs/cc_refs/bcc_refs point\nat other Stix objects (email-addr). Per-object storm callbacks only receive\n$object + $bundle and have no access to nodes already built for other Stix\nobjects (no nodesbyid), so those refs are intentionally left unresolved here\n- same limitation documented in file.storm for parent_directory_ref.\n\nTODO - Do we want our stix tol to post-process nodes like this to resolve internal object references?\n*/\n[ inet:email:message=(stix, email-message, $object.id)\n    :subject?=$object.subject\n    :date?=$object.date\n    :body?=$object.body\n]\n[ <(refs)+ { it:sec:stix:bundle:id=$bundle.id } ]\n$node.data.set(`stix:object:bundle:{$bundle.id}`, $object)\nreturn($node)"
+    },
+    "file": {
+      "storm": "    ($ok, $hash) = $lib.trycast(hash:sha256, $object.hashes.\"SHA-256\")\n    if $ok {\n        $guid = `sha256:{$hash}`\n    } else {\n        $guid = `guid:{$lib.guid(stix, file, $object.id)}`\n    }\n    [\n        file:bytes=$guid\n        :size?=$object.size\n        :name?=$object.name\n        :mime?=$object.mime_type\n        :md5?=$object.hashes.\"MD5\"\n        :sha1?=$object.hashes.\"SHA-1\"\n        :sha256?=$object.hashes.\"SHA-256\"\n        :sha512?=$object.hashes.\"SHA-512\"\n    ]\n\n    // TODO - Somehow check if a file-parser is installed and use those model extensions to save more about the file?\n\n    { for $directory in $bundle.objects {\n        if ($directory.id = $object.parent_directory_ref and $directory.type = \"directory\" and $object.name != $lib.null) {\n            [ file:filepath=($guid, `{$directory.path}/{$object.name}`) ]\n            [ <(refs)+ { it:sec:stix:bundle:id=$bundle.id } ]\n        }\n    } }\n    // TODO - Do something with windows-pebinary-ext extension\n    [ <(refs)+ { it:sec:stix:bundle:id=$bundle.id } ]\n    $node.data.set(`stix:object:bundle:{$bundle.id}`, $object)\n    return($node)"
+    },
+    "grouping": {
+      "storm": "/*\nExample Stix 2.1 \"grouping\" object:\n{\n    \"type\": \"grouping\",\n    \"spec_version\": \"2.1\",\n    \"id\": \"grouping--84e4d88f-44ea-4bcd-bbf3-b2c1c320bcb3\",\n    \"created\": \"2020-01-16T20:28:23.000Z\",\n    \"modified\": \"2020-01-16T20:28:23.000Z\",\n    \"name\": \"Malware Campaign Grouping\",\n    \"description\": \"A grouping of objects related to a single malware campaign.\",\n    \"context\": \"malware-analysis\",\n    \"object_refs\": [\n        \"malware--16d2358f-a3e1-4fca-b839-e33566a069b5\",\n        \"indicator--c410e480-e42b-47d1-9476-85307c12bcda\"\n    ]\n}\n\nMapped to meta:note, matching the existing note.storm/opinion.storm pattern\nfor generic container/narrative Stix objects. object_refs do NOT need manual\nhandling - the Stix ingest engine (LibStixImport.ingest) automatically adds\n\"refs\" edges for the literal \"object_refs\" field after all objects are built.\n*/\n[ meta:note=(stix, grouping, $object.id)\n    :type=`stix.grouping.{$object.context}`\n    :text?=$object.description\n    :created?=$object.created\n    :updated?=$object.modified\n]\n[ <(refs)+ { it:sec:stix:bundle:id=$bundle.id } ]\n$node.data.set(`stix:object:bundle:{$bundle.id}`, $object)\nreturn($node)"
+    },
+    "identity": {
+      "storm": "switch $object.identity_class {\n    group: {[ ps:contact=(stix, identity, $object.id) :orgname?=$object.name ]}\n    organization: {[ ps:contact=(stix, identity, $object.id) :orgname?=$object.name ]}\n    individual: {[ ps:contact=(stix, identity, $object.id) :name?=$object.name ]}\n    system: {[ it:host=(stix, identity, $object.id) :name?=$object.name ]}\n    *: {[ ps:contact=(stix, identity, $object.id) :name?=$object.name ]}\n}\n[ <(refs)+ { it:sec:stix:bundle:id=$bundle.id } ]\n$node.data.set(`stix:object:bundle:{$bundle.id}`, $object)\nreturn($node)"
+    },
+    "incident": {
+      "storm": "/*\nExample Stix 2.1 \"incident\" object (core Incident SDO is intentionally\nminimal in Stix 2.1 - richer detail is added via the Incident Core Extension):\n{\n    \"type\": \"incident\",\n    \"spec_version\": \"2.1\",\n    \"id\": \"incident--f6cec2e5-4e9d-49b1-b7b8-9ba38c5f6a54\",\n    \"created\": \"2023-06-01T12:00:00.000Z\",\n    \"modified\": \"2023-06-01T12:00:00.000Z\",\n    \"name\": \"Ransomware Compromise of Acme Corp\",\n    \"description\": \"Acme Corp was compromised via a phishing email that led to a ransomware deployment.\"\n}\n\nMapped to risk:compromise with its name and description. Incident extension\nfields are preserved in node data.\n*/\n[ risk:compromise=(stix, incident, $object.id)\n    :name?=$object.name\n    :desc?=$object.description\n]\n[ <(refs)+ { it:sec:stix:bundle:id=$bundle.id } ]\n$node.data.set(`stix:object:bundle:{$bundle.id}`, $object)\nreturn($node)"
+    },
+    "indicator": {
+      "storm": "// TODO - Need to save the \"description\" as a meta:note.\n$guid = $lib.guid(stix, indicator, $object.id)\nswitch $object.pattern_type {\n\n    yara: {[ it:app:yara:rule=$guid\n                :name?=$object.name\n                :text?=$object.pattern\n    ]}\n\n    snort: {[ it:app:snort:rule=$guid\n                :name?=$object.name\n                :text?=$object.pattern\n    ]}\n\n    *: {[ it:sec:stix:indicator=$guid\n            :name?=$object.name\n            :pattern?=$object.pattern\n            :created?=$object.created\n            :updated?=$object.modified]\n       | scrape --refs :pattern\n       }\n}\n[ <(refs)+ { it:sec:stix:bundle:id=$bundle.id } ]\n$node.data.set(`stix:object:bundle:{$bundle.id}`, $object)\nreturn($node)"
+    },
+    "infrastructure": {
+      "storm": "/*\nExample Stix 2.1 \"infrastructure\" object:\n{\n    \"type\": \"infrastructure\",\n    \"spec_version\": \"2.1\",\n    \"id\": \"infrastructure--38c47d93-d984-4fd9-b87b-d69463f22740\",\n    \"created\": \"2016-05-12T08:17:27.000Z\",\n    \"modified\": \"2016-05-12T08:17:27.000Z\",\n    \"name\": \"Poison Ivy C2\",\n    \"description\": \"Poison Ivy C2 server hosting infrastructure used by the threat actor.\",\n    \"infrastructure_types\": [\"command-and-control\"],\n    \"first_seen\": \"2016-01-01T00:00:00.000Z\",\n    \"last_seen\": \"2016-04-01T00:00:00.000Z\"\n}\n\nMapped to it:host, as for system identities. Infrastructure types are tags;\nthe complete original object is retained in node data.\n*/\n[ it:host=(stix, infrastructure, $object.id)\n    :name?=$object.name\n    .seen?=$object.first_seen\n    .seen?=$object.last_seen\n]\n{ for $itype in $object.infrastructure_types {\n    $tag = `stix.infra.{$itype}`\n    [ +#$tag ]\n} }\n[ <(refs)+ { it:sec:stix:bundle:id=$bundle.id } ]\n$node.data.set(`stix:object:bundle:{$bundle.id}`, $object)\nreturn($node)"
+    },
+    "intrusion-set": {
+      "storm": "/*\nFleshed out: added :desc and .seen (first_seen/last_seen) on the created/\nexisting ou:org node, matching the convention used in campaign.storm.\n*/\n($ok, $name) = $lib.trycast(ou:name, $object.name)\nif $ok {\n\n    ou:name=$name -> ou:org\n    { for $alias in $object.aliases { [ :names?+=$alias ] } }\n    [\n        :desc?=$object.description\n        .seen?=$object.first_seen\n        .seen?=$object.last_seen\n    ]\n    [ <(refs)+ { it:sec:stix:bundle:id=$bundle.id } ]\n    $node.data.set(`stix:object:bundle:{$bundle.id}`, $object)\n    return($node)\n\n    // NOTE: this looks unreachable (code after an unconditional return($node)\n    // above), but it likely relies on Storm's node-stream semantics: the\n    // \"ou:name=$name -> ou:org\" pivot lifts zero nodes when no matching org\n    // exists yet, so the operators above never fire for an empty stream and\n    // this block becomes the effective \"create new ou:org\" fallback. Flagged\n    // for confirmation with a real Cortex (see\n    // stormlibpp.tmpcortex.getTempCortexWithArgs) - the same pattern also\n    // appears in malware.storm/tool.storm/software.storm/artifact.storm.\n    [\n        ou:org=*\n        :name=$name\n        :desc?=$object.description\n        .seen?=$object.first_seen\n        .seen?=$object.last_seen\n    ]\n    { for $alias in $object.aliases { [ :names?+=$alias ] } }\n    [ <(refs)+ { it:sec:stix:bundle:id=$bundle.id } ]\n    $node.data.set(`stix:object:bundle:{$bundle.id}`, $object)\n    return($node)\n}"
+    },
+    "ipv4-addr": {
+      "storm": "[inet:ipv4=$object.value]\n[ <(refs)+ { it:sec:stix:bundle:id=$bundle.id } ]\n$node.data.set(`stix:object:bundle:{$bundle.id}`, $object)\nreturn($node)"
+    },
+    "ipv6-addr": {
+      "storm": "[inet:ipv6=$object.value]\n[ <(refs)+ { it:sec:stix:bundle:id=$bundle.id } ]\n$node.data.set(`stix:object:bundle:{$bundle.id}`, $object)\nreturn($node)"
+    },
+    "location": {
+      "storm": "/*\nExample Stix 2.1 \"location\" object (real sample, trimmed, from\ntests/data/cisa_stix_bun.json):\n{\n    \"type\": \"location\",\n    \"spec_version\": \"2.1\",\n    \"id\": \"location--34610caa-9135-4875-ac37-4746088dd006\",\n    \"created\": \"2024-02-02T15:11:50.25412Z\",\n    \"modified\": \"2024-02-02T15:11:50.25412Z\",\n    \"name\": \"203.95.8.98\",\n    \"description\": \"Domain Name: pdsguam.biz\\r\\nRegistrar: GoDaddy.com, LLC ... (truncated whois text)\",\n    \"region\": \"northern-america\",\n    \"country\": \"US\"\n}\n\nMapped to geo:place, which mirrors the reverse (export) mapping already used\nby synapse.lib.stormlib.stix for geo:place <-> location. That reverse mapping\nreads :loc/:latlong, so this sets the same props from the Stix side.\n*/\n[ geo:place=(stix, location, $object.id)\n    :name?=$object.name\n    :desc?=$object.description\n]\nif ($object.country != $lib.null) {\n    [ :loc?=$object.country.lower() ]\n}\nif (($object.latitude != $lib.null) and ($object.longitude != $lib.null)) {\n    [ :latlong?=($object.latitude, $object.longitude) ]\n}\n[ <(refs)+ { it:sec:stix:bundle:id=$bundle.id } ]\n$node.data.set(`stix:object:bundle:{$bundle.id}`, $object)\nreturn($node)"
+    },
+    "mac-addr": {
+      "storm": "[inet:mac=$object.value]\n[ <(refs)+ { it:sec:stix:bundle:id=$bundle.id } ]\n$node.data.set(`stix:object:bundle:{$bundle.id}`, $object)\nreturn($node)"
+    },
+    "malware-analysis": {
+      "storm": "[\n    it:av:scan:result=$lib.guid(stix, \"malware-analysis\", $object.id)\n    :verdict?=$object.result\n    :signame?=$object.result_name\n    :scanner:name=$object.product\n]\n[ <(refs)+ { it:sec:stix:bundle:id=$bundle.id } ]\n$node.data.set(`stix:object:bundle:{$bundle.id}`, $object)\nreturn($node)"
+    },
+    "malware": {
+      "storm": "// TODO - Need to save the \"description\" as a meta:note, since it:prod:soft has no :desc secondary prop.\n// TODO - Need to save the \"malware_types\" and \"is_family\" fields somewhere.\n($ok, $name) = $lib.trycast(it:prod:softname, $object.name)\nif $ok {\n    it:prod:softname=$name -> it:prod:soft\n    [ <(refs)+ { it:sec:stix:bundle:id=$bundle.id } ]\n    $node.data.set(`stix:object:bundle:{$bundle.id}`, $object)\n    return($node)\n    [ it:prod:soft=* :name=$name ]\n    [ <(refs)+ { it:sec:stix:bundle:id=$bundle.id } ]\n    $node.data.set(`stix:object:bundle:{$bundle.id}`, $object)\n    return($node)\n} else { // Sometimes malware objects don't have a name, let's save the description as a meta:note instead.\n    [\n        meta:note=(stix, note, $object.id)\n        :type=stix.malware\n        :text?=$object.description\n        :created?=$object.created\n        :updated?=$object.modified\n    ]\n    [ <(refs)+ { it:sec:stix:bundle:id=$bundle.id } ]\n    $node.data.set(`stix:object:bundle:{$bundle.id}`, $object)\n    return($node)\n}"
+    },
+    "mutex": {
+      "storm": "[ it:dev:mutex=$object.name ]\n[ <(refs)+ { it:sec:stix:bundle:id=$bundle.id } ]\n$node.data.set(`stix:object:bundle:{$bundle.id}`, $object)\nreturn($node)"
+    },
+    "network-traffic": {
+      "storm": "/*\nExample Stix 2.1 \"network-traffic\" object:\n{\n    \"type\": \"network-traffic\",\n    \"spec_version\": \"2.1\",\n    \"id\": \"network-traffic--2568d22a-8998-58eb-99ec-3c8ca74f527d\",\n    \"start\": \"2016-05-12T08:17:27.000Z\",\n    \"end\": \"2016-05-12T08:22:27.000Z\",\n    \"is_active\": false,\n    \"src_ref\": \"ipv4-addr--4d22aae0-2bf9-5427-8c79-6a56f6a306e2\",\n    \"dst_ref\": \"ipv4-addr--03b708d9-7761-5523-ab75-5ea096294a68\",\n    \"protocols\": [\"tcp\"],\n    \"src_port\": 24678,\n    \"dst_port\": 443,\n    \"src_byte_count\": 147600,\n    \"dst_byte_count\": 35800\n}\n\nMapped to inet:flow. Protocol stacks and unresolved endpoint references are\npreserved in node data; IP endpoints from this bundle are resolved below.\n*/\n[ inet:flow=(stix, network-traffic, $object.id)\n    :time?=$object.start\n    :src:port?=$object.src_port\n    :dst:port?=$object.dst_port\n    :src:txbytes?=$object.src_byte_count\n    :dst:txbytes?=$object.dst_byte_count\n    :src:txcount?=$object.src_packets\n    :dst:txcount?=$object.dst_packets\n]\n{ for $endpoint in $bundle.objects {\n    if ($endpoint.id = $object.src_ref) {\n        switch $endpoint.type {\n            ipv4-addr: { [ :src:ipv4?=$endpoint.value ] }\n            ipv6-addr: { [ :src:ipv6?=$endpoint.value ] }\n        }\n    }\n    if ($endpoint.id = $object.dst_ref) {\n        switch $endpoint.type {\n            ipv4-addr: { [ :dst:ipv4?=$endpoint.value ] }\n            ipv6-addr: { [ :dst:ipv6?=$endpoint.value ] }\n        }\n    }\n} }\n[ <(refs)+ { it:sec:stix:bundle:id=$bundle.id } ]\n$node.data.set(`stix:object:bundle:{$bundle.id}`, $object)\nreturn($node)"
+    },
+    "note": {
+      "storm": "[\n    meta:note=(stix, note, $object.id)\n    :type=stix.note\n    :text=$object.content\n    :created=$object.created\n    :updated=$object.modified\n]\n[ <(refs)+ { it:sec:stix:bundle:id=$bundle.id } ]\n$node.data.set(`stix:object:bundle:{$bundle.id}`, $object)\nreturn($node)"
+    },
+    "observed-data": {
+      "storm": "/*\nExample Stix 2.1 \"observed-data\" object:\n{\n    \"type\": \"observed-data\",\n    \"spec_version\": \"2.1\",\n    \"id\": \"observed-data--b67d30ff-02ac-498a-92f9-32f845f448cf\",\n    \"created\": \"2016-04-06T19:58:16.000Z\",\n    \"modified\": \"2016-04-06T19:58:16.000Z\",\n    \"first_observed\": \"2016-03-01T00:00:00.000Z\",\n    \"last_observed\": \"2016-03-01T00:00:00.000Z\",\n    \"number_observed\": 1,\n    \"object_refs\": [\n        \"ipv4-addr--efcd5e80-570c-4107-b6fb-963f78038002\"\n    ]\n}\n\nMapped to meta:note (same fallback used for note.storm/opinion.storm/\ngrouping.storm), since Synapse has no single form matching this generic\n\"observation event\" concept. number_observed is preserved via the raw Stix\nobject stashed in nodedata below. object_refs are auto-linked as refs edges\nby the Stix ingest engine itself - no manual handling needed here.\n*/\n[ meta:note=(stix, observed-data, $object.id)\n    :type=stix.observed-data\n    .seen?=$object.first_observed\n    .seen?=$object.last_observed\n]\n[ <(refs)+ { it:sec:stix:bundle:id=$bundle.id } ]\n$node.data.set(`stix:object:bundle:{$bundle.id}`, $object)\nreturn($node)"
+    },
+    "opinion": {
+      "storm": "[\n    meta:note=(stix, note, $object.id)\n    :type=`stix.opinion.{$object.opinion}`\n    :text?=$object.explanation\n    :created=$object.created\n    :updated=$object.modified\n]\n[ <(refs)+ { it:sec:stix:bundle:id=$bundle.id } ]\n$node.data.set(`stix:object:bundle:{$bundle.id}`, $object)\nreturn($node)"
+    },
+    "process": {
+      "storm": "/*\nExample Stix 2.1 \"process\" object:\n{\n    \"type\": \"process\",\n    \"spec_version\": \"2.1\",\n    \"id\": \"process--f7a5c7bb-8c4a-4d55-9c39-7cf6e4e5c1c8\",\n    \"pid\": 1221,\n    \"created_time\": \"2016-01-20T14:11:25.55Z\",\n    \"cwd\": \"/tmp\",\n    \"command_line\": \"./gedit-bin --new-window\",\n    \"binary_ref\": \"file--3128d3ac-6b0e-4f1b-8f6c-cee29d9a6b78\"\n}\n\nMapped to it:exec:proc. Working directory and process-specific references\nare preserved in node data rather than conflated with the executable path.\n*/\n[ it:exec:proc=(stix, process, $object.id)\n    :pid?=$object.pid\n    :time?=$object.created_time\n    :cmd?=$object.command_line\n]\n[ <(refs)+ { it:sec:stix:bundle:id=$bundle.id } ]\n$node.data.set(`stix:object:bundle:{$bundle.id}`, $object)\nreturn($node)"
+    },
+    "report": {
+      "storm": "[ media:news=(stix, report, $object.id)\n    :title?=$object.name\n    :summary?=$object.description\n    :published?=$object.published\n]\n[ <(refs)+ { it:sec:stix:bundle:id=$bundle.id } ]\n$node.data.set(`stix:object:bundle:{$bundle.id}`, $object)\nreturn($node)"
+    },
+    "sighting": {
+      "storm": "/*\nExample Stix 2.1 \"sighting\" object:\n{\n    \"type\": \"sighting\",\n    \"spec_version\": \"2.1\",\n    \"id\": \"sighting--ee20065d-2555-424f-ad9e-0f8428623c75\",\n    \"created\": \"2016-04-06T20:08:31.000Z\",\n    \"modified\": \"2016-04-06T20:08:31.000Z\",\n    \"first_seen\": \"2015-12-21T19:00:00.000Z\",\n    \"last_seen\": \"2015-12-21T19:00:00.000Z\",\n    \"count\": 1,\n    \"sighting_of_ref\": \"indicator--26ffb872-1dd9-446e-b6f5-d58527e5b5d2\",\n    \"observed_data_refs\": [\n        \"observed-data--b67d30ff-02ac-498a-92f9-32f845f448cf\"\n    ]\n}\n\nIMPORTANT: unlike \"relationship\" objects, \"sighting\" objects are NOT diverted\nbefore reaching config['objects'] in Synapse's LibStixImport.ingest (only the\nliteral type \"relationship\" is special-cased) - this file genuinely executes\nfor every Stix \"sighting\" object. sighting_of_ref and observed_data_refs point\nat other Stix objects and cannot be resolved here (no nodesbyid access at\nthis stage) - same limitation as elsewhere in this folder. Mapped to\nmeta:note as a fallback since Synapse has no dedicated \"sighting\" form.\n*/\n[ meta:note=(stix, sighting, $object.id)\n    :type=stix.sighting\n    .seen?=$object.first_seen\n    .seen?=$object.last_seen\n]\n[ <(refs)+ { it:sec:stix:bundle:id=$bundle.id } ]\n$node.data.set(`stix:object:bundle:{$bundle.id}`, $object)\nreturn($node)"
+    },
+    "software": {
+      "storm": "($ok, $name) = $lib.trycast(it:prod:softname, $object.name)\nif $ok {\n    it:prod:softname=$name -> it:prod:soft\n    [ <(refs)+ { it:sec:stix:bundle:id=$bundle.id } ]\n    $node.data.set(`stix:object:bundle:{$bundle.id}`, $object)\n    return($node)\n    [\n        it:prod:soft=*\n        :name=$name\n        :cpe?=$object.cpe\n    ]\n    // TODO - Figure out how to save the software vender\n    [ <(refs)+ { it:sec:stix:bundle:id=$bundle.id } ]\n    $node.data.set(`stix:object:bundle:{$bundle.id}`, $object)\n    return($node)\n}"
+    },
+    "threat-actor": {
+      "storm": "/*\nResolved: yes, this mirrors the exact mapping Vertex uses in their own\ndefault Stix ingest config (synapse.lib.stormlib.stix.stixingest) for\nthreat-actor -> ps:contact, so this is the intentional/confirmed choice.\n*/\n[ ps:contact=(stix, threat-actor, $object.id)\n    :name?=$object.name\n    :desc?=$object.description\n    :names?=$object.aliases\n]\n[ <(refs)+ { it:sec:stix:bundle:id=$bundle.id } ]\n$node.data.set(`stix:object:bundle:{$bundle.id}`, $object)\nreturn($node)"
+    },
+    "tool": {
+      "storm": "($ok, $name) = $lib.trycast(it:prod:softname, $object.name)\nif $ok {\n    it:prod:softname=$name -> it:prod:soft\n    [ <(refs)+ { it:sec:stix:bundle:id=$bundle.id } ]\n    $node.data.set(`stix:object:bundle:{$bundle.id}`, $object)\n    return($node)\n    [ it:prod:soft=* :name=$name ]\n    [ <(refs)+ { it:sec:stix:bundle:id=$bundle.id } ]\n    $node.data.set(`stix:object:bundle:{$bundle.id}`, $object)\n    return($node)\n}"
+    },
+    "url": {
+      "storm": "[inet:url=$object.value]\n[ <(refs)+ { it:sec:stix:bundle:id=$bundle.id } ]\n$node.data.set(`stix:object:bundle:{$bundle.id}`, $object)\nreturn($node)"
+    },
+    "user-account": {
+      "storm": "if (($object.account_type != $lib.null) and ($object.account_login != $lib.null)) {\n    if ($object.account_type = \"posix\" or $object.account_type = \"windows-local\" or $object.account_type = \"windows-domain\") {\n        [\n            it:account=(stix, \"user-account\", $object.id)\n            :user?=$object.account_login\n        ]\n        if ($object.account_type = \"posix\") {\n            [ :posix:uid?=$object.user_id ]\n        } else {\n            [ :windows:sid?=$object.user_id ]\n        }\n    } elif ($object.account_type = \"facebook\" or $object.account_type = \"skype\" or $object.account_type = \"twitter\") {\n        switch $object.account_type {\n            facebook: {[inet:web:acct=(facebook.com, $object.account_login)]}\n            skype: {[inet:web:acct=(skype.com, $object.account_login)]}\n            twitter: {[inet:web:acct=(twitter.com, $object.account_login)]}\n        }\n    } else {\n        [\n            auth:creds=(stix, \"user-account\", $object.id)\n            :user?=$object.account_login\n            :passwd?=$object.credential\n        ]\n    }\n}\n\nif (($node != $lib.null) and ($node.form() != \"auth:creds\")) {\n    $acct = $node\n    {\n        | spin |\n        [\n            auth:creds=(stix, \"user-account\", $object.id)\n            :user=$object.account_login\n            :passwd?=$object.credential\n        ]\n        +auth:creds\n        if ($object.account_type = \"posix\" or $object.account_type = \"windows-local\" or $object.account_type = \"windows-domain\") {\n            [:account={yield $acct}]\n        } else {\n            [ +(refs)> { yield $acct } ]\n        }\n    }\n}\n[ <(refs)+ { it:sec:stix:bundle:id=$bundle.id } ]\n$node.data.set(`stix:object:bundle:{$bundle.id}`, $object)\nreturn($node)\n"
+    },
+    "vulnerability": {
+      "storm": "/*\nExample Stix 2.1 \"vulnerability\" object:\n{\n    \"type\": \"vulnerability\",\n    \"spec_version\": \"2.1\",\n    \"id\": \"vulnerability--0c7b5b88-8ff7-4a4d-aa9d-feb398cd0061\",\n    \"created\": \"2016-05-12T08:17:27.000Z\",\n    \"modified\": \"2016-05-12T08:17:27.000Z\",\n    \"name\": \"CVE-2016-1234\",\n    \"description\": \"A buffer overflow in Example App allows remote attackers to execute arbitrary code.\",\n    \"external_references\": [\n        { \"source_name\": \"cve\", \"external_id\": \"CVE-2016-1234\" }\n    ]\n}\n\nMapped to risk:vuln, which mirrors the reverse (export) mapping already used\nby synapse.lib.stormlib.stix for risk:vuln <-> vulnerability (including\npulling the CVE id out of external_references into the :cve prop).\n*/\n[ risk:vuln=(stix, vulnerability, $object.id)\n    :name?=$object.name\n    :desc?=$object.description\n]\n{ for $ref in $object.external_references {\n    if ($ref.source_name = \"cve\") {\n        [ :cve?=$ref.external_id ]\n    }\n} }\n[ <(refs)+ { it:sec:stix:bundle:id=$bundle.id } ]\n$node.data.set(`stix:object:bundle:{$bundle.id}`, $object)\nreturn($node)"
+    },
+    "windows-registry-key": {
+      "storm": "/*\nExample Stix 2.1 \"windows-registry-key\" object:\n{\n    \"type\": \"windows-registry-key\",\n    \"spec_version\": \"2.1\",\n    \"id\": \"windows-registry-key--2ba37ae7-2745-5082-9dfd-9486dad41016\",\n    \"key\": \"hkey_local_machine\\\\system\\\\bar\\\\foo\",\n    \"values\": [\n        { \"name\": \"Foo\", \"data\": \"qwerty\", \"data_type\": \"REG_SZ\" }\n    ]\n}\n\nStix allows one key with multiple values, but it:dev:regval\nmodels a single key+value pair per node, so this creates one node per entry\nin \"values\" (or a single key-only node if \"values\" is empty/unset). Only the\nlast node created is returned/tracked by the ingest engine - a known\nlimitation of the one-node-per-object ingest model for this Stix type.\n*/\nif $object.values {\n    // NOTE: intentionally NOT wrapped in a `{ }` subquery here (unlike the\n    // usual loop convention elsewhere in this repo) - a subquery isolates\n    // its pipeline from the outer one, which would prevent the created node\n    // from ever binding to $node for the final return($node) below. Verified\n    // against a live Cortex: wrapping this in `{ }` silently drops the node.\n    for $regval in $object.values {\n        [ it:dev:regval=(stix, windows-registry-key, $object.id, $regval.name)\n            :key?=$object.key\n            :str?=$regval.data\n        ]\n        [ <(refs)+ { it:sec:stix:bundle:id=$bundle.id } ]\n        $node.data.set(`stix:object:bundle:{$bundle.id}`, $object)\n    }\n} else {\n    [ it:dev:regval=(stix, windows-registry-key, $object.id)\n        :key?=$object.key\n    ]\n    [ <(refs)+ { it:sec:stix:bundle:id=$bundle.id } ]\n    $node.data.set(`stix:object:bundle:{$bundle.id}`, $object)\n}\nreturn($node)"
+    },
+    "x509-certificate": {
+      "storm": "[ crypto:x509:cert=(stix, x509-certificate, $object.id)\n    :serial?=$object.serial_number\n    :version?=$object.version\n    :algo?=$object.signature_algorithm\n    :issuer?=$object.issuer\n    :subject?=$object.subject\n    :validity:notbefore?=$object.validity_not_before\n    :validity:notafter?=$object.validity_not_after\n]\n\nif $object.hashes {\n    [ :md5?=$object.hashes.MD5\n      :sha1?=$object.hashes.\"SHA-1\"\n      :sha256?=$object.hashes.\"SHA-256\"\n    ]\n    if $object.hashes.\"SHA-256\" {\n        [ :file?=$object.hashes.\"SHA-256\" ]\n    }\n}\n\n[ <(refs)+ { it:sec:stix:bundle:id=$bundle.id } ]\n$node.data.set(`stix:object:bundle:{$bundle.id}`, $object)\nreturn($node)"
+    }
+  },
+  "relationships": [
+    {
+      "type": [
+        "campaign",
+        "attributed-to",
+        "intrusion-set"
+      ],
+      "storm": "$n1node.props.org = $n2node"
+    },
+    {
+      "type": [
+        "intrusion-set",
+        "attributed-to",
+        "threat-actor"
+      ],
+      "storm": "$n2node.props.org = $n1node"
+    },
+    {
+      "type": [
+        null,
+        "uses",
+        null
+      ],
+      "storm": "yield $n1node [ +(uses)> { yield $n2node } ]"
+    },
+    {
+      "type": [
+        null,
+        "indicates",
+        null
+      ],
+      "storm": "yield $n1node [ +(indicates)> { yield $n2node } ]"
+    },
+    {
+      "type": [
+        null,
+        "communicates-with",
+        null
+      ],
+      "storm": "yield $n1node [ +(communicates-with)> { yield $n2node } ]"
+    },
+    {
+      "type": [
+        "threat-actor",
+        "attributed-to",
+        "identity"
+      ],
+      "storm": "yield $n1node [ +(attributed-to)> { yield $n2node } ]\n"
+    }
+  ]
+}

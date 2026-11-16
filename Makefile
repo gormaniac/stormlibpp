@@ -10,8 +10,12 @@ change-version: # Change the version of this project (requires VERSION=#.#.#)
 	pipenv run python3 scripts/changever.py $(VERSION)
 
 .PHONY: build
-build: # Build the Python package tarball and wheel
+build: build-stix # Build the Python package tarball and wheel
 	pipenv run python3 -m build .
+
+.PHONY: build-stix
+build-stix: # Rebuild the standalone STIX import configuration
+	pipenv run python3 scripts/build_stix_conf.py
 
 .PHONY: build-storm
 build-storm: # Build all Storm packages in this project
@@ -56,7 +60,8 @@ read-docs: # Open the package docs locally
 
 .PHONY: release
 release: change-version clean setup build docs # Build a new versioned release and push it (requires VERSION=#.#.#)
-	git add doc/* pyproject.toml $(PKG_DIR)/__init__.py
+	python3 scripts/changelog.py release $(VERSION) || echo "WARNING: no CHANGELOG entries for v$(VERSION)"
+	git add doc/* pyproject.toml $(PKG_DIR)/__init__.py CHANGELOG.md
 	git commit -m "build: release v$(VERSION)"
 	git push
 	git tag -a v$(VERSION) -m "Release v$(VERSION)"
@@ -66,6 +71,10 @@ release: change-version clean setup build docs # Build a new versioned release a
 .PHONY: tests
 tests: # Run the pytest suite for this project.
 	pipenv run pytest tests/
+
+.PHONY: lint-storm
+lint-storm: # Fail on Storm syntax errors in the Storm packages (Synapse's linter, E rules).
+	pipenv run python3 -m synapse.tools.storm.lint --select E src/pkgs
 
 .PHONY: pypi
 pypi: # Upload all Python packages in "dist/" to PyPI.

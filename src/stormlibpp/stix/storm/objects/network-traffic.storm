@@ -1,0 +1,47 @@
+/*
+Example Stix 2.1 "network-traffic" object:
+{
+    "type": "network-traffic",
+    "spec_version": "2.1",
+    "id": "network-traffic--2568d22a-8998-58eb-99ec-3c8ca74f527d",
+    "start": "2016-05-12T08:17:27.000Z",
+    "end": "2016-05-12T08:22:27.000Z",
+    "is_active": false,
+    "src_ref": "ipv4-addr--4d22aae0-2bf9-5427-8c79-6a56f6a306e2",
+    "dst_ref": "ipv4-addr--03b708d9-7761-5523-ab75-5ea096294a68",
+    "protocols": ["tcp"],
+    "src_port": 24678,
+    "dst_port": 443,
+    "src_byte_count": 147600,
+    "dst_byte_count": 35800
+}
+
+Mapped to inet:flow. Protocol stacks and unresolved endpoint references are
+preserved in node data; IP endpoints from this bundle are resolved below.
+*/
+[ inet:flow=(stix, network-traffic, $object.id)
+    :time?=$object.start
+    :src:port?=$object.src_port
+    :dst:port?=$object.dst_port
+    :src:txbytes?=$object.src_byte_count
+    :dst:txbytes?=$object.dst_byte_count
+    :src:txcount?=$object.src_packets
+    :dst:txcount?=$object.dst_packets
+]
+{ for $endpoint in $bundle.objects {
+    if ($endpoint.id = $object.src_ref) {
+        switch $endpoint.type {
+            ipv4-addr: { [ :src:ipv4?=$endpoint.value ] }
+            ipv6-addr: { [ :src:ipv6?=$endpoint.value ] }
+        }
+    }
+    if ($endpoint.id = $object.dst_ref) {
+        switch $endpoint.type {
+            ipv4-addr: { [ :dst:ipv4?=$endpoint.value ] }
+            ipv6-addr: { [ :dst:ipv6?=$endpoint.value ] }
+        }
+    }
+} }
+[ <(refs)+ { it:sec:stix:bundle:id=$bundle.id } ]
+$node.data.set(`stix:object:bundle:{$bundle.id}`, $object)
+return($node)

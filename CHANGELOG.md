@@ -1,3 +1,51 @@
+## Unreleased
+### Features
+- Add `stormlibpp.stix.BundleConf` to build standalone STIX import configs from Storm files, with 38 object mappings, six relationship mappings, and source-object node data.
+- Release `stormlibpp-stix` version `0.2.0`. Built packages download the config from their matching repository release instead of following `main`; custom config and URL overrides remain supported.
+- Attach `stix_import_conf.json` to GitHub Releases and add automated config-freshness, Cortex ingest, release-pinning, and distribution-content checks.
+- Adds version 1.0.0 of the `slib.ipapi` Rapid Power-Up, which enriches IPs from ip-api.com. It replaces the `slib.ipapi` Storm Service from the stormsvcs repo with the same commands, perms and settings, but no service to deploy. ip-api.com's rate limit (45 requests a minute) is now shared by every query on the Cortex through its rate limit headers, and rate limited queries wait and retry. To upgrade, remove the service with `service.del` and load the package.
+- Adds `slib.utils.inet` to the utils package, with the ASN and owner org modeling that `slib.ipapi` and `ipinfo` share.
+- Adds a pure Storm X.509 certificate parser to the utils package, `slib.utils.x509`, and bumps slib.utils to 0.2.0. It parses certificates and CT precertificate TBSCertificates (DER, PEM or base64) into Storm primitives, including the RFC 5280 extensions (subjectDirectoryAttributes is kept raw), RFC 6962 SCT lists and RSA-PSS/EC/EdDSA/DSA keys, and lists recoverable DER and RFC 5280 deviations as warnings. Its output matches Python cryptography on a corpus of real root CA and CT certificates.
+- Add `stormlibpp.svc`, the shared building blocks for a Storm service's Telepath API, so services stop hand-rolling their own:
+  - `RetnApi`, a `CellApi` mixin. List the cell's methods in `RETN_METHS`/`GENR_METHS` and it generates API methods that return (or yield) `TelepathRetn`s. No public async method on the API can raise to Storm: unexpected errors are logged with a traceback and returned as `status=False` with an `Unexpected error: ...` message, bad input as `Invalid input: ...`, and `RETN_ERRORS` (default `SvcError`) and `AuthDeny` with their own message. `_retnRedact()` scrubs secrets from every error message.
+  - `retn()`, `retnGenr()` and `errRetn()`, the same wrapping as functions.
+  - `SvcError`, the base for errors whose message is meant for the Storm user.
+  - `safeJoin()`, `checkName()` and `checkGuid()`, for values from Storm that end up in a file path.
+- Add `stormlibpp.testing`, a pytest plugin for Storm service and package test suites (enable it with `pytest_plugins = ["stormlibpp.testing"]`, install with the `testing` extra). It moves the Synapse deprecation harness out of each project's `conftest.py`, now also fails the run for deprecations logged outside of a test (ex. a deprecated import at collection time; set `stormlibpp_outside_deprecations = warn` to only list them, which the terminal summary says when it fails a run), and adds `localhost` to `NO_PROXY` for fake upstream servers.
+- Add `stormlibpp.testing.checks`: `assertVersionsMatch()` checks a service's version in `pyproject.toml`, `__init__.py`, its Storm package prototypes and `uv.lock`; `stormLint()` runs Synapse's Storm linter; `assertMainHelp()` checks `python -m <module> --help` works.
+- StormLib++'s own tests use the new plugin.
+### Fixes
+- Isolate config-builder state and make repeated loads atomic and idempotent. Fix Storm syntax and runtime mappings, preserve metadata on reused software nodes, and reject artifact hash mismatches.
+- Correct the STIX command examples to use `slib.stix.ingest`.
+- STIX ingest no longer fails on optional fields: `malware-analysis` objects without `result` or `result_name`, and `user-account` objects without `account_login`.
+- STIX ingest saves the bundle as node data when the `it:sec:stix:bundle` node already exists, not only when it is created.
+- ipinfo (0.1.2) models ASNs with `slib.utils.inet`, and no longer makes an `ou:org` with an empty name when ipinfo.io has no AS name.
+
+## v0.12.1 - 2026-11-01
+### Features
+- Bump the GitHub Actions the workflows use to their latest releases, which run on Node.js 24 (GitHub deprecated the Node.js 20 runtime the old ones used).
+- CI catches Storm syntax errors in every package: a test loads every package under `src/pkgs/` into a Cortex, and a new `make lint-storm` step runs Synapse's Storm linter before the tests. The dev environment (Pipfile) now requires Synapse `>=2.256.0`, the first release with the linter.
+### Fixes
+- report-ingest raises its own "Could not get the report URL!" error when a report request fails, instead of `'boolean' object is not callable` from a `$lib.debug(...)` call. `--debug` now prints the HTTP error. Its help examples also use the right command name.
+
+## v0.12.0 - 2026-11-01
+### Features
+- The test suite fails on deprecated Synapse API use (see `tests/conftest.py`) and on Python `DeprecationWarning`s raised from StormLib++ code. This only affects test runs, the library and CLIs still treat deprecation warnings normally.
+- Requires Synapse `>=2.225.0`, where Synapse's tools moved to their new module paths.
+- Publish the Python package to PyPI from the Release GitHub Action.
+- Add a manually run Prepare Release GitHub Action that bumps the version, rolls the CHANGELOG, tags, and runs the release.
+### Fixes
+- Migrate off deprecated Synapse APIs:
+  - `$lib.dict()`/`$lib.list()` are replaced with `({})`/`([])` literals in the dnsstorm, ipinfo, and stix packages.
+  - Storm packages use `synapse_version` instead of `synapse_minversion`, and `cmdinputs` instead of the command `forms` key.
+  - `stormlibpp.stormpkg` and the package build scripts use `synapse.tools.storm.pkg.gen` instead of `synapse.tools.genpkg`.
+- `stormlibpp.hfeed` and `stormlibpp.stormcli` (used by `hstorm` and `import`) work with current Synapse, which removed `synapse.tools.feed.makeargparser()` and moved `StormCli` into `synapse.tools.storm._cli`.
+- `HttpCortex` no longer uses aiohttp's deprecated `read_timeout` argument.
+- The ipinfo package sends the API token; its `Authorization` header used a plain string instead of a format string.
+- Bumps the patch version of every StormLib++ Storm package.
+- The stix package loads: fix its Storm syntax errors and its `$lib.debug(...)` calls (`$lib.debug` is a boolean, not a function).
+- The release steps moved from the README to the contribution guide.
+
 ## v0.11.0 - 2026-07-26
 ### Features
 - Adds version 0.1.0 of an ipinfo.io Rapid Power-Up - slib.ipinfo

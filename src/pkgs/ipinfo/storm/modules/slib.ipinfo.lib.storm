@@ -3,7 +3,7 @@
 function getIpInfo(ip, token) {
     $url = "https://api.ipinfo.io/lite/"
 
-    $headers = $lib.dict(Authorization="Bearer {$token}")
+    $headers = ({"Authorization": `Bearer {$token}`})
 
     $resp = $lib.inet.http.get($url, headers=$headers)
 
@@ -21,16 +21,11 @@ function getIpInfo(ip, token) {
     }
 
     // Return an empty dict if we got no answer
-    return($lib.dict())
+    return(({}))
 }
 
 function getOrBuildAsn(data) {
-    [
-        inet:asn=$data.asn.replace('AS', '')
-        :owner?={yield $lib.gen.orgByName($data.as_name)}
-    ]
-
-    return($node)
+    return($lib.import(slib.utils.inet).asnNode($data.asn, orgname=$data.as_name))
 }
 
 function ingestIpInfo(data, query) {
@@ -38,7 +33,7 @@ function ingestIpInfo(data, query) {
     [
         inet:ipv4?=$data.ip
         inet:ipv6?=$data.ip
-        :asn={yield $getOrBuildAsn($data)}
+        :asn?={yield $getOrBuildAsn($data)}
     ]
 
     return($node)

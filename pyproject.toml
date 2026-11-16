@@ -1,25 +1,29 @@
 [build-system]
-requires = ["setuptools"]
+requires = ["setuptools>=77"]
 build-backend = "setuptools.build_meta"
 
 [project]
 name = "stormlibpp"
-version = "0.11.0"
+version = "0.12.1"
 description = "The StormLib++ Python package"
 readme = "README.md"
+license = "MIT AND Apache-2.0"
+license-files = ["LICENSE", "NOTICE", "LICENSES/Apache-2.0.txt"]
 requires-python = ">=3.11"
 
 # Fill in dependencies here.
 dependencies = [
-    "synapse>=2.139.0,<3",
-    "marko>=2,<3"
+    "synapse>=2.225.0,<3",
+    "marko>=2,<3",
 ]
+
+[project.optional-dependencies]
+# stormlibpp.testing, the pytest plugin and checks for Storm service test suites.
+# stormlibpp.testing.stormLint() also needs synapse>=2.256.0, the first with the Storm linter.
+testing = ["pytest"]
 
 [[project.authors]]
 name = "John Gorman"
-
-[project.license]
-file = "LICENSE"
 
 [project.urls]
 Homepage = "https://github.com/gormaniac/stormlibpp"
@@ -28,3 +32,10 @@ Documentation = "https://docs.gormo.co/stormlibpp/"
 [tool.setuptools.packages.find]
 namespaces = true
 where = ["src"]
+
+[tool.pytest.ini_options]
+# Python deprecations raised from StormLib++'s own code fail the tests. Synapse's
+# deprecations are logged instead, tests/conftest.py fails the tests for those.
+filterwarnings = [
+    "error::DeprecationWarning:stormlibpp",
+]
