@@ -1,0 +1,16 @@
+init {
+    $admin = $lib.import(slib.ipapi.admin)
+
+    if $cmdopts.clear {
+        $lib.print($admin.setApiKey((null)))
+    }
+    elif $cmdopts.apikey {
+        $lib.print($admin.setApiKey($cmdopts.apikey))
+    }
+    elif $admin.hasApiKey() {
+        $lib.print("slib.ipapi: A global ip-api.com pro key is set.")
+    }
+    else {
+        $lib.print("slib.ipapi: No global ip-api.com pro key is set, the free endpoints are used.")
+    }
+}

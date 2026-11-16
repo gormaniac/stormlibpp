@@ -1,6 +1,15 @@
 ## Unreleased
 ### Features
+- Release `slib.ipapi` version `1.1.0`, with the changes the `slib.ipapi` 0.3.0 Storm Service got in the stormsvcs repo after this package was ported from it:
+  - Inbound nodes are queried in batches of up to 100 with ip-api.com's `/batch` endpoint, which has its own rate limit.
+  - Models reverse DNS (`:dns:rev`), `inet:asn:name`, the IP's WHOIS org (`-(owns)>`), `geo:place:loc`, `-(seen)>` edges from the package's `meta:source`, and one `geo:telem` per IP and place.
+  - `--query` warns about strings that aren't IP addresses, the tag prefix must be a valid tag, and a bad tag setting warns instead of stopping the query.
+  - ip-api.com pro keys (HTTPS, no rate limit): `slib.ipapi.apikey` sets your own key and `slib.ipapi.admin.apikey` the global key, both in `ipapi` vaults. Keys are scrubbed from warnings.
+  - Requests time out after 30 seconds, and a rate limited request is retried 3 times.
+  - The `slib:ipapi:url` global overrides the ip-api.com base URL, which the tests use for a fake ip-api.com.
 ### Fixes
+- `slib.utils` 0.2.1: `slib.utils.inet.asnNode()` adds `names` to the owner org's `:names` instead of replacing them.
+- `slib.ipapi` 1.1.0 only waits for ip-api.com's rate limit window when no requests are left (`X-Rl` 0), not when one is.
 
 ## v1.0.0 - 2026-11-16
 ### Features

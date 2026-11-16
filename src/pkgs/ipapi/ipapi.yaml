@@ -1,5 +1,5 @@
 name: slib.ipapi
-version: 1.0.0
+version: 1.1.0
 guid: 92cc9d722c63125d64911389cd39c685
 
 synapse_version: ">=2.162.0,<3.0.0"
@@ -20,7 +20,7 @@ docs:
 depends:
   requires:
     - name: slib.utils
-      version: ">=0.2.0,<1.0.0"
+      version: ">=0.2.1,<1.0.0"
       desc: slib.ipapi models ASNs with slib.utils.inet.
 
 # Runs every time the package loads. The tag globals are only set when they're missing, so
@@ -56,6 +56,17 @@ commands:
     descr: |
       Query the ip-api.com API for information about the input IP addresses.
 
+      Each IP's ASN (and the AS's org), geolocation (geo:place and geo:telem), reverse DNS name,
+      and WHOIS org are modeled, and the IP is tagged with the hosting/mobile/proxy results
+      (see slib.ipapi.admin.settag).
+
+      Inbound nodes are queried in batches of up to 100 with ip-api.com's batch endpoint, so
+      they're yielded once their batch is done. Nodes that aren't inet:ipv4 or inet:ipv6 are
+      passed through with a warning.
+
+      Uses your own ip-api.com pro key (slib.ipapi.apikey) if you've set one, then the global
+      key (slib.ipapi.admin.apikey), otherwise ip-api.com's free endpoints.
+
       Examples:
 
         // Lift some inet:ipv4 nodes and query ip-api.com for information.
@@ -69,16 +80,17 @@ commands:
         - type: str
           default: ''
           help: |
-            An IP address string to query for.
+            An IPv4 or IPv6 address string to query for.
 
             Ignores any nodes in the pipeline and uses only the string passed to this arg.
+            Warns, without querying, if the string is not a valid IP address.
 
       - - --yield
         - default: false
           action: store_true
           help: |
             Yield the newly created inet:ipv4/ipv6 records.
-            
+
             A bit redundant when not using --query because nodes stay in the pipeline otherwise.
 
     cmdinputs:
@@ -86,6 +98,57 @@ commands:
         help: IPs to query ip-api.com for (ignored when --query is used).
       - form: inet:ipv6
         help: IPs to query ip-api.com for (ignored when --query is used).
+
+  - name: slib.ipapi.apikey
+    perms:
+        - [ slib, ipapi, user ]
+    descr: |
+      Set your own ip-api.com pro key, stored in a user scoped Synapse vault of type "ipapi".
+
+      With a pro key, your queries use ip-api.com's HTTPS pro endpoints, which have no rate
+      limit and allow commercial use. Your key takes precedence over the global key set by
+      slib.ipapi.admin.apikey. Prints whether you have a key set when run without arguments.
+
+      Examples:
+
+        slib.ipapi.apikey ABCDEFG
+
+        slib.ipapi.apikey --clear
+    cmdargs:
+      - - apikey
+        - type: str
+          nargs: "?"
+          default: null
+          help: Your ip-api.com pro key.
+      - - --clear
+        - default: false
+          action: store_true
+          help: Delete your stored key.
+
+  - name: slib.ipapi.admin.apikey
+    perms:
+        - [ slib, ipapi, admin ]
+    descr: |
+      Set the global ip-api.com pro key, used when a user hasn't set their own.
+
+      It's stored in a global scoped Synapse vault of type "ipapi", which only slib.ipapi's
+      privileged module reads. Prints whether a key is set when run without arguments.
+
+      Examples:
+
+        slib.ipapi.admin.apikey ABCDEFG
+
+        slib.ipapi.admin.apikey --clear
+    cmdargs:
+      - - apikey
+        - type: str
+          nargs: "?"
+          default: null
+          help: The ip-api.com pro key.
+      - - --clear
+        - default: false
+          action: store_true
+          help: Delete the global key.
 
   - name: slib.ipapi.admin.settag
     perms:
@@ -99,11 +162,16 @@ commands:
 
       This can be disabled using the slib.ipapi.admin.disabletag command.
 
+      Examples:
+
+        // Tag IPs with #rep.myorg.ipapi.hosting, #rep.myorg.ipapi.mobile, and #rep.myorg.ipapi.proxy.
+        slib.ipapi.admin.settag rep.myorg.ipapi
+
     cmdargs:
       - - prefix
         - type: str
           help: |
-            The custom tag prefix to use.
+            The custom tag prefix to use, which must be a valid tag (ex. rep.ipapi.infra).
 
   - name: slib.ipapi.admin.disabletag
     perms:

@@ -1,0 +1,28 @@
+init {
+    $vault = $lib.vault.bytype(ipapi, scope=user)
+
+    if $cmdopts.clear {
+        if $vault {
+            $vault.delete()
+            $lib.print("slib.ipapi: Deleted your ip-api.com pro key.")
+        } else {
+            $lib.print("slib.ipapi: You don't have an ip-api.com pro key set.")
+        }
+    }
+    elif (not $cmdopts.apikey) {
+        if $vault {
+            $lib.print("slib.ipapi: Your ip-api.com pro key is set in vault {name}.", name=$vault.name)
+        } else {
+            $lib.print("slib.ipapi: You don't have an ip-api.com pro key set.")
+        }
+    }
+    elif $vault {
+        $vault.secrets.apikey = $cmdopts.apikey
+        $lib.print("slib.ipapi: Updated your ip-api.com pro key.")
+    }
+    else {
+        $name = `slib.ipapi:{$lib.user.name()}`
+        $lib.vault.add($name, ipapi, user, $lib.user.iden, ({"apikey": $cmdopts.apikey}), ({}))
+        $lib.print("slib.ipapi: Saved your ip-api.com pro key in vault {name}.", name=$name)
+    }
+}

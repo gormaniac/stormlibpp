@@ -1,22 +1,83 @@
-// Query ip-api.com for an IP address. Returns {"status", "mesg", "data"}: status is true and data
-// is ip-api.com's result (with its "as" field named "as_") when the query worked.
-function query(query) {
-    return($lib.import(slib.ipapi.privsep).query($query))
+// Query ip-api.com and model its results.
+
+init {
+    $privsep = $lib.import(slib.ipapi.privsep)
+
+    // The guid of slib.ipapi's meta:source node, made by the package's onload. It's the same
+    // guid the slib.ipapi Storm Service used.
+    $srcGuid = "c177b2a9c0eff5c2984946d439de23ea"
+
+    // The most IPs sent in one batch request, the most ip-api.com's /batch endpoint accepts.
+    $batchSize = (100)
 }
 
-function buildGeoTelemNode (ipNode, placeNode, data) {
-    $countryNode = $lib.gen.polCountryByIso2($data.countryCode, try=$lib.true)
+// The calling user's own ip-api.com pro key, from their user scoped "ipapi" vault, or (null).
+// Only the user scope is read, so another user's or role's secrets are never exposed. This
+// module isn't asroot, so the vault is the caller's, not root's.
+function userKey() {
+    $vault = $lib.vault.bytype(ipapi, scope=user)
+    if ($vault = null) { return() }
+    $secrets = $vault.secrets
+    if ($secrets = null) { return() }
+    return($secrets.apikey)
+}
 
-    [ geo:telem=({"node": ([$ipNode.form(), $ipNode.value()]), "place": $placeNode})
-        :time=($lib.time.now())
-        :place:name = $placeNode.props.name
+// Query ip-api.com for an IP address. Returns {"status", "mesg", "data"}.
+function query(query) {
+    return($privsep.query($query, apikey=$userKey()))
+}
+
+// Query ip-api.com for a list of IP addresses with its /batch endpoint.
+// Returns {"status", "mesg", "data"}, data has one query() style result per IP.
+function queryBatch(queries) {
+    return($privsep.queryBatch($queries, apikey=$userKey()))
+}
+
+// Whether the node is an inet:ipv4 or inet:ipv6 node.
+// NOTE: Filters by form, since $node.form() is not callable in Synapse 3.x. The forms are
+// renamed to inet:ip in 3.x, this package requires Synapse <3.0.0 so M001 is ignored here.
+function isIp(n) {
+    $ip = { yield $n +(inet:ipv4 or inet:ipv6) }  // noqa: M001
+    return(($ip != null))
+}
+
+// The IP form (inet:ipv4 or inet:ipv6) of an IP string, or (null) if it's neither.
+function ipForm(text) {
+    // Synapse also parses IPv4 strings as valid inet:ipv6 values (::ffff:x.x.x.x),
+    // so only fall back to inet:ipv6 when the text is not a valid IPv4.
+    ($ok, $valu) = $lib.trycast(inet:ipv4, $text)
+    if $ok { return(inet:ipv4) }
+
+    ($ok, $valu) = $lib.trycast(inet:ipv6, $text)
+    if $ok { return(inet:ipv6) }
+
+    return()
+}
+
+function buildGeoTelemNode(ipNode, form, placeNode, data) {
+    $loc = $buildLoc($data)
+    ($hasCode, $iso2) = $lib.trycast(pol:iso2, $data.countryCode)
+
+    // One telem per IP and place, so re-querying an IP at the same place reuses it.
+    [ geo:telem=({"node": [$form, $ipNode.repr()], "place": $placeNode.repr()})
+        :place:name ?= $placeNode.props.name
         :place:latlong = $placeNode.props.latlong
-        :place:country ?= $countryNode
-        :place:country:code ?= $data.countryCode
-        :desc = (`IP geolocation data for {$ipNode.form()}={$ipNode.repr()} at the coordinates {$data.lat}, {$data.lon} per ip-api.com.`)
+        :place:loc ?= $loc
+        :desc = `IP geolocation data for {$form}={$ipNode.repr()} at the coordinates {$data.lat}, {$data.lon} per ip-api.com.`
+        <(seen)+ { meta:source=$srcGuid }
     ]
 
-    return((null))
+    // :time is when the IP was first seen at the place, later queries don't move it.
+    if (not :time) { [ :time=now ] }
+
+    if $hasCode {
+        [
+            :place:country:code = $iso2
+            :place:country = { [ pol:country=({"iso2": $iso2}) ] }
+        ]
+    }
+
+    return($node)
 }
 
 function buildPlaceNode(data) {
@@ -30,8 +91,9 @@ function buildPlaceNode(data) {
         geo:place=($data.lat, $data.lon, $data.city)
         :latlong=($data.lat, $data.lon)
         :name?=$placeName
+        :loc?=$buildLoc($data)
         :type=ip.geoloc.city
-        :desc=(`{$placeName} at the coordinates {$data.lat}, {$data.lon} per ip geolocation data.`)
+        :desc=`{$placeName} at the coordinates {$data.lat}, {$data.lon} per ip geolocation data.`
     ]
 
     return($node)
@@ -47,57 +109,149 @@ function buildLoc(data) {
         if (not $part) { break }
         $locParts.append($part)
     }
-    if (not $locParts) { return((null)) }
+    if (not $locParts) { return() }
     return(('.').join($locParts))
 }
 
-function buildASNNode(data) {
-    $names = ([])
-    for $name in ($data.asname, $data.as_, $data.as_.strip("AS").split(" ").0) {
-        if $name { $names.append($name) }
-    }
-    return($lib.import(slib.utils.inet).asnNode($data.as_, orgname=$data.isp, names=$names, orgtype=company.isp))
+// Get or make the ou:org named name, adding any non-empty names to its :names.
+// Returns (null) when name is empty, ex. ip-api.com's "" isp/org for IPs with no owner info.
+function buildOrgNode(name, names=(null), isp=(false)) {
+    if (not $name) { return() }
+    if ($names = null) { $names = ([]) }
+
+    gen.ou.org $name |
+    // A subquery, a for loop in the pipeline would yield the node once per name.
+    { for $alias in $names { if $alias { [ :names += $alias ] } } }
+    if $isp { [ :orgtype=company.isp ] }
+
+    return($node)
 }
 
-function modelResult(data, tagPrefix) {
-    $locNode = $buildPlaceNode($data)
-    $asnNode = $buildASNNode($data)
+// Get or make the IP's inet:asn, owned by the AS's org.
+// Returns (null) when the IP has no ASN (ip-api.com's "as" is "", so asnum is null).
+function buildASNNode(data) {
+    if ($data.asnum = null) { return() }
 
-    // Synapse also parses IPv4 strings as valid inet:ipv6 values (::ffff:x.x.x.x),
-    // so only fall back to inet:ipv6 when the query is not a valid IPv4.
-    ($isIpv4, $ipv4) = $lib.trycast(inet:ipv4, $data.query)
-    if $isIpv4 {
-        $ipForm = inet:ipv4
+    // The AS's org name follows its number in ip-api.com's "as", ex. "AS15169 Google LLC".
+    // Fall back to the ISP when "as" only has the number.
+    $ownerName = $data.asorg
+    if (not $ownerName) { $ownerName = $data.isp }
+    $orgtype = (null)
+    if ($ownerName and $ownerName = $data.isp) { $orgtype = company.isp }
+
+    $names = ([])
+    if $data.asname { $names.append($data.asname) }
+
+    yield $lib.import(slib.utils.inet).asnNode($data.asnum, orgname=$ownerName, names=$names, orgtype=$orgtype)
+    [ <(seen)+ { meta:source=$srcGuid } ]
+    if $data.asname { [ :name=$data.asname ] }
+
+    return($node)
+}
+
+// Model a successful ip-api.com result, yielding the IP node.
+// ipNode is the IP node that was queried, if any, otherwise the node is made from data.query.
+function modelResult(data, tagPrefix, ipNode=(null)) {
+    if $ipNode {
+        $ipText = $ipNode.repr()
     } else {
-        $ipForm = inet:ipv6
+        $ipText = $data.query
+    }
+    $form = $ipForm($ipText)
+
+    if (not $form) {
+        $lib.warn(`ip-api.com returned an invalid IP address: {$ipText}`)
+    }
+    else {
+        $placeNode = $buildPlaceNode($data)
+        $asnNode = $buildASNNode($data)
+        // The IP's WHOIS org, which isn't always the AS's org.
+        $whoisOrg = $buildOrgNode($data.org)
+
+        [ *$form=$ipText
+            :latlong?=($data.lat, $data.lon)
+            :place?=$placeNode
+            :loc?=$buildLoc($data)
+            <(seen)+ { meta:source=$srcGuid }
+        ]
+
+        if $asnNode { [ :asn=$asnNode ] }
+        if $data.reverse { [ :dns:rev?=$data.reverse ] }
+        if $whoisOrg { [ <(owns)+ $whoisOrg ] }
+
+        if ($tagPrefix != null) {
+            // TODO - add tag timestamps here
+            // A subquery, a for loop in the pipeline would yield the node once per name.
+            {
+                for $name in (hosting, proxy, mobile) {
+                    if $data.$name {
+                        $tag = `{$tagPrefix}.{$name}`
+                        [ +#$tag ]
+                    }
+                }
+            }
+        }
+
+        $buildGeoTelemNode($node, $form, $placeNode, $data)
+    }
+}
+
+// Query and model an IP string, yielding the IP node. Warns about invalid IPs and errors.
+function queryText(text, tagPrefix) {
+    if (not $ipForm($text)) {
+        $lib.warn(`slib.ipapi.query was given an invalid IP address: {$text}`)
+    }
+    else {
+        $retn = $query($text)
+        if $retn.status {
+            yield $modelResult($retn.data, $tagPrefix)
+        }
+        else {
+            $lib.warn(`There was an error querying the IPAPI service for '{$text}': {$retn.mesg}`)
+        }
+    }
+}
+
+// Query and model IP nodes, with one batch request when there's more than one.
+// Yields each node once it's modeled, or as is with a warning if its query failed.
+function queryNodes(nodes, tagPrefix) {
+    $ips = ([])
+    for $n in $nodes { $ips.append($n.repr()) }
+
+    if ($ips.size() = 1) {
+        $retns = ([$query($ips.0)])
+    }
+    else {
+        $batch = $queryBatch($ips)
+        if $batch.status {
+            $retns = $batch.data
+        }
+        else {
+            $retns = ([])
+            for $ip in $ips { $retns.append($batch) }
+        }
     }
 
-    [
-        *$ipForm?=$data.query
-        :asn?=$asnNode
-        :latlong?=($data.lat, $data.lon)
-        :place?=$locNode
-        :loc?=$buildLoc($data)
-    ]
-
-    // TODO - add tag timestamps here
-    if ($tagPrefix != null) {
-        if ($data.hosting) {
-            $hostingTag = `{$tagPrefix}.hosting`
-            [+#$hostingTag]
+    for ($n, $retn) in $lib.iters.zip($nodes, $retns) {
+        if $retn.status {
+            yield $modelResult($retn.data, $tagPrefix, ipNode=$n)
         }
-        if ($data.proxy) {
-            $proxyTag = `{$tagPrefix}.proxy`
-            [+#$proxyTag]
-        }
-        if ($data.mobile) {
-            $mobileTag = `{$tagPrefix}.mobile`
-            [+#$mobileTag]
+        else {
+            $lib.warn(`There was an error querying the IPAPI service for '{$n.repr()}': {$retn.mesg}`)
+            yield $n
         }
     }
+}
 
-    $buildGeoTelemNode($node, $locNode, $data)
+// Query and model all of the IP nodes queued in state.nodes, emptying it.
+function flushNodes(state, tagPrefix) {
+    $nodes = $state.nodes
+    $state.nodes = ([])
+    if $nodes { yield $queryNodes($nodes, $tagPrefix) }
+}
 
-    // TODO - edge to the meta:source
-    // TODO - build a 2nd org for the IP WhoIS organization if different that get's edged to the ASN org node (<contains? <uses?) and IP node (<owns)
+// Queue an IP node in state.nodes, querying and modeling the queue once it holds a full batch.
+function queueNode(state, n, tagPrefix) {
+    $state.nodes.append($n)
+    if ($state.nodes.size() >= $batchSize) { yield $flushNodes($state, $tagPrefix) }
 }

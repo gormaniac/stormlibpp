@@ -19,7 +19,7 @@ Network modeling shared by StormLib++ packages (`slib.ipapi` and `ipinfo`).
   `AS15169 Google LLC`. Returns `null` if there isn't one.
 - `asnNode(asn, orgname=(null), names=(null), orgtype=(null))` - Make the `inet:asn` and return
   it. With `orgname`, its `:owner` is the `ou:org` with that name (`$lib.gen.orgByName`), which
-  also gets `names` and `orgtype`. Makes nothing and returns `null` if `asn` has no ASN number.
+  also gets `names` added to its `:names` (existing names are kept) and `orgtype`. Makes nothing and returns `null` if `asn` has no ASN number.
     ```
     $inet = $lib.import(slib.utils.inet)
     yield $inet.asnNode("AS15169 Google LLC", orgname="Google LLC", orgtype=company.isp)
