@@ -66,7 +66,7 @@ class StormCompiler:
                         f"+#{tag.name}:{prop.key.removeprefix(':')}={self.value(prop.val)}"
                         for prop in tag.props
                     )
-                lines.append("[ " + " ".join(edits) + " ]")
+                lines.append("[\n" + "\n".join(edits) + "\n]")
                 for edge in node.edges:
                     operator = f"<({edge.verb})+" if edge.reverse else f"+({edge.verb})>"
                     for form, value in edge.targets:
