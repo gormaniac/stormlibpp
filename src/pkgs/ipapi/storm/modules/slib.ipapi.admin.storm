@@ -1,14 +1,56 @@
-function setTagPrefix (prefix) {
-    if ( $prefix = '' ) {
+// Admin (asroot) functions that change the slib.ipapi settings.
+//
+// NOTE: $lib.globals.get/set are the only global var APIs in Synapse 2.x, this package
+// requires Synapse <3.0.0 (see synapse_version), so R005 is ignored here.
+
+// Set the tag prefix, raising BadArg if it's empty or not a valid tag.
+function setTagPrefix(prefix) {
+    if ($prefix = '') {
         $lib.raise(BadArg, "slib.ipapi.admin.settag requires a non-empty tag prefix.")
     }
-    $lib.globals.set("slib:ipapi:tag:prefix", $prefix)
+
+    ($ok, $norm) = $lib.trycast(syn:tag, $prefix)
+    if (not $ok) {
+        $lib.raise(BadArg, `slib.ipapi.admin.settag requires a valid tag prefix, got: {$prefix}`)
+    }
+
+    $lib.globals.set("slib:ipapi:tag:prefix", $norm)  // noqa: R005
+    return($norm)
 }
 
-function disableTagPrefix () {
-    $lib.globals.set("slib:ipapi:tag:enabled", (false))
+function disableTagPrefix() {
+    $lib.globals.set("slib:ipapi:tag:enabled", (false))  // noqa: R005
 }
 
-function enableTagPrefix () {
-    $lib.globals.set("slib:ipapi:tag:enabled", (true))
+// Enable tags, warning if there's no tag prefix to use yet.
+function enableTagPrefix() {
+    $lib.globals.set("slib:ipapi:tag:enabled", (true))  // noqa: R005
+
+    if ($lib.globals.get("slib:ipapi:tag:prefix") = null) {  // noqa: R005
+        $lib.warn("Tags are enabled but no tag prefix is set, set one with slib.ipapi.admin.settag.")
+    }
+}
+
+// Set (or with (null), delete) the global ip-api.com pro key, kept in a global scoped "ipapi"
+// vault. Users' own keys (slib.ipapi.apikey) take precedence over it.
+function setApiKey(apikey) {
+    $vault = $lib.vault.bytype(ipapi, scope=global)
+    if ($apikey = null) {
+        if $vault {
+            $vault.delete()
+            return("slib.ipapi: Deleted the global ip-api.com pro key.")
+        }
+        return("slib.ipapi: No global ip-api.com pro key is set.")
+    }
+    if $vault {
+        $vault.secrets.apikey = $apikey
+        return("slib.ipapi: Updated the global ip-api.com pro key.")
+    }
+    $lib.vault.add("slib.ipapi:global", ipapi, global, (null), ({"apikey": $apikey}), ({}))
+    return("slib.ipapi: Saved the global ip-api.com pro key in vault slib.ipapi:global.")
+}
+
+// Whether a global ip-api.com pro key is set.
+function hasApiKey() {
+    return(($lib.import(slib.ipapi.privsep).globalKey() != null))
 }

@@ -1,50 +1,44 @@
 init {
-    $ipapilib = $lib.import("slib.ipapi.lib")
-    // TODO - cast query to an inet:ipv4/6 so we can error on bad input
+    $ipapilib = $lib.import(slib.ipapi.lib)
     $queryOpt = $cmdopts.query
+
     // Read fresh on every command call so slib.ipapi.admin.settag/enabletag/disabletag
-    // take effect on subsequent queries without needing a package reload.
-    $tagPrefix = $lib.import("slib.ipapi.privsep").getIpApiTag()
+    // take effect on subsequent queries without needing a package reload. A bad setting
+    // only means the results go untagged, it doesn't stop the query.
+    try {
+        $tagPrefix = $lib.import(slib.ipapi.privsep).getIpApiTag()
+    }
+    catch BadConfValu as err {
+        $lib.warn(`{$err.mesg} Querying without tags.`)
+        $tagPrefix = (null)
+    }
+
+    // --query ignores inbound nodes, they're dropped and its query runs in the fini block.
+    $useNodes = ($queryOpt = '')
+
+    // Inbound IP nodes waiting to be sent to ip-api.com in one batch request.
+    $state = ({"nodes": []})
 }
 
-// Use the value in --query if it is passed. This branch must not reference
-// $node at all - that would make it non-runtsafe and the command would never
-// run when --query is used without inbound nodes.
-if ( $queryOpt != '' ) {
-    // We spin when --query is used because this isn't meant to accept inbound nodes.
-    | spin |
++$useNodes
 
-    $retn = $ipapilib.query($queryOpt)
-
-    if $retn.status {
-        divert $cmdopts.yield $ipapilib.modelResult($retn.data, $tagPrefix)
-    }
-    else {
-        $lib.warn("There was an error querying the IPAPI service for '{query}': {err}",
-            query=$queryOpt, err=$retn.mesg
-        )
-    }
+if $ipapilib.isIp($node) {
+    // Queue the node, it's yielded again once its batch is queried and modeled.
+    divert (true) $ipapilib.queueNode($state, $node, $tagPrefix)
 }
 else {
-    if (($node.form() = "inet:ipv4") or ($node.form() = "inet:ipv6")) {
-        // Use repr() not value() - ip-api.com needs the printable address,
-        // not the normalized integer form that value() returns for inet:ipv4.
-        $query = $node.repr()
+    // Never hit the API for unsupported forms - ip-api.com answers an
+    // empty query with the requesting host's own IP.
+    $lib.warn(`The node {$node.repr()} is not supported by the slib.ipapi.query command, only inet:ipv4 and inet:ipv6 nodes are.`)
+}
 
-        $retn = $ipapilib.query($query)
-
-        if $retn.status {
-            divert $cmdopts.yield $ipapilib.modelResult($retn.data, $tagPrefix)
-        }
-        else {
-            $lib.warn("There was an error querying the IPAPI service for '{query}': {err}",
-                query=$query, err=$retn.mesg
-            )
-        }
+// NOTE: The fini block must come last, any opers after it would get the nodes it yields.
+fini {
+    if $useNodes {
+        // Query whatever is left of the last batch.
+        yield $ipapilib.flushNodes($state, $tagPrefix)
     }
     else {
-        // Never hit the API for unsupported forms - ip-api.com answers an
-        // empty query with the requesting host's own IP.
-        $lib.warn(`The node form "{$node.form()}" is not supported by the slib.ipapi.query command.`)
+        divert $cmdopts.yield $ipapilib.queryText($queryOpt, $tagPrefix)
     }
 }
