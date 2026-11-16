@@ -14,12 +14,22 @@
 - Add `stormlibpp.testing`, a pytest plugin for Storm service and package test suites (enable it with `pytest_plugins = ["stormlibpp.testing"]`, install with the `testing` extra). It moves the Synapse deprecation harness out of each project's `conftest.py`, now also fails the run for deprecations logged outside of a test (ex. a deprecated import at collection time; set `stormlibpp_outside_deprecations = warn` to only list them, which the terminal summary says when it fails a run), and adds `localhost` to `NO_PROXY` for fake upstream servers.
 - Add `stormlibpp.testing.checks`: `assertVersionsMatch()` checks a service's version in `pyproject.toml`, `__init__.py`, its Storm package prototypes and `uv.lock`; `stormLint()` runs Synapse's Storm linter; `assertMainHelp()` checks `python -m <module> --help` works.
 - StormLib++'s own tests use the new plugin.
+- Implements stormgen Markdown-to-node extraction and offline conversion, including properties, tags, tag properties and constant values.
+- Adds `compile_storm()` and asynchronous `apply()` APIs for creating and updating Cortex nodes, including generated GUIDs, runtime expressions and directed edges.
+- Adds optional documentation-to-`meta:note` conversion with deduplication.
+- Adds a compiler CLI via `python -m stormlibpp.stormgen`, accepting files or standard input and emitting standalone Storm.
+- Supports full-document, single-form and embedded node definitions, with configurable heading levels.
+- Adds documentation, examples and regression coverage for extraction, conversion, compilation, application and the CLI.
+- **Note:** Documents containing Storm expressions are executable input and must be trusted. Cortex application is not guaranteed atomic.
 ### Fixes
 - Isolate config-builder state and make repeated loads atomic and idempotent. Fix Storm syntax and runtime mappings, preserve metadata on reused software nodes, and reject artifact hash mismatches.
 - Correct the STIX command examples to use `slib.stix.ingest`.
 - STIX ingest no longer fails on optional fields: `malware-analysis` objects without `result` or `result_name`, and `user-account` objects without `account_login`.
 - STIX ingest saves the bundle as node data when the `it:sec:stix:bundle` node already exists, not only when it is created.
 - ipinfo (0.1.2) models ASNs with `slib.utils.inet`, and no longer makes an `ou:org` with an empty name when ipinfo.io has no AS name.
+- Corrects heading scope, property/tag ownership and repeated parsing to prevent unrelated content or duplicate entries from being extracted.
+- Preserves literal Markdown values separately from executable Storm expressions and validates generated syntax before submission.
+- Rejects malformed definitions and operations unsupported by offline conversion instead of silently omitting them.
 
 ## v0.12.1 - 2026-11-01
 ### Features
