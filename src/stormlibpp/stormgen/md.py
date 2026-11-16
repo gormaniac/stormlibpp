@@ -9,6 +9,8 @@ import marko.md_renderer
 
 def text_from_element(element: marko.element.Element) -> str:
     """Extract text recursively, including nested inline formatting."""
+    if isinstance(element, marko.inline.LineBreak):
+        return "\n"
     children = getattr(element, "children", [])
     if isinstance(children, str):
         return children
