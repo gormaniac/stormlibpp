@@ -28,6 +28,25 @@ StormLib++ is split into 2 parts:
 - [`stormlibpp.telepath.TelepathRetn`](https://docs.gormo.co/stormlibpp/stormlibpp/stormlibpp.telepath/#stormlibpp.telepath.TelepathRetn)
     - This object and it's many defined subclasses can be used in a Storm Advanced Power-Up's API to give developers a simple way to return standardized objects over Telepath (and it helps with type hints 🙂).
 
+## Stormgen
+
+Stormgen turns structured Markdown into Synapse node data or executable Storm,
+including properties, tags, edges and optional documentation notes. It supports
+offline extraction and conversion, Storm compilation, and application through a
+caller-provided Cortex connection.
+
+See the [Stormgen guide](doc/stormgen_design.md) and
+[example document](tests/data/stormgen-example.md). Compile a document with:
+
+```sh
+python -m stormlibpp.stormgen nodes.md
+```
+
+Documents containing Storm expressions are executable input. Only compile or
+apply trusted documents under appropriately scoped Cortex permissions.
+
+See [release notes](CHANGELOG.md) for changes.
+
 ## StormLib++ Power-Ups
 
 StormLib++ contains 4 different Synapse Rapid Power-Ups stored in the repo's `src/pkgs/` directory:
@@ -64,5 +83,6 @@ pkgs/index
 :maxdepth: 1
 
 stormlibpp/stormlibpp
+stormgen_design
 changelog
 ```

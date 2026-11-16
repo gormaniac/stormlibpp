@@ -6,6 +6,7 @@ name = "pypi"
 [packages]
 synapse = ">=2.256.0,<3"
 aiohttp = "*"
+marko = ">=2,<3"
 
 [dev-packages]
 black = "*"

@@ -13,7 +13,8 @@ requires-python = ">=3.11"
 
 # Fill in dependencies here.
 dependencies = [
-    "synapse>=2.225.0,<3"
+    "synapse>=2.225.0,<3",
+    "marko>=2,<3",
 ]
 
 [project.optional-dependencies]
