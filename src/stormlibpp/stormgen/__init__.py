@@ -409,7 +409,7 @@ class NodesConverter:
                 raise ValueError(f"Edges on {node!r} require stormgen.apply()")
             text, expression = utils.heading_value(node.valu)
             value = utils.constant_value(text) if expression else text
-            if value == "*" or isinstance(value, tuple):
+            if text.strip() == "*" or isinstance(value, tuple):
                 raise ValueError(f"Generated or composite primary values on {node!r} require stormgen.apply()")
             props = {
                 prop.key.removeprefix(":"): self._value(prop.val)
