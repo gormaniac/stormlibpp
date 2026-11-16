@@ -338,11 +338,13 @@ class DocExtractor:
         return nodes
 
     def _extract_forms(self):
-        root = self.doc.parts[0] if self.doc.parts else None
-        if root is not None and root.level == 0 and any(
-            not isinstance(block, marko.block.BlankLine) for block in root.blocks
-        ):
-            raise ValueError("Single-form documents must start with a node heading")
+        for part in self.doc.parts:
+            if part.level == 1:
+                break
+            if part.level or any(
+                not isinstance(block, marko.block.BlankLine) for block in part.blocks
+            ):
+                raise ValueError("Single-form documents must start with a node heading")
         return self._extract(self.doc.parts, form=self.form, form_level=0, node_level=1)
 
     def _extract_full(self):
