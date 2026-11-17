@@ -1,0 +1,119 @@
+// slib.pdns.privsep - Privileged (asroot) code for slib.pdns: the CIRCL Passive DNS request.
+//
+// Runs asroot (gated by the slib.pdns.user perm) so it can read the credentials saved by
+// slib.pdns.admin.key without users being able to read them. Modeling is in slib.pdns.lib.
+//
+// API docs: https://www.circl.lu/services/passive-dns/
+//
+// GET https://www.circl.lu/pdns/query/<fqdn or ip>, HTTP Basic auth. CIDRs aren't supported.
+//
+// Request headers (all optional):
+//   dribble-disable-active-query  Don't actively resolve the query (only presence is checked)
+//   dribble-filter-rrtype         Only return this rrtype, ex. NS
+//   dribble-paginate-count        Records per page
+//   dribble-paginate-cursor       The X-Dribble-Cursor of the previous page
+//
+// Response headers:
+//   X-Dribble-Cursor  The next page's cursor (only when paginating and more remain)
+//   X-Dribble-Errors  A JSON list, ex. [{"error": "maxset", "record": "cdn1.wixdns.net",
+//                     "value": 1000, "rrtype": "CNAME", "total_value": 13518377}] when an
+//                     rrtype was capped at 1000 records (use pages to get them all)
+//
+// The body is application/x-ndjson, one COF record a line (empty when nothing was found):
+//
+//   {"rrtype": "A", "rrname": "185.194.93.14", "rdata": "circl.lu", "count": 8617,
+//    "time_first": 1696798385, "time_last": 1790942704, "origin": "https://www.circl.lu/pdns/"}
+//
+// NOTE - In CIRCL's responses (as of 2026-11), "rrname" is the record's VALUE and "rdata" is
+// the name that OWNS the record, the reverse of the COF spec. Ex. the record above is
+// "circl.lu A 185.194.93.14", and querying www.circl.lu returns
+// {"rrtype": "CNAME", "rrname": "cpab.circl.lu", "rdata": "www.circl.lu"} for
+// "www.circl.lu CNAME cpab.circl.lu". See tests/pkgs/pdns/cassettes/ for real responses.
+//
+// Times are epoch seconds. MX values are "<pref> <host>", SOA values are the whole SOA rdata.
+// A 401 is a text/html body (bad or missing credentials).
+
+$URL = "https://www.circl.lu/pdns/query"
+$USERKEY = "slib:pdns:auth:user"
+$PASSKEY = "slib:pdns:auth:passwd"
+
+function _fail(mesg) {
+    return(({"status": (false), "mesg": $mesg, "data": (null)}))
+}
+
+// A response header by name, ignoring case. Returns null if it's missing.
+function _header(headers, name) {
+    $name = $name.lower()
+    for ($key, $valu) in $headers {
+        if ($key.lower() = $name) { return($valu) }
+    }
+    return((null))
+}
+
+// The request headers for a query: Basic auth, and any dribble-* options.
+// Raises NeedConfValu if the credentials aren't set.
+function _headers(rrtype, active, pagesize, cursor) {
+    $user = $lib.globals.get($USERKEY)
+    $passwd = $lib.globals.get($PASSKEY)
+    if ($user = null or $passwd = null) {
+        $lib.raise(NeedConfValu, "The CIRCL Passive DNS credentials are not set. Set them with the slib.pdns.admin.key command.")
+    }
+
+    $creds = `{$user}:{$passwd}`
+    $headers = ({"Authorization": `Basic {$lib.base64.encode($creds.encode())}`})
+
+    // CIRCL only checks that this header is there, its value is ignored.
+    if (not $active) { $headers."dribble-disable-active-query" = "1" }
+    if $rrtype { $headers."dribble-filter-rrtype" = $rrtype.upper() }
+    if $pagesize { $headers."dribble-paginate-count" = $lib.cast(str, $pagesize) }
+    if $cursor { $headers."dribble-paginate-cursor" = $cursor }
+
+    return($headers)
+}
+
+// Query CIRCL Passive DNS for an FQDN or IP.
+//
+// Returns {"status", "mesg", "data"}. When status is true, data is:
+//
+//   {"records": [<COF record>, ...], "cursor": <the next page's cursor, or null>,
+//    "errors": [<X-Dribble-Errors entry>, ...]}
+function request(valu, rrtype=(null), active=(true), pagesize=(null), cursor=(null)) {
+    $headers = $_headers($rrtype, $active, $pagesize, $cursor)
+
+    $resp = $lib.inet.http.get(`{$URL}/{$valu}`, headers=$headers)
+
+    if ($resp.code = 401) {
+        return($_fail(`CIRCL Passive DNS rejected the credentials set with slib.pdns.admin.key (HTTP 401) while querying: {$valu}`))
+    }
+    if ($resp.code != 200) {
+        if ($resp.code = -1) {
+            $err = $resp.reason
+        } else {
+            $err = `HTTP {$resp.code} {$resp.reason}`
+        }
+        return($_fail(`An HTTP error occurred while querying CIRCL Passive DNS for: {$valu} - {$err}`))
+    }
+
+    $records = ([])
+    try {
+        for $line in $resp.body.decode().split("\n") {
+            $line = $line.strip()
+            if $line { $records.append($lib.json.load($line)) }
+        }
+    } catch * as err {
+        return($_fail(`CIRCL Passive DNS returned invalid JSON for: {$valu} - {$err.mesg}`))
+    }
+
+    $errors = ([])
+    $errhdr = $_header($resp.headers, "X-Dribble-Errors")
+    if $errhdr {
+        try {
+            $errors = $lib.json.load($errhdr)
+        } catch * as err {
+            $errors = ([({"error": "badjson", "value": $errhdr})])
+        }
+    }
+
+    $data = ({"records": $records, "cursor": $_header($resp.headers, "X-Dribble-Cursor"), "errors": $errors})
+    return(({"status": (true), "mesg": `Successfully queried CIRCL Passive DNS for: {$valu}`, "data": $data}))
+}

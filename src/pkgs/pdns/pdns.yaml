@@ -31,8 +31,12 @@ perms:
     desc: Allows a user to call user APIs of the slib.pdns Storm Package.
 
 modules:
-  # asroot so users can make requests with the CIRCL credentials without being able to read them.
+  # Modeling runs as the calling user, so it needs the user's node edit perms.
   - name: slib.pdns.lib
+    perms:
+        - [ slib, pdns, user ]
+  # asroot so users can make requests with the CIRCL credentials without being able to read them.
+  - name: slib.pdns.privsep
     asroot:perms:
         - [ slib, pdns, user ]
   - name: slib.pdns.lib.admin
@@ -83,6 +87,11 @@ commands:
             How many records CIRCL returns a request, 0 lets CIRCL decide.
 
             CIRCL caps a record type at 1000 results unless pages are used.
+
+      - - --max-pages
+        - type: int
+          default: 10
+          help: The most pages to request when --page-size is used, 0 for no limit.
 
       - - --yield
         - default: false

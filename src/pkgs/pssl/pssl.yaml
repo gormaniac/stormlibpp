@@ -37,8 +37,12 @@ perms:
     desc: Allows a user to call user APIs of the slib.pssl Storm Package.
 
 modules:
-  # asroot so users can make requests with the CIRCL credentials without being able to read them.
+  # Modeling runs as the calling user, so it needs the user's node edit perms.
   - name: slib.pssl.lib
+    perms:
+        - [ slib, pssl, user ]
+  # asroot so users can make requests with the CIRCL credentials without being able to read them.
+  - name: slib.pssl.privsep
     asroot:perms:
         - [ slib, pssl, user ]
   - name: slib.pssl.lib.admin
