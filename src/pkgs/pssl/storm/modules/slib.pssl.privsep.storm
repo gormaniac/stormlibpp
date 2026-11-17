@@ -35,20 +35,22 @@ function _fail(mesg) {
     return(({"status": (false), "mesg": $mesg, "data": (null)}))
 }
 
-// The Basic auth header. Raises NeedConfValu if the credentials aren't set.
-function _headers() {
+// GET <url>/<endpoint>/<valu>. Returns {"status", "mesg", "data"}, data is the JSON response.
+//
+// Raises NeedConfValu if the credentials aren't set.
+function _request(endpoint, valu) {
+    // The credentials are only read here, where they're used. Every function in an asroot module
+    // can be called by a slib.pssl.user (a leading "_" doesn't make one private), so no function
+    // may return them, or anything they can be recovered from, like the Authorization header.
     $user = $lib.globals.get($userKey)
     $passwd = $lib.globals.get($passKey)
     if ($user = null or $passwd = null) {
         $lib.raise(NeedConfValu, "The CIRCL Passive SSL credentials are not set. Set them with the slib.pssl.admin.key command.")
     }
     $creds = `{$user}:{$passwd}`
-    return(({"Authorization": `Basic {$lib.base64.encode($creds.encode())}`}))
-}
+    $headers = ({"Authorization": `Basic {$lib.base64.encode($creds.encode())}`})
 
-// GET <url>/<endpoint>/<valu>. Returns {"status", "mesg", "data"}, data is the JSON response.
-function _request(endpoint, valu) {
-    $resp = $lib.inet.http.get(`{$url}/{$endpoint}/{$valu}`, headers=$_headers())
+    $resp = $lib.inet.http.get(`{$url}/{$endpoint}/{$valu}`, headers=$headers)
 
     if ($resp.code = 401) {
         return($_fail(`CIRCL Passive SSL rejected the credentials set with slib.pssl.admin.key (HTTP 401) while querying {$endpoint}: {$valu}`))

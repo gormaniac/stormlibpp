@@ -4,7 +4,7 @@ An interface to the passive DNS data published by [circl.lu](https://www.circl.l
 
 `slib.pdns` is a Synapse Rapid Power-Up that looks up FQDNs and IPs in CIRCL Passive DNS and models the DNS records CIRCL has seen.
 
-Each record becomes an `inet:dns:a`, `inet:dns:aaaa`, `inet:dns:cname`, `inet:dns:mx`, `inet:dns:ns`, `inet:dns:txt` or `inet:dns:soa` node. Its `.seen` is CIRCL's first and last seen times. Its `slib:pdns` node data holds CIRCL's `count`, `time_first` and `time_last`. The node has a `seen` edge from the `circl.lu passive dns` `meta:source`. Other rrtypes are skipped with a warning. Records whose name isn't a valid `inet:fqdn`, ex. a wildcard like `*.example.com`, are skipped.
+Each record becomes an `inet:dns:a`, `inet:dns:aaaa`, `inet:dns:cname`, `inet:dns:mx`, `inet:dns:ns`, `inet:dns:txt` or `inet:dns:soa` node. Its `.seen` is CIRCL's first and last seen times. Its `slib:pdns` node data holds CIRCL's `count`, `time_first` and `time_last` for each CIRCL record, keyed by the record's raw `<rdata> <rrname>`. Records that only differ by case are one node, so each one is kept. The node has a `seen` edge from the `circl.lu passive dns` `meta:source`. Other rrtypes are skipped with a warning. Records whose name isn't a valid `inet:fqdn`, ex. a wildcard like `*.example.com`, are skipped.
 
 CIRCL Passive DNS needs an account. CIRCL gives access to trusted partners. Request it from CIRCL's [contact page](https://www.circl.lu/contact/) and say who you are and what you'll use the data for. The API uses HTTP Basic auth. An admin saves the credentials once with `slib.pdns.admin.key`, and every user's lookups use them. Users can't read the credentials.
 

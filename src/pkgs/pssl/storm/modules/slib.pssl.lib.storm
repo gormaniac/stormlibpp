@@ -50,14 +50,22 @@ function serverCert(ip, cert) {
     return($node)
 }
 
+// The subject DN in a query() result's subject "values", or null if there isn't one. The
+// values aren't always DNs, ex. one has a base64 certificate before its DN. A DN starts with an
+// attribute name or OID and "=" (ex. "C=US, ...", "serialNumber=...", "1.3.6.1...=..."), a base64
+// certificate's only "="s are its padding.
+function subjectDn(values) {
+    for $valu in $values {
+        if $lib.regex.matches('^([A-Za-z][A-Za-z0-9-]{0,63}|[0-9]+(\.[0-9]+)+)=', $valu) { return($valu) }
+    }
+    return((null))
+}
+
 // Model a query() result. Emits an inet:tls:servercert for each certificate on each IP.
 function modelQuery(data) {
     for ($ip, $info) in $data {
         for $sha1 in $info.certificates {
-            $subject = (null)
-            $subjects = $info.subjects.$sha1.values
-            if $subjects { $subject = $subjects.0 }
-            $cert = $certNode($sha1, subject=$subject)
+            $cert = $certNode($sha1, subject=$subjectDn($info.subjects.$sha1.values))
             emit $serverCert($ip, $cert)
         }
     }

@@ -31,44 +31,62 @@ function modelRecord(record) {
     $owner = $record.rdata.rstrip(".")
     $valu = $record.rrname
 
+    // The form and its value, checked with trycast before any node is made.
     switch $record.rrtype {
-        "A": { [ inet:dns:a?=($owner, $valu) ] }
-        "AAAA": { [ inet:dns:aaaa?=($owner, $valu) ] }
-        "CNAME": { [ inet:dns:cname?=($owner, $valu.rstrip(".")) ] }
+        "A": { $form = "inet:dns:a" $ndef = ($owner, $valu) }
+        "AAAA": { $form = "inet:dns:aaaa" $ndef = ($owner, $valu) }
+        "CNAME": { $form = "inet:dns:cname" $ndef = ($owner, $valu.rstrip(".")) }
         // "<pref> <host>"
-        "MX": { [ inet:dns:mx?=($owner, $valu.split(" ").index(-1).rstrip(".")) ] }
-        "NS": { [ inet:dns:ns?=($owner, $valu.rstrip(".")) ] }
-        "TXT": { [ inet:dns:txt?=($owner, $valu) ] }
+        "MX": { $form = "inet:dns:mx" $ndef = ($owner, $valu.split(" ").index(-1).rstrip(".")) }
+        "NS": { $form = "inet:dns:ns" $ndef = ($owner, $valu.rstrip(".")) }
+        "TXT": { $form = "inet:dns:txt" $ndef = ($owner, $valu) }
         // "<mname> <rname> <serial> <refresh> <retry> <expire> <minimum>"
-        "SOA": {
-            $parts = $valu.split(" ")
-            ($ok, $fqdn) = $lib.trycast(inet:fqdn, $owner)
-            if (not $ok) { return((null)) }
-            // A bad MNAME or RNAME is left off, the rest of the SOA is still modeled.
-            $props = ({"fqdn": $fqdn})
-            ($ok, $ns) = $lib.trycast(inet:fqdn, $parts.0.rstrip("."))
-            if $ok { $props.ns = $ns }
-            if ($lib.len($parts) > 1) {
-                $rname = $soaEmail($parts.1)
-                if $rname {
-                    ($ok, $email) = $lib.trycast(inet:email, $rname)
-                    if $ok { $props.email = $email }
-                }
-            }
-            [ inet:dns:soa=$props ]
-        }
+        "SOA": { $form = "inet:dns:soa" $ndef = $soaProps($owner, $valu) }
         *: { return((null)) }
     }
 
-    // The try-sets above make no node for an invalid value, and then nothing below runs and
-    // this returns null.
+    if ($ndef = null) { return((null)) }
+    if ($form != "inet:dns:soa") {
+        ($ok, $ndef) = $lib.trycast($form, $ndef)
+        if (not $ok) { return((null)) }
+    }
+
     [
+        *$form=$ndef
         .seen=($lib.time.fromunix($record.time_first), $lib.time.fromunix($record.time_last))
         <(seen)+ { meta:source=$srcGuid }
     ]
-    $node.data.set("slib:pdns", ({"count": $record.count, "time_first": $record.time_first, "time_last": $record.time_last}))
+
+    // Records that only differ by case (ex. "cpAb.circl.lu" and "cpab.circl.lu") are the same
+    // node, so CIRCL's count and times are kept per record, keyed by its raw "<rdata> <rrname>".
+    // A repeated lookup replaces the same keys.
+    $seen = $node.data.get("slib:pdns")
+    if ($seen = null) { $seen = ({}) }
+    $rawKey = `{$record.rdata} {$record.rrname}`
+    $seen.$rawKey = ({"count": $record.count, "time_first": $record.time_first, "time_last": $record.time_last})
+    $node.data.set("slib:pdns", $seen)
 
     return($node)
+}
+
+// The inet:dns:soa guid props of an SOA record, or null if the owner isn't a valid inet:fqdn.
+// A bad MNAME or RNAME is left off, the rest of the SOA is still modeled.
+function soaProps(owner, valu) {
+    ($ok, $fqdn) = $lib.trycast(inet:fqdn, $owner)
+    if (not $ok) { return((null)) }
+
+    $parts = $valu.split(" ")
+    $props = ({"fqdn": $fqdn})
+    ($ok, $ns) = $lib.trycast(inet:fqdn, $parts.0.rstrip("."))
+    if $ok { $props.ns = $ns }
+    if ($lib.len($parts) > 1) {
+        $rname = $soaEmail($parts.1)
+        if $rname {
+            ($ok, $email) = $lib.trycast(inet:email, $rname)
+            if $ok { $props.email = $email }
+        }
+    }
+    return($props)
 }
 
 // Query CIRCL Passive DNS for valu and emit each COF record. Warns on CIRCL's errors.

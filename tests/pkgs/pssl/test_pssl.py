@@ -2,6 +2,7 @@
 
 import base64
 import contextlib
+import json
 import os
 
 import synapse.tests.utils as s_test
@@ -110,6 +111,14 @@ class PsslTest(s_test.StormPkgTest):
             msgs = await core.stormlist('$lib.print($lib.globals.get("slib:pssl:auth:passwd"))', opts=opts)
             self.stormIsInErr("must have permission globals.get", msgs)
 
+            # No privsep function hands the credentials back. Every function in an asroot module
+            # can be called by the user, even ones whose names start with "_".
+            secrets = ("mypasswd", base64.b64encode(b"myuser:mypasswd").decode())
+            self.false(any(s in json.dumps(retn) for s in secrets))
+            msgs = await core.stormlist("$lib.print($lib.import(slib.pssl.privsep)._headers())", opts=opts)
+            self.stormIsInErr("_headers", msgs)
+            self.false(any(s in json.dumps(msgs) for s in secrets))
+
             # Modeling runs as the user, so it needs node edit perms too.
             with cassette("query_ip"):
                 msgs = await core.stormlist("slib.pssl.lookup --query 172.228.24.7", opts=opts)
@@ -193,6 +202,26 @@ class PsslTest(s_test.StormPkgTest):
             self.len(77, [m for m in msgs if m[0] == "node"])
             self.len(9, await core.nodes("inet:server"))
             self.len(53, await core.nodes("crypto:x509:cert"))
+
+            # This cert's subject "values" are a base64 certificate, then its DN.
+            certs = await core.nodes("crypto:x509:cert:sha1=3ab2c99ad59cbfd4f3ec18f5f02cc2703094a380")
+            self.eq("C=US, ST=California, L=Ventura, O=Patagonia, OU=Ventura, CN=www.patagonia.com", certs[0].get("subject"))
+            self.len(0, await core.nodes("crypto:x509:cert:subject^=MII"))
+
+    async def test_pssl_subject_dn(self):
+        async with self.getTestCore() as core:
+            q = "return($lib.import(slib.pssl.lib).subjectDn($vals))"
+            for vals, dn in (
+                (["C=US, O=Example, CN=example.com"], "C=US, O=Example, CN=example.com"),
+                (["MIIFIjCCBAqgAwIBAgIQbHfwC7uqMl+L/Q+0TSveGzANBgkqhkiG9w0BAQsF" + "A" * 1500 + "==", "CN=b"], "CN=b"),
+                (["serialNumber=123, CN=a"], "serialNumber=123, CN=a"),
+                (["1.3.6.1.4.1.311.60.2.1.3=US, CN=a"], "1.3.6.1.4.1.311.60.2.1.3=US, CN=a"),
+                # Base64 with no "+" or "/" before its padding still isn't a DN.
+                (["MIIF" + "A" * 1500 + "=="], None),
+                ([], None),
+                (None, None),
+            ):
+                self.eq(dn, await core.callStorm(q, opts={"vars": {"vals": vals}}))
 
     async def test_pssl_lookup_empty(self):
         async with self.getTestCore() as core:

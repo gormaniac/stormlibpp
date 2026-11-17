@@ -2,6 +2,7 @@
 
 import base64
 import contextlib
+import json
 import os
 
 import synapse.tests.utils as s_test
@@ -126,6 +127,14 @@ class PdnsTest(s_test.StormPkgTest):
             msgs = await core.stormlist('$lib.print($lib.globals.get("slib:pdns:auth:passwd"))', opts=opts)
             self.stormIsInErr("must have permission globals.get", msgs)
 
+            # No privsep function hands the credentials back. Every function in an asroot module
+            # can be called by the user, even ones whose names start with "_".
+            secrets = ("mypasswd", base64.b64encode(b"myuser:mypasswd").decode())
+            self.false(any(s in json.dumps(retn) for s in secrets))
+            msgs = await core.stormlist("$lib.print($lib.import(slib.pdns.privsep)._headers())", opts=opts)
+            self.stormIsInErr("_headers", msgs)
+            self.false(any(s in json.dumps(msgs) for s in secrets))
+
             # Modeling runs as the user, so it needs node edit perms too.
             with cassette("domain"):
                 msgs = await core.stormlist("slib.pdns.lookup --query circl.lu", opts=opts)
@@ -169,7 +178,7 @@ class PdnsTest(s_test.StormPkgTest):
             nodes = await core.nodes("inet:dns:a=(circl.lu, 185.194.93.14)")
             self.len(1, nodes)
             self.eq((1696798385000, 1790942704000), nodes[0].get(".seen"))
-            self.eq({"count": 8617, "time_first": 1696798385, "time_last": 1790942704},
+            self.eq({"circl.lu 185.194.93.14": {"count": 8617, "time_first": 1696798385, "time_last": 1790942704}},
                     await nodes[0].getData("slib:pdns"))
             self.len(1, await core.nodes(f"inet:dns:a=(circl.lu, 185.194.93.14) <(seen)- meta:source={SOURCE}"))
 
@@ -222,6 +231,22 @@ class PdnsTest(s_test.StormPkgTest):
             self.len(1, await core.nodes("inet:dns:cname=(www.circl.lu, cfss1.circl.lu)"))
             self.len(1, await core.nodes("inet:dns:cname=(www.circl.lu, cpab.circl.lu)"))
             self.len(2, await core.nodes("inet:dns:cname:fqdn=www.circl.lu"))
+
+            # Each case variant keeps its own count and times, they don't overwrite each other.
+            nodes = await core.nodes("inet:dns:cname=(www.circl.lu, cpab.circl.lu)")
+            data = await nodes[0].getData("slib:pdns")
+            self.len(16, data)
+            self.eq({"count": 29001, "time_first": 1696779474, "time_last": 1790939251}, data["www.circl.lu cpab.circl.lu"])
+            self.eq({"count": 12, "time_first": 1713939878, "time_last": 1727363163}, data["www.circl.lu cpAb.circl.lu"])
+            # .seen covers every variant.
+            self.eq(1696779474000, nodes[0].get(".seen")[0])
+
+            # A repeated lookup replaces the same keys.
+            with cassette("fqdn_cname"):
+                msgs = await core.stormlist("slib.pdns.lookup --query www.circl.lu")
+            self.stormHasNoWarnErr(msgs)
+            nodes = await core.nodes("inet:dns:cname=(www.circl.lu, cpab.circl.lu)")
+            self.eq(data, await nodes[0].getData("slib:pdns"))
 
     async def test_pdns_lookup_ips(self):
         async with self.getTestCore() as core:

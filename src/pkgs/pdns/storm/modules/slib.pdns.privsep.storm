@@ -50,15 +50,23 @@ function _header(headers, name) {
     return((null))
 }
 
-// The request headers for a query: Basic auth, and any dribble-* options.
+// Query CIRCL Passive DNS for an FQDN or IP.
+//
+// Returns {"status", "mesg", "data"}. When status is true, data is:
+//
+//   {"records": [<COF record>, ...], "cursor": <the next page's cursor, or null>,
+//    "errors": [<X-Dribble-Errors entry>, ...]}
+//
 // Raises NeedConfValu if the credentials aren't set.
-function _headers(rrtype, active, pagesize, cursor) {
+function request(valu, rrtype=(null), active=(true), pagesize=(null), cursor=(null)) {
+    // The credentials are only read here, where they're used. Every function in an asroot module
+    // can be called by a slib.pdns.user (a leading "_" doesn't make one private), so no function
+    // may return them, or anything they can be recovered from, like the Authorization header.
     $user = $lib.globals.get($userKey)
     $passwd = $lib.globals.get($passKey)
     if ($user = null or $passwd = null) {
         $lib.raise(NeedConfValu, "The CIRCL Passive DNS credentials are not set. Set them with the slib.pdns.admin.key command.")
     }
-
     $creds = `{$user}:{$passwd}`
     $headers = ({"Authorization": `Basic {$lib.base64.encode($creds.encode())}`})
 
@@ -67,18 +75,6 @@ function _headers(rrtype, active, pagesize, cursor) {
     if $rrtype { $headers."dribble-filter-rrtype" = $rrtype.upper() }
     if $pagesize { $headers."dribble-paginate-count" = $lib.cast(str, $pagesize) }
     if $cursor { $headers."dribble-paginate-cursor" = $cursor }
-
-    return($headers)
-}
-
-// Query CIRCL Passive DNS for an FQDN or IP.
-//
-// Returns {"status", "mesg", "data"}. When status is true, data is:
-//
-//   {"records": [<COF record>, ...], "cursor": <the next page's cursor, or null>,
-//    "errors": [<X-Dribble-Errors entry>, ...]}
-function request(valu, rrtype=(null), active=(true), pagesize=(null), cursor=(null)) {
-    $headers = $_headers($rrtype, $active, $pagesize, $cursor)
 
     $resp = $lib.inet.http.get(`{$url}/{$valu}`, headers=$headers)
 
