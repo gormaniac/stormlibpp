@@ -1,6 +1,7 @@
 ## Unreleased
 ### Features
 ### Fixes
+- `stormlibpp.testing`: deprecations logged by a test marked `allow_synapse_deprecations` no longer count as outside of a test, which failed the run.
 
 ## v1.1.0 - 2026-11-16
 ### Features
