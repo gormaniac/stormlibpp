@@ -304,6 +304,20 @@ class PsslTest(s_test.StormPkgTest):
             self.eq(2048, keys[0].get("bits"))
             self.eq(65537, keys[0].get("pub:exp"))
 
+    async def test_pssl_fetch_bad_identities(self):
+        async with self.getTestCore() as core:
+            # A cert's identities and SANs aren't always valid nodes. The bad ones are dropped, the
+            # good ones are kept, and the rest of the fetch goes on.
+            q = '''
+                $x509 = $lib.import(slib.utils.x509)
+                $ids = $x509.identities(((dns, "Acme,Inc.example"), (dns, "ok.example.com"), (email, "not an email"), (uri, "::bad")), ())
+                return($lib.import(slib.pssl.lib)._valid(inet:fqdn, $ids.fqdns))
+            '''
+            self.eq(["ok.example.com"], await core.callStorm(q))
+            self.eq([], await core.callStorm("return($lib.import(slib.pssl.lib)._valid(inet:email, (['not an email'])))"))
+            self.eq([], await core.callStorm("return($lib.import(slib.pssl.lib)._valid(inet:url, (['::bad'])))"))
+            self.eq([], await core.callStorm("return($lib.import(slib.pssl.lib)._valid(inet:url, (null)))"))
+
     async def test_pssl_lookup_query_fetch(self):
         async with self.getTestCore() as core:
             await self.auth(core)

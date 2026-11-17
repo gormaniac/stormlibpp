@@ -2,7 +2,7 @@ name: slib.pdns
 version: 0.1.0
 guid: b0c48ad2eec04567a5ecae461017ebbe
 
-synapse_version: ">=2.162.0,<3.0.0"
+synapse_version: ">=2.207.0,<3.0.0"
 
 genopts:
     dotstorm: true

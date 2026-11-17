@@ -8,6 +8,8 @@ Each record becomes an `inet:dns:a`, `inet:dns:aaaa`, `inet:dns:cname`, `inet:dn
 
 CIRCL Passive DNS needs an account. CIRCL gives access to trusted partners. Request it from CIRCL's [contact page](https://www.circl.lu/contact/) and say who you are and what you'll use the data for. The API uses HTTP Basic auth. An admin saves the credentials once with `slib.pdns.admin.key`, and every user's lookups use them. Users can't read the credentials.
 
+Requires Synapse 2.207.0 or newer.
+
 ## Examples
 ```
 // Save the CIRCL Passive DNS credentials (admin only).
