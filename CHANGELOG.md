@@ -1,5 +1,8 @@
 ## Unreleased
 ### Features
+- Adds version 0.1.0 of the `slib.pdns` Rapid Power-Up, which looks up FQDNs and IPs in [CIRCL Passive DNS](https://www.circl.lu/services/passive-dns/) and models the DNS records CIRCL has seen. `slib.pdns.lookup` takes `inet:fqdn`, `inet:ipv4` and `inet:ipv6` nodes or a `--query` string, and can filter by record type (`--rrtype`), skip CIRCL's active resolver (`--no-active`) and page through large results (`--page-size`, `--max-pages`). Records are modeled as `inet:dns:*` nodes with CIRCL's first and last seen times as `.seen`. CIRCL needs an account: an admin saves the credentials with `slib.pdns.admin.key`, and users can't read them.
+- Adds version 0.1.0 of the `slib.pssl` Rapid Power-Up, which looks up IPs, CIDR blocks (/23 to /32) and certificates in [CIRCL Passive SSL](https://www.circl.lu/services/passive-ssl/) and models the X.509 certificates seen on each IP as `inet:tls:servercert` nodes. `slib.pssl.lookup` takes `inet:ipv4`, `inet:cidr4`, `crypto:x509:cert` and `hash:sha1` nodes or a `--query` string. `--fetch` also downloads each certificate and parses it with `slib.utils.x509` into a full `crypto:x509:cert`. Requires `slib.utils`. CIRCL needs an account: an admin saves the credentials with `slib.pssl.admin.key`, and users can't read them.
+- Adds `scripts/pkgs/record_circl.py`, which records the CIRCL Passive DNS and Passive SSL responses the `slib.pdns` and `slib.pssl` tests replay.
 ### Fixes
 
 ## v1.1.1 - 2026-11-17
@@ -44,9 +47,6 @@
 - Supports full-document, single-form and embedded node definitions, with configurable heading levels.
 - Adds documentation, examples and regression coverage for extraction, conversion, compilation, application and the CLI.
 - **Note:** Documents containing Storm expressions are executable input and must be trusted. Cortex application is not guaranteed atomic.
-- Adds version 0.1.0 of the `slib.pdns` Rapid Power-Up, which looks up FQDNs and IPs in [CIRCL Passive DNS](https://www.circl.lu/services/passive-dns/) and models the DNS records CIRCL has seen. `slib.pdns.lookup` takes `inet:fqdn`, `inet:ipv4` and `inet:ipv6` nodes or a `--query` string, and can filter by record type (`--rrtype`), skip CIRCL's active resolver (`--no-active`) and page through large results (`--page-size`, `--max-pages`). Records are modeled as `inet:dns:*` nodes with CIRCL's first and last seen times as `.seen`. CIRCL needs an account: an admin saves the credentials with `slib.pdns.admin.key`, and users can't read them.
-- Adds version 0.1.0 of the `slib.pssl` Rapid Power-Up, which looks up IPs, CIDR blocks (/23 to /32) and certificates in [CIRCL Passive SSL](https://www.circl.lu/services/passive-ssl/) and models the X.509 certificates seen on each IP as `inet:tls:servercert` nodes. `slib.pssl.lookup` takes `inet:ipv4`, `inet:cidr4`, `crypto:x509:cert` and `hash:sha1` nodes or a `--query` string. `--fetch` also downloads each certificate and parses it with `slib.utils.x509` into a full `crypto:x509:cert`. Requires `slib.utils`. CIRCL needs an account: an admin saves the credentials with `slib.pssl.admin.key`, and users can't read them.
-- Adds `scripts/pkgs/record_circl.py`, which records the CIRCL Passive DNS and Passive SSL responses the `slib.pdns` and `slib.pssl` tests replay.
 ### Fixes
 - Isolate config-builder state and make repeated loads atomic and idempotent. Fix Storm syntax and runtime mappings, preserve metadata on reused software nodes, and reject artifact hash mismatches.
 - Correct the STIX command examples to use `slib.stix.ingest`.
