@@ -10,9 +10,9 @@ $privSep = $lib.import(slib.pssl.privsep)
 $x509 = $lib.import(slib.utils.x509)
 
 // The meta:source made by the package's onload.
-$SOURCE = "7aa991399fab4171a80682a69a1a8d54"
+$srcGuid = "7aa991399fab4171a80682a69a1a8d54"
 
-$MSPERDAY = (86400000)
+$msPerDay = (86400000)
 
 // The certificates seen on an IPv4 address or CIDR block (/23 to /32).
 function query(valu) {
@@ -34,7 +34,7 @@ function cfetch(sha1) {
 // subject (CIRCL's subject string) is only set if the cert has no :subject - a fetched cert's
 // :subject (the RFC 4514 DN) is never overwritten.
 function certNode(sha1, subject=(null)) {
-    [ crypto:x509:cert=({"sha1": $sha1}) <(seen)+ { meta:source=$SOURCE } ]
+    [ crypto:x509:cert=({"sha1": $sha1}) <(seen)+ { meta:source=$srcGuid } ]
     if ($subject and not :subject) { [ :subject=$subject ] }
     return($node)
 }
@@ -46,7 +46,7 @@ function serverCert(ip, cert) {
     } else {
         $server = `tcp://{$ip}`
     }
-    [ inet:tls:servercert=($server, $cert) <(seen)+ { meta:source=$SOURCE } ]
+    [ inet:tls:servercert=($server, $cert) <(seen)+ { meta:source=$srcGuid } ]
     return($node)
 }
 
@@ -136,7 +136,7 @@ function modelCfetch(data, sha1) {
     if $icsi { $first = $icsi.first_seen $last = $icsi.last_seen }
     else { $first = (null) $last = (null) }
     if ($first and $last) {
-        [ .seen=(($lib.cast(int, $first) * $MSPERDAY), ($lib.cast(int, $last) * $MSPERDAY)) ]
+        [ .seen=(($lib.cast(int, $first) * $msPerDay), ($lib.cast(int, $last) * $msPerDay)) ]
     }
 
     return($cert)

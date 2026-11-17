@@ -33,9 +33,9 @@
 // Times are epoch seconds. MX values are "<pref> <host>", SOA values are the whole SOA rdata.
 // A 401 is a text/html body (bad or missing credentials).
 
-$URL = "https://www.circl.lu/pdns/query"
-$USERKEY = "slib:pdns:auth:user"
-$PASSKEY = "slib:pdns:auth:passwd"
+$url = "https://www.circl.lu/pdns/query"
+$userKey = "slib:pdns:auth:user"
+$passKey = "slib:pdns:auth:passwd"
 
 function _fail(mesg) {
     return(({"status": (false), "mesg": $mesg, "data": (null)}))
@@ -53,8 +53,8 @@ function _header(headers, name) {
 // The request headers for a query: Basic auth, and any dribble-* options.
 // Raises NeedConfValu if the credentials aren't set.
 function _headers(rrtype, active, pagesize, cursor) {
-    $user = $lib.globals.get($USERKEY)
-    $passwd = $lib.globals.get($PASSKEY)
+    $user = $lib.globals.get($userKey)
+    $passwd = $lib.globals.get($passKey)
     if ($user = null or $passwd = null) {
         $lib.raise(NeedConfValu, "The CIRCL Passive DNS credentials are not set. Set them with the slib.pdns.admin.key command.")
     }
@@ -80,7 +80,7 @@ function _headers(rrtype, active, pagesize, cursor) {
 function request(valu, rrtype=(null), active=(true), pagesize=(null), cursor=(null)) {
     $headers = $_headers($rrtype, $active, $pagesize, $cursor)
 
-    $resp = $lib.inet.http.get(`{$URL}/{$valu}`, headers=$headers)
+    $resp = $lib.inet.http.get(`{$url}/{$valu}`, headers=$headers)
 
     if ($resp.code = 401) {
         return($_fail(`CIRCL Passive DNS rejected the credentials set with slib.pdns.admin.key (HTTP 401) while querying: {$valu}`))

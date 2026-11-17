@@ -6,10 +6,10 @@
 $privSep = $lib.import(slib.pdns.privsep)
 
 // The meta:source made by the package's onload.
-$SOURCE = "696c119cb73c4a079a2865108c96668a"
+$srcGuid = "696c119cb73c4a079a2865108c96668a"
 
 // The rrtypes modelRecord() knows how to model.
-$RRTYPES = ("A", "AAAA", "CNAME", "MX", "NS", "SOA", "TXT")
+$rrTypes = ("A", "AAAA", "CNAME", "MX", "NS", "SOA", "TXT")
 
 // Query CIRCL Passive DNS for an FQDN or IP. See slib.pdns.privsep.request().
 function request(valu, rrtype=(null), active=(true), pagesize=(null), cursor=(null)) {
@@ -64,7 +64,7 @@ function modelRecord(record) {
     // this returns null.
     [
         .seen=($lib.time.fromunix($record.time_first), $lib.time.fromunix($record.time_last))
-        <(seen)+ { meta:source=$SOURCE }
+        <(seen)+ { meta:source=$srcGuid }
     ]
     $node.data.set("slib:pdns", ({"count": $record.count, "time_first": $record.time_first, "time_last": $record.time_last}))
 
@@ -96,7 +96,7 @@ function records(valu, rrtype=(null), active=(true), pagesize=(null), maxpages=(
         }
 
         for $record in $retn.data.records {
-            if (not $RRTYPES.has($record.rrtype)) {
+            if (not $rrTypes.has($record.rrtype)) {
                 $rtype = $record.rrtype
                 $skipped.$rtype = (true)
             }

@@ -7,26 +7,26 @@
 
 // The free endpoints (no API key, plain HTTP only, non-commercial use only) and the pro
 // endpoints (API key, HTTPS, no rate limit). slib:ipapi:url overrides both, ex. for tests.
-$FREE_URL = "http://ip-api.com"
-$PRO_URL = "https://pro.ip-api.com"
+$freeUrl = "http://ip-api.com"
+$proUrl = "https://pro.ip-api.com"
 
 // The fields requested from ip-api.com, for both the /json and /batch endpoints.
-$FIELDS = "status,message,country,countryCode,region,regionName,city,lat,lon,isp,org,as,asname,reverse,mobile,proxy,hosting,query"
+$fields = "status,message,country,countryCode,region,regionName,city,lat,lon,isp,org,as,asname,reverse,mobile,proxy,hosting,query"
 
 // The most IPs ip-api.com accepts in one /batch request.
-$BATCH_SIZE = (100)
+$batchSize = (100)
 
 // Seconds to wait if ip-api.com rate limits a request without a usable X-Ttl header.
-$DEFAULT_TTL = (60)
+$defaultTtl = (60)
 
 // How many times a request is retried after an HTTP 429 before it fails.
-$MAX_RETRIES = (3)
+$maxRetries = (3)
 
 // The total time, in seconds, one ip-api.com request may take.
-$TIMEOUT = (30)
+$timeout = (30)
 
 // The vault type for ip-api.com pro API keys, global (admins) and user scoped (each user).
-$VAULT_TYPE = "ipapi"
+$vaultType = "ipapi"
 
 // The tag prefix to use for ip-api.com's hosting/mobile/proxy results, or (null) if tags
 // are disabled. Raises BadConfValu if tags are enabled but the prefix is unset or invalid.
@@ -49,7 +49,7 @@ function getIpApiTag() {
 
 // The global ip-api.com pro key (set with slib.ipapi.admin.apikey), or (null).
 function globalKey() {
-    $vault = $lib.vault.bytype($VAULT_TYPE, scope=global)
+    $vault = $lib.vault.bytype($vaultType, scope=global)
     if ($vault = null) { return() }
     $secrets = $vault.secrets
     if ($secrets = null) { return() }
@@ -72,7 +72,7 @@ function _header(headers, name) {
     return()
 }
 
-// The X-Ttl header (seconds, maybe fractional) in millis, or DEFAULT_TTL if it's missing or
+// The X-Ttl header (seconds, maybe fractional) in millis, or defaultTtl if it's missing or
 // not a number.
 function _ttl(headers) {
     $valu = $_header($headers, "X-Ttl")
@@ -84,7 +84,7 @@ function _ttl(headers) {
         }
         return($millis)
     }
-    return(($DEFAULT_TTL * 1000))
+    return(($defaultTtl * 1000))
 }
 
 // The global var that holds when an endpoint's rate limit window resets (epoch millis). /json
@@ -117,11 +117,11 @@ function _wait(kind) {
 function _url(path, apikey) {
     $base = $lib.globals.get("slib:ipapi:url")  // noqa: R005
     if $apikey {
-        if (not $base) { $base = $PRO_URL }
-        return(`{$base}{$path}?key={$apikey}&fields={$FIELDS}`)
+        if (not $base) { $base = $proUrl }
+        return(`{$base}{$path}?key={$apikey}&fields={$fields}`)
     }
-    if (not $base) { $base = $FREE_URL }
-    return(`{$base}{$path}?fields={$FIELDS}`)
+    if (not $base) { $base = $freeUrl }
+    return(`{$base}{$path}?fields={$fields}`)
 }
 
 // Remove an API key from text, so it never ends up in a warning.
@@ -166,7 +166,7 @@ function _toRetn(ipaddr, data) {
     return(({"status": (true), "mesg": `Successfully queried ip-api.com for IP address: {$ipaddr}`, "data": $_shape($data)}))
 }
 
-// Make one /json or /batch request, retrying after an HTTP 429 up to MAX_RETRIES times.
+// Make one /json or /batch request, retrying after an HTTP 429 up to maxRetries times.
 // Returns {"status", "mesg", "data"}, data is the parsed JSON body. desc describes the query
 // for error messages.
 //
@@ -180,15 +180,15 @@ function _request(kind, path, apikey, desc, body=(null)) {
         if (not $apikey) { $_wait($kind) }
 
         if ($body = null) {
-            $resp = $lib.inet.http.get($url, timeout=$TIMEOUT)
+            $resp = $lib.inet.http.get($url, timeout=$timeout)
         } else {
-            $resp = $lib.inet.http.post($url, json=$body, timeout=$TIMEOUT)
+            $resp = $lib.inet.http.post($url, json=$body, timeout=$timeout)
         }
 
         if ($resp.code = 429) {
             $_block($kind, $_ttl($resp.headers))
-            if ($tries >= $MAX_RETRIES) {
-                return($_fail(`ip-api.com is still rate limiting requests after {$MAX_RETRIES} retries, gave up querying for {$desc}`))
+            if ($tries >= $maxRetries) {
+                return($_fail(`ip-api.com is still rate limiting requests after {$maxRetries} retries, gave up querying for {$desc}`))
             }
             $tries = ($tries + 1)
             continue
@@ -196,7 +196,7 @@ function _request(kind, path, apikey, desc, body=(null)) {
 
         if ($resp.code = -1) {
             if ($resp.reason ~= "TimeoutError") {
-                return($_fail(`Timed out after {$TIMEOUT}s querying ip-api.com for {$desc}`))
+                return($_fail(`Timed out after {$timeout}s querying ip-api.com for {$desc}`))
             }
             return($_fail(`An HTTP error occurred while trying to query ip-api.com for {$desc} - {$_scrub($resp.reason, $apikey)}`))
         }
@@ -232,7 +232,7 @@ function query(ipaddr, apikey=(null)) {
     return($_toRetn($ipaddr, $retn.data))
 }
 
-// Query ip-api.com for many IP addresses with its /batch endpoint, BATCH_SIZE IPs per request.
+// Query ip-api.com for many IP addresses with its /batch endpoint, batchSize IPs per request.
 // Returns {"status", "mesg", "data"}: data has one query() style result per IP, in order. A
 // request that fails entirely fails each of its IPs with the request's error.
 function queryBatch(ipaddrs, apikey=(null)) {
@@ -251,7 +251,7 @@ function queryBatch(ipaddrs, apikey=(null)) {
     $start = (0)
     $total = $lib.len($ipaddrs)
     while ($start < $total) {
-        $chunk = $ipaddrs.slice($start, ($start + $BATCH_SIZE))
+        $chunk = $ipaddrs.slice($start, ($start + $batchSize))
         $desc = `{$lib.len($chunk)} IP addresses ({$chunk.0}, ...)`
 
         $retn = $_request(batch, "/batch", $apikey, $desc, body=$chunk)
@@ -271,7 +271,7 @@ function queryBatch(ipaddrs, apikey=(null)) {
             $i = ($i + 1)
         }
 
-        $start = ($start + $BATCH_SIZE)
+        $start = ($start + $batchSize)
     }
 
     return(({"status": (true), "mesg": `Batch queried ip-api.com for {$total} IP addresses`, "data": $retns}))

@@ -27,9 +27,9 @@
 // "IPv6 is not (yet) supported", "Not existing certificate", "Incorrect format of the
 // certificate fingerprint (expected SHA1 in hex format)". A 401 is bad or missing credentials.
 
-$URL = "https://www.circl.lu/v2pssl"
-$USERKEY = "slib:pssl:auth:user"
-$PASSKEY = "slib:pssl:auth:passwd"
+$url = "https://www.circl.lu/v2pssl"
+$userKey = "slib:pssl:auth:user"
+$passKey = "slib:pssl:auth:passwd"
 
 function _fail(mesg) {
     return(({"status": (false), "mesg": $mesg, "data": (null)}))
@@ -37,8 +37,8 @@ function _fail(mesg) {
 
 // The Basic auth header. Raises NeedConfValu if the credentials aren't set.
 function _headers() {
-    $user = $lib.globals.get($USERKEY)
-    $passwd = $lib.globals.get($PASSKEY)
+    $user = $lib.globals.get($userKey)
+    $passwd = $lib.globals.get($passKey)
     if ($user = null or $passwd = null) {
         $lib.raise(NeedConfValu, "The CIRCL Passive SSL credentials are not set. Set them with the slib.pssl.admin.key command.")
     }
@@ -46,9 +46,9 @@ function _headers() {
     return(({"Authorization": `Basic {$lib.base64.encode($creds.encode())}`}))
 }
 
-// GET <URL>/<endpoint>/<valu>. Returns {"status", "mesg", "data"}, data is the JSON response.
+// GET <url>/<endpoint>/<valu>. Returns {"status", "mesg", "data"}, data is the JSON response.
 function _request(endpoint, valu) {
-    $resp = $lib.inet.http.get(`{$URL}/{$endpoint}/{$valu}`, headers=$_headers())
+    $resp = $lib.inet.http.get(`{$url}/{$endpoint}/{$valu}`, headers=$_headers())
 
     if ($resp.code = 401) {
         return($_fail(`CIRCL Passive SSL rejected the credentials set with slib.pssl.admin.key (HTTP 401) while querying {$endpoint}: {$valu}`))
