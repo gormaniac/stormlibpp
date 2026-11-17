@@ -12,10 +12,12 @@ function asnNum(valu) {
     return()
 }
 
-// Set an ou:org's :names and :orgtype. A function, so the org stays out of the caller's pipeline.
+// Add names to an ou:org's :names and set its :orgtype. A function, so the org stays out of the
+// caller's pipeline.
 function _editOrg(org, names, orgtype) {
     yield $org
-    if $names { [ :names?=$names ] }
+    // A subquery, a for loop in the pipeline would yield the node once per name.
+    if $names { { for $name in $names { if $name { [ :names?+=$name ] } } } }
     if $orgtype { [ :orgtype?=$orgtype ] }
     return()
 }
@@ -23,7 +25,8 @@ function _editOrg(org, names, orgtype) {
 // Make (or update) the inet:asn for asn, and yield it.
 //
 // asn is anything asnNum() accepts. If orgname is given, the ASN's :owner is set to the
-// ou:org with that name ($lib.gen.orgByName), and that org gets the given :names and :orgtype.
+// ou:org with that name ($lib.gen.orgByName). The org gets the given names added to its :names
+// (existing names are kept) and the given :orgtype.
 // Returns null, and makes nothing, if asn has no ASN number.
 function asnNode(asn, orgname=(null), names=(null), orgtype=(null)) {
     $num = $asnNum($asn)

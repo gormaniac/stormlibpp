@@ -112,7 +112,11 @@ class TestPlugin:
             def test_uses_deprecated():
                 s_common.deprecated("old.marked", curv="2.1.0")
             """)
-        pytester.runpytest_subprocess().assert_outcomes(passed=1)
+        result = pytester.runpytest_subprocess()
+        result.assert_outcomes(passed=1)
+        # Its deprecations don't count as outside of a test either.
+        assert result.ret == pytest.ExitCode.OK
+        result.stdout.no_fnmatch_line("*outside of tests*")
 
     def _outside(self, pytester, ini=""):
         pytester.makeconftest('pytest_plugins = ["stormlibpp.testing"]')

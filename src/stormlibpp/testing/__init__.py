@@ -158,7 +158,12 @@ def _failOnSynapseDeprecations(
 ):
     """Fail the test if it used a deprecated Synapse API."""
     if _allowed(request):
-        yield
+        # Still collect them, or they'd be counted as outside of a test and fail the run.
+        _SYN_DEPRS.intest = set()
+        try:
+            yield
+        finally:
+            _SYN_DEPRS.intest = None
         return
 
     # Storm warn messages sent with log=False never reach the logging handler.

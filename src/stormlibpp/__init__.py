@@ -54,7 +54,7 @@ fails tests that use deprecated Synapse APIs), with checks every service should 
 Neither is imported by ``import stormlibpp``.
 """
 
-__version__ = "0.12.1"
+__version__ = "1.1.1"
 
 # TODO - Do we want to change this to only import submods, or do we even need that?
 from . import errors

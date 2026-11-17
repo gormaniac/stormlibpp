@@ -1,6 +1,6 @@
 init {
-    $ipapiAdminLib = $lib.import("slib.ipapi.admin")
-    $prefixOpt = $cmdopts.prefix
+    $ipapiAdminLib = $lib.import(slib.ipapi.admin)
 }
 
-$ipapiAdminLib.setTagPrefix($prefixOpt)
+$prefix = $ipapiAdminLib.setTagPrefix($cmdopts.prefix)
+$lib.print(`slib.ipapi will tag IPs with #{$prefix}.hosting, #{$prefix}.mobile, and #{$prefix}.proxy.`)
