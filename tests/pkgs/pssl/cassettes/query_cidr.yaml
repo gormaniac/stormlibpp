@@ -1,0 +1,208 @@
+interactions:
+- request:
+    body: null
+    headers: {}
+    method: GET
+    uri: https://www.circl.lu/v2pssl/query/172.228.24.0/28
+  response:
+    body:
+      string: '{"172.228.24.7": {"certificates": ["37221925980c05deefac014f9a72b4765e716341",
+        "3209cc3ce4f1c22ab64b2e4284100b0022ad2739", "041d0d04b5629698f0abb5348986e4bc38c3a0d5",
+        "4d34ea92764b3a3149119952f41930ca11348361", "6ad2b04e2196e48bf685752890e811cd2ed60606",
+        "c43b30bf08bfb0b92c070f42f51b6980c8ada064", "30d1fd4a296ab1a8831cd56b4110a227f557bfff",
+        "79068f16776372aa6b12b83dd2b7288298727f54"], "subjects": {"37221925980c05deefac014f9a72b4765e716341":
+        {"values": ["C=JP, ST=Tokyo, L=Minato-ku, O=Sony corporation, OU=NPS, CN=psn-rsc.prod.dl.playstation.net"]},
+        "3209cc3ce4f1c22ab64b2e4284100b0022ad2739": {"values": ["C=NL, L=Amsterdam,
+        O=Verizon Enterprise Solutions, OU=Cybertrust, CN=Verizon Akamai SureServer
+        CA G14-SHA1"]}, "041d0d04b5629698f0abb5348986e4bc38c3a0d5": {"values": ["C=JP,
+        ST=Tokyo, L=Minato-ku, O=Sony corporation, OU=NPS, CN=psn-rsc.prod.dl.playstation.net"]},
+        "4d34ea92764b3a3149119952f41930ca11348361": {"values": ["C=IE, O=Baltimore,
+        OU=CyberTrust, CN=Baltimore CyberTrust Root"]}, "c43b30bf08bfb0b92c070f42f51b6980c8ada064":
+        {"values": ["C=CY, ST=Cyprus, L=Limassol, O=Blue Capital Markets Limited,
+        OU=IT, CN=www.easy-forex.com"]}, "6ad2b04e2196e48bf685752890e811cd2ed60606":
+        {"values": ["C=NL, L=Amsterdam, O=Verizon Enterprise Solutions, OU=Cybertrust,
+        CN=Verizon Akamai SureServer CA G14-SHA2"]}, "30d1fd4a296ab1a8831cd56b4110a227f557bfff":
+        {"values": ["O=Cybertrust Inc, CN=Cybertrust Public SureServer SV CA"]}, "79068f16776372aa6b12b83dd2b7288298727f54":
+        {"values": ["C=CY, ST=Cyprus, L=Limassol, O=Easy Forex, OU=IT, CN=www.easy-forex.com"]}}},
+        "172.228.24.8": {"certificates": ["87a779f6f909c83ddf00e3fdb42709d07f5ae192",
+        "3209cc3ce4f1c22ab64b2e4284100b0022ad2739", "4ab70b97decd784aa60395a351daf4274fd37fca",
+        "e3fc0ad84f2f5a83ed6f86f567f8b14b40dcbf12", "c46fed822dadac3f31f9bb4d1a78a1d9eae4567b",
+        "eed26c64c45a7b0a7459b24a6a73007aaf499065", "4d34ea92764b3a3149119952f41930ca11348361",
+        "c484f1361e5fb2562c1578766fb30ecf3ca2c531", "5aeaee3f7f2a9449cebafeec68fdd184f20124a7",
+        "30d1fd4a296ab1a8831cd56b4110a227f557bfff", "2a237a9156472eccac85708294398e85fa0cd96d",
+        "32f30882622b87cf8856c63db873df0853b4dd27", "6ad2b04e2196e48bf685752890e811cd2ed60606"],
+        "subjects": {"87a779f6f909c83ddf00e3fdb42709d07f5ae192": {"values": ["C=US,
+        ST=NC, L=Raleigh, O=Peopleclick Inc., OU=Production_Akamai, CN=twa.peopleclick.com"]},
+        "3209cc3ce4f1c22ab64b2e4284100b0022ad2739": {"values": ["C=NL, L=Amsterdam,
+        O=Verizon Enterprise Solutions, OU=Cybertrust, CN=Verizon Akamai SureServer
+        CA G14-SHA1"]}, "4ab70b97decd784aa60395a351daf4274fd37fca": {"values": ["C=US,
+        ST=MARYLAND, L=Hanover, O=Allegis Group Inc, OU=IT, CN=*.apac.allegisgroup.com"]},
+        "e3fc0ad84f2f5a83ed6f86f567f8b14b40dcbf12": {"values": ["C=US, O=Symantec
+        Corporation, OU=Symantec Trust Network, CN=Symantec Class 3 EV SSL CA - G3"]},
+        "c46fed822dadac3f31f9bb4d1a78a1d9eae4567b": {"values": ["1.3.6.1.4.1.311.60.2.1.3=AU/businessCategory=Private
+        Organization/serialNumber=85 092 445 442, C=AU/postalCode=1230, ST=NSW, L=Sydney/street=680
+        George Street, O=HotelClub Pty. Ltd., OU=Engineering, CN=www.hotelclub.cn"]},
+        "2a237a9156472eccac85708294398e85fa0cd96d": {"values": ["C=US, ST=NC, L=Raleigh,
+        O=Peopleclick Inc., OU=Production_Akamai, CN=twa.peopleclick.com"]}, "4d34ea92764b3a3149119952f41930ca11348361":
+        {"values": ["C=IE, O=Baltimore, OU=CyberTrust, CN=Baltimore CyberTrust Root"]},
+        "c484f1361e5fb2562c1578766fb30ecf3ca2c531": {"values": ["C=US, ST=NC, L=Raleigh,
+        O=Peopleclick Inc., OU=Production_Akamai, CN=twa.peopleclick.com"]}, "5aeaee3f7f2a9449cebafeec68fdd184f20124a7":
+        {"values": ["C=US, O=GeoTrust Inc., CN=GeoTrust SSL CA - G3"]}, "30d1fd4a296ab1a8831cd56b4110a227f557bfff":
+        {"values": ["O=Cybertrust Inc, CN=Cybertrust Public SureServer SV CA"]}, "eed26c64c45a7b0a7459b24a6a73007aaf499065":
+        {"values": ["C=US, ST=California, L=San Luis Obispo, O=MindBody Inc, OU=Engineering,
+        CN=*.mindbodyonline.com"]}, "32f30882622b87cf8856c63db873df0853b4dd27": {"values":
+        ["C=US, O=VeriSign, Inc., OU=VeriSign Trust Network, OU=(c) 2006 VeriSign,
+        Inc. - For authorized use only, CN=VeriSign Class 3 Public Primary Certification
+        Authority - G5"]}, "6ad2b04e2196e48bf685752890e811cd2ed60606": {"values":
+        ["C=NL, L=Amsterdam, O=Verizon Enterprise Solutions, OU=Cybertrust, CN=Verizon
+        Akamai SureServer CA G14-SHA2"]}}}, "172.228.24.9": {"certificates": ["780a06f6e9b4061cad0c6502710606eb535f1c26",
+        "2ea71c367d178c843fd21db4fdb630ba54a20dc5", "d10050dad40f850c2f84c215929e344ff8c9c552",
+        "ef96139a766d8a66f97017f4a71b77ba707d4a16", "08ff9ecb28facd74dd125ded44f4e0dd6707f902",
+        "5aeaee3f7f2a9449cebafeec68fdd184f20124a7"], "subjects": {"780a06f6e9b4061cad0c6502710606eb535f1c26":
+        {"values": ["C=US, O=GeoTrust, Inc., CN=GeoTrust SSL CA"]}, "2ea71c367d178c843fd21db4fdb630ba54a20dc5":
+        {"values": ["C=US, O=thawte, Inc., CN=thawte SSL CA - G2"]}, "d10050dad40f850c2f84c215929e344ff8c9c552":
+        {"values": ["C=US, ST=California, L=San Jose, O=Altera Corporation, OU=IT,
+        CN=*.altera.com.cn"]}, "ef96139a766d8a66f97017f4a71b77ba707d4a16": {"values":
+        ["C=GB, ST=London, L=London, O=Momondo Group Limited, CN=cheapflights.com"]},
+        "08ff9ecb28facd74dd125ded44f4e0dd6707f902": {"values": ["serialNumber=Dyi4QNdi9bHxOhWakExUXmDdd09Ny/kj,
+        C=US, ST=Texas, L=Dallas, O=FareCompare, LP, OU=Information Technology, CN=www.farecompare.com"]},
+        "5aeaee3f7f2a9449cebafeec68fdd184f20124a7": {"values": ["C=US, O=GeoTrust
+        Inc., CN=GeoTrust SSL CA - G3"]}}}, "172.228.24.10": {"certificates": ["780a06f6e9b4061cad0c6502710606eb535f1c26",
+        "3209cc3ce4f1c22ab64b2e4284100b0022ad2739", "4b948bf1b5852e1fc0a4ffd73a4087c967e2c968",
+        "4d34ea92764b3a3149119952f41930ca11348361", "6d5de0c7c3e8689f5e0840a9382eb2f9157a61aa",
+        "6ad2b04e2196e48bf685752890e811cd2ed60606", "5d8bb61c95b213c38d9b4555a6131da71251d79e",
+        "de28f4a4ffe5b92fa3c503d1a349a7f9962a8212"], "subjects": {"780a06f6e9b4061cad0c6502710606eb535f1c26":
+        {"values": ["C=US, O=GeoTrust, Inc., CN=GeoTrust SSL CA"]}, "3209cc3ce4f1c22ab64b2e4284100b0022ad2739":
+        {"values": ["C=NL, L=Amsterdam, O=Verizon Enterprise Solutions, OU=Cybertrust,
+        CN=Verizon Akamai SureServer CA G14-SHA1"]}, "4b948bf1b5852e1fc0a4ffd73a4087c967e2c968":
+        {"values": ["serialNumber=votSFS5N71H6C8XC9xvyFnfXnCbjfirr, C=GB, ST=London,
+        L=London, O=News Group Newspapers Ltd, CN=join.thesun.co.uk"]}, "4d34ea92764b3a3149119952f41930ca11348361":
+        {"values": ["C=IE, O=Baltimore, OU=CyberTrust, CN=Baltimore CyberTrust Root"]},
+        "6d5de0c7c3e8689f5e0840a9382eb2f9157a61aa": {"values": ["C=US, ST=CA, L=Burbank,
+        O=Warner Bros. Entertainment Inc., OU=Turbine, Inc., CN=*.mortalkombat.com"]},
+        "6ad2b04e2196e48bf685752890e811cd2ed60606": {"values": ["C=NL, L=Amsterdam,
+        O=Verizon Enterprise Solutions, OU=Cybertrust, CN=Verizon Akamai SureServer
+        CA G14-SHA2"]}, "5d8bb61c95b213c38d9b4555a6131da71251d79e": {"values": ["C=US,
+        ST=CA, L=Burbank, O=Warner Bros. Entertainment Inc., OU=Turbine, Inc., CN=*.mortalkombat.com"]},
+        "de28f4a4ffe5b92fa3c503d1a349a7f9962a8212": {"values": ["C=US, O=GeoTrust
+        Inc., CN=GeoTrust Global CA"]}}}, "172.228.24.11": {"certificates": ["780a06f6e9b4061cad0c6502710606eb535f1c26",
+        "771e5ac4b190995fe950bdcc28818df07360fe9b", "de28f4a4ffe5b92fa3c503d1a349a7f9962a8212",
+        "9e1a0c35e714b69792d090b2cc4bba45833c3015", "f21c12f46cdb6b2e16f09f9419cdff328437b2d7",
+        "542ff5a0a035c1e2f0845fd0ed54ccf9bee2517c", "baec99a4971e2a3ed2ec655c5128f70f4825f253"],
+        "subjects": {"780a06f6e9b4061cad0c6502710606eb535f1c26": {"values": ["C=US,
+        O=GeoTrust, Inc., CN=GeoTrust SSL CA"]}, "771e5ac4b190995fe950bdcc28818df07360fe9b":
+        {"values": ["C=US, ST=California, L=Glendale, O=Disney Interactive, CN=holidayassets.lucasfilm.com"]},
+        "de28f4a4ffe5b92fa3c503d1a349a7f9962a8212": {"values": ["C=US, O=GeoTrust
+        Inc., CN=GeoTrust Global CA"]}, "9e1a0c35e714b69792d090b2cc4bba45833c3015":
+        {"values": ["C=US, O=Entrust, Inc., OU=See www.entrust.net/legal-terms, OU=(c)
+        2009 Entrust, Inc. - for authorized use only, CN=Entrust Root Certification
+        Authority - G2"]}, "f21c12f46cdb6b2e16f09f9419cdff328437b2d7": {"values":
+        ["C=US, O=Entrust, Inc., OU=See www.entrust.net/legal-terms, OU=(c) 2012 Entrust,
+        Inc. - for authorized use only, CN=Entrust Certification Authority - L1K"]},
+        "542ff5a0a035c1e2f0845fd0ed54ccf9bee2517c": {"values": ["serialNumber=Y8t0npKVp3Fpoq45a6WRSh/ZdY9/FX3r,
+        C=US, ST=California, L=San Diego, O=INTUIT INC., OU=Tech_Ops, CN=quickbase.intuit.com"]},
+        "baec99a4971e2a3ed2ec655c5128f70f4825f253": {"values": ["serialNumber=nzBrFJ-aDulujDA7UkxQWFI8bv5F/zoU,
+        C=US, ST=California, L=San Diego, O=Sony Online Entertainment, OU=Operational
+        Engineering, CN=www-cdn.everquest.com"]}}}, "172.228.24.12": {"certificates":
+        ["c53e73073f93ce7895de7484126bc303dab9e657", "503006091d97d4f5ae39f7cbe7927d7d652d3431",
+        "3209cc3ce4f1c22ab64b2e4284100b0022ad2739", "aca9789a735eb253b410ccb979bb35e5e7dcdea9",
+        "4d34ea92764b3a3149119952f41930ca11348361", "b279ff647c3696c5a4d011d9c0144ce6f8b67b7d",
+        "43b31c858772f17f87235272cf339c29160727c7", "5aeaee3f7f2a9449cebafeec68fdd184f20124a7",
+        "4d8162044f73d3614fa1a1b229a3fb51d7c24f02"], "subjects": {"c53e73073f93ce7895de7484126bc303dab9e657":
+        {"values": ["C=US, O=Entrust, Inc., OU=www.entrust.net/rpa is incorporated
+        by reference, OU=(c) 2009 Entrust, Inc., CN=Entrust Certification Authority
+        - L1C"]}, "503006091d97d4f5ae39f7cbe7927d7d652d3431": {"values": ["O=Entrust.net,
+        OU=www.entrust.net/CPS_2048 incorp. by ref. (limits liab.), OU=(c) 1999 Entrust.net
+        Limited, CN=Entrust.net Certification Authority (2048)"]}, "3209cc3ce4f1c22ab64b2e4284100b0022ad2739":
+        {"values": ["C=NL, L=Amsterdam, O=Verizon Enterprise Solutions, OU=Cybertrust,
+        CN=Verizon Akamai SureServer CA G14-SHA1"]}, "aca9789a735eb253b410ccb979bb35e5e7dcdea9":
+        {"values": ["C=US, ST=WA, L=Seattle, O=Getty Images, Inc., OU=iStockphoto,
+        CN=secure.istockphoto.com"]}, "4d34ea92764b3a3149119952f41930ca11348361":
+        {"values": ["C=IE, O=Baltimore, OU=CyberTrust, CN=Baltimore CyberTrust Root"]},
+        "b279ff647c3696c5a4d011d9c0144ce6f8b67b7d": {"values": ["C=CN, ST=Beijing,
+        L=Beijing, O=ZHIZHE SIHAI(BEIJING) TECHNOLOGY, OU=Infrastructure, CN=www.zhihu.com"]},
+        "43b31c858772f17f87235272cf339c29160727c7": {"values": ["C=US, ST=Georgia,
+        L=Atlanta, O=The Home Depot, CN=kdlms.homedepot.com"]}, "5aeaee3f7f2a9449cebafeec68fdd184f20124a7":
+        {"values": ["C=US, O=GeoTrust Inc., CN=GeoTrust SSL CA - G3"]}, "4d8162044f73d3614fa1a1b229a3fb51d7c24f02":
+        {"values": ["C=CN, ST=Beijing, L=Beijing, O=ZHIZHE SIHAI(BEIJING) TECHNOLOGY,
+        OU=Infrastructure, CN=www.zhihu.com"]}}}, "172.228.24.13": {"certificates":
+        ["780a06f6e9b4061cad0c6502710606eb535f1c26", "8f3ee62d0f0c7efa3568b3b9ddcd97b2f26e3309",
+        "1a7d8d6e58caeb72bb4237ffc1c04e8d368c913a", "3209cc3ce4f1c22ab64b2e4284100b0022ad2739",
+        "4d34ea92764b3a3149119952f41930ca11348361", "de44a6934310a71b080f3098c720658671f177cf"],
+        "subjects": {"780a06f6e9b4061cad0c6502710606eb535f1c26": {"values": ["C=US,
+        O=GeoTrust, Inc., CN=GeoTrust SSL CA"]}, "8f3ee62d0f0c7efa3568b3b9ddcd97b2f26e3309":
+        {"values": ["C=US, ST=CA, L=Foster City, O=ClientConnect LTD, OU=IT, CN=*.conduit-download.com"]},
+        "1a7d8d6e58caeb72bb4237ffc1c04e8d368c913a": {"values": ["serialNumber=dVn4HhED532-1HQOwGkA/TovT-JtOEMN,
+        C=US, ST=California, L=Rancho Dominguez, O=Onestop Internet Inc., OU=Onestop
+        Internet, CN=www.onestop.com"]}, "3209cc3ce4f1c22ab64b2e4284100b0022ad2739":
+        {"values": ["C=NL, L=Amsterdam, O=Verizon Enterprise Solutions, OU=Cybertrust,
+        CN=Verizon Akamai SureServer CA G14-SHA1"]}, "4d34ea92764b3a3149119952f41930ca11348361":
+        {"values": ["C=IE, O=Baltimore, OU=CyberTrust, CN=Baltimore CyberTrust Root"]},
+        "de44a6934310a71b080f3098c720658671f177cf": {"values": ["C=US, ST=CA, L=Foster
+        City, O=ClientConnect LTD, OU=IT, CN=*.conduit-download.com"]}}}, "172.228.24.14":
+        {"certificates": ["4d34ea92764b3a3149119952f41930ca11348361", "ac8f7c5bc86ef1896f2d161c32a57aab37d364da",
+        "2796bae63f1801e277261ba0d77770028f20eee4", "5f5968e72ffd87450dd50e5ee96a1b793f110d46",
+        "4136bb45dd375b8cba5f430d0a03e50edbe7410a", "ee05050aa320157bc33a11749221962629a23f65",
+        "e3fc0ad84f2f5a83ed6f86f567f8b14b40dcbf12", "30d1fd4a296ab1a8831cd56b4110a227f557bfff",
+        "3291627c229aa54bab0dfe2eaece7c2f22adbb3e", "27ac9369faf25207bb2627cefaccbe4ef9c319b8",
+        "6ad2b04e2196e48bf685752890e811cd2ed60606", "93c0fe47c5e61a8d4a9fc2f3a8e7f0cfdfaf7567",
+        "1ae8aaddeb4e27392c4a549a7df2d6aef4e95e7a", "340b2880f446fcc04e59ed33f52b3d08d6242964",
+        "32f30882622b87cf8856c63db873df0853b4dd27", "77e58147b574daef595c3523e20acde854e51df4"],
+        "subjects": {"340b2880f446fcc04e59ed33f52b3d08d6242964": {"values": ["C=US,
+        ST=Arizona, L=Scottsdale, O=GoDaddy.com, Inc., CN=Go Daddy Root Certificate
+        Authority - G2"]}, "ac8f7c5bc86ef1896f2d161c32a57aab37d364da": {"values":
+        ["C=US, O=GeoTrust Inc., CN=GeoTrust SSL CA - G4"]}, "2796bae63f1801e277261ba0d77770028f20eee4":
+        {"values": ["C=US, O=The Go Daddy Group, Inc., OU=Go Daddy Class 2 Certification
+        Authority"]}, "5f5968e72ffd87450dd50e5ee96a1b793f110d46": {"values": ["CN=happy
+        hacker fake CA"]}, "4136bb45dd375b8cba5f430d0a03e50edbe7410a": {"values":
+        ["C=DE, ST=Baden-Wuerttemberg, L=Walldorf, O=SAP SE, OU=Cloud Infrastructure
+        Delivery, CN=pilot.support.sap.com"]}, "e3fc0ad84f2f5a83ed6f86f567f8b14b40dcbf12":
+        {"values": ["C=US, O=Symantec Corporation, OU=Symantec Trust Network, CN=Symantec
+        Class 3 EV SSL CA - G3"]}, "4d34ea92764b3a3149119952f41930ca11348361": {"values":
+        ["C=IE, O=Baltimore, OU=CyberTrust, CN=Baltimore CyberTrust Root"]}, "3291627c229aa54bab0dfe2eaece7c2f22adbb3e":
+        {"values": ["1.3.6.1.4.1.311.60.2.1.3=US/1.3.6.1.4.1.311.60.2.1.2=California/businessCategory=Private
+        Organization/serialNumber=C0806592, C=US/postalCode=95014, ST=California,
+        L=Cupertino/street=1 Infinite Loop, O=Apple Inc., OU=Apple Online Store, CN=store.storeimages.cdn-apple.com"]},
+        "27ac9369faf25207bb2627cefaccbe4ef9c319b8": {"values": ["C=US, ST=Arizona,
+        L=Scottsdale, O=GoDaddy.com, Inc., OU=http://certs.godaddy.com/repository/,
+        CN=Go Daddy Secure Certificate Authority - G2"]}, "6ad2b04e2196e48bf685752890e811cd2ed60606":
+        {"values": ["C=NL, L=Amsterdam, O=Verizon Enterprise Solutions, OU=Cybertrust,
+        CN=Verizon Akamai SureServer CA G14-SHA2"]}, "93c0fe47c5e61a8d4a9fc2f3a8e7f0cfdfaf7567":
+        {"values": ["1.3.6.1.4.1.311.60.2.1.3=GB/businessCategory=Private Organization/serialNumber=04072405,
+        C=GB, ST=Greater London, L=London, O=Ixaris Systems Ltd, CN=entropay.com"]},
+        "ee05050aa320157bc33a11749221962629a23f65": {"values": ["CN=secure170.alejandrobascuas.com"]},
+        "30d1fd4a296ab1a8831cd56b4110a227f557bfff": {"values": ["O=Cybertrust Inc,
+        CN=Cybertrust Public SureServer SV CA"]}, "1ae8aaddeb4e27392c4a549a7df2d6aef4e95e7a":
+        {"values": ["C=US, ST=SOUTH CAROLINA, L=Hilton Head Island, O=Hilton Head
+        Island-Bluffton Chamber of Commerce, OU=IT, CN=*.hiltonheadisland.org"]},
+        "32f30882622b87cf8856c63db873df0853b4dd27": {"values": ["C=US, O=VeriSign,
+        Inc., OU=VeriSign Trust Network, OU=(c) 2006 VeriSign, Inc. - For authorized
+        use only, CN=VeriSign Class 3 Public Primary Certification Authority - G5"]},
+        "77e58147b574daef595c3523e20acde854e51df4": {"values": ["C=US, ST=MA, L=Canton,
+        O=adidas AG, OU=Global IT, CN=rbkcustom.reebok.com"]}}}, "172.228.24.15":
+        {"certificates": ["780a06f6e9b4061cad0c6502710606eb535f1c26", "afe5fac5f3dae7523b7e2948d72f95f80a5b0e42",
+        "3ab2c99ad59cbfd4f3ec18f5f02cc2703094a380", "5aeaee3f7f2a9449cebafeec68fdd184f20124a7"],
+        "subjects": {"5aeaee3f7f2a9449cebafeec68fdd184f20124a7": {"values": ["C=US,
+        O=GeoTrust Inc., CN=GeoTrust SSL CA - G3"]}, "780a06f6e9b4061cad0c6502710606eb535f1c26":
+        {"values": ["C=US, O=GeoTrust, Inc., CN=GeoTrust SSL CA"]}, "3ab2c99ad59cbfd4f3ec18f5f02cc2703094a380":
+        {"values": ["MIIFIjCCBAqgAwIBAgIQbHfwC7uqMl+L/Q+0TSveGzANBgkqhkiG9w0BAQsFADBEMQswCQYDVQQGEwJVUzEWMBQGA1UEChMNR2VvVHJ1c3QgSW5jLjEdMBsGA1UEAxMUR2VvVHJ1c3QgU1NMIENBIC0gRzMwHhcNMTUwOTA5MDAwMDAwWhcNMTYxMTA3MjM1OTU5WjB2MQswCQYDVQQGEwJVUzETMBEGA1UECBMKQ2FsaWZvcm5pYTEQMA4GA1UEBxQHVmVudHVyYTESMBAGA1UEChQJUGF0YWdvbmlhMRAwDgYDVQQLFAdWZW50dXJhMRowGAYDVQQDFBF3d3cucGF0YWdvbmlhLmNvbTCCASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoCggEBAL0YZr26Du7tsFP0BfTHfZ1Y8NTbdLZajgduuIcAaHu63oqPnRLQUnA+VzBqupdy0BQVGlGBJTYbg4jRo10N+ZCM3nCxsCT+cZM77V5e+awaTf6q5Vj1JiHOCmj1c0F/tvRryWNBOmRorjKpydUNY7nSIfWqcowHiAwCULoRnpiWVStqRuoiQbZnStkG7kWWP85U7bbLrjlSbxvyL3Alaa24uwA5xzLz+A32eUldz+Iv+h3wV/kyXcDVoMEbJ0sOxlvGWo8OrO+XEE/u7GLKmAnmFoOlB6IzpgvUXETgYtu9a3WGrT9rDWjcY5Ri4JJNzOZuoUOaB1Ufsi87pukK1gUCAwEAAaOCAdwwggHYMFUGA1UdEQROMEyCDXBhdGFnb25pYS5jb22CEnRlc3QucGF0YWdvbmlhLmNvbYIUaW1hZ2VzLnBhdGFnb25pYS5jb22CEXd3dy5wYXRhZ29uaWEuY29tMAkGA1UdEwQCMAAwDgYDVR0PAQH/BAQDAgWgMCsGA1UdHwQkMCIwIKAeoByGGmh0dHA6Ly9nbi5zeW1jYi5jb20vZ24uY3JsMIGdBgNVHSAEgZUwgZIwgY8GBmeBDAECAjCBhDA/BggrBgEFBQcCARYzaHR0cHM6Ly93d3cuZ2VvdHJ1c3QuY29tL3Jlc291cmNlcy9yZXBvc2l0b3J5L2xlZ2FsMEEGCCsGAQUFBwICMDUMM2h0dHBzOi8vd3d3Lmdlb3RydXN0LmNvbS9yZXNvdXJjZXMvcmVwb3NpdG9yeS9sZWdhbDAdBgNVHSUEFjAUBggrBgEFBQcDAQYIKwYBBQUHAwIwHwYDVR0jBBgwFoAU0m/3lvSFP3I8MH0j2oV4m6N8WnwwVwYIKwYBBQUHAQEESzBJMB8GCCsGAQUFBzABhhNodHRwOi8vZ24uc3ltY2QuY29tMCYGCCsGAQUFBzAChhpodHRwOi8vZ24uc3ltY2IuY29tL2duLmNydDANBgkqhkiG9w0BAQsFAAOCAQEAK+64Zlnm42XuhIe/sTlRfrRNAk9VlgpKQQnjESCk2vyGQW1DggiFqyxzYrMjCIcTCyS98vYb7n/rZ2P+zkMPgNJzG4VoWqUagvRxP7FnGsb3yGo8Cw4ousihYwZ3EePKC5Xh4oYdEUzbJfgkufX8iGJtC6+C25QWhTyvH1igxBBocH0AIOH34pf/3QCvrJOEvKUJpC0jjAUF6SCuF9Aw43gps2wtoQ+u54moglRQQJ1VUgax4SD0yhad6t/TlAidTZqH8y0/VxBsljSdhdRqjSj9Z81o76A6IiHAALkwazYxM22fjioouvF4KPBM9F9+GwnwLKAdGlKgyFMfFqJBiQ==",
+        "C=US, ST=California, L=Ventura, O=Patagonia, OU=Ventura, CN=www.patagonia.com"]},
+        "afe5fac5f3dae7523b7e2948d72f95f80a5b0e42": {"values": ["serialNumber=2Fr160kmOjBTWTTIe/pv4hmFm0kiNYOP,
+        C=US, ST=California, L=Ventura, O=Patagonia, OU=Ventura, CN=www.patagonia.com"]}}}}'
+    headers:
+      Connection:
+      - close
+      Content-Length:
+      - '17541'
+      Content-Type:
+      - application/json
+      Date:
+      - Tue, 17 Nov 2026 04:20:29 GMT
+      Etag:
+      - '"7f04875b6cf46f04b3c91f91217d00a8b0a9e1d4"'
+      Server:
+      - SSL Certificate API - https://github.com/adulau/crl-monitor
+    status:
+      code: 200
+      message: OK
+version: 1

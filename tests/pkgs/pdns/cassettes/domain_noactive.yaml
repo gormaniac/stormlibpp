@@ -1,0 +1,358 @@
+interactions:
+- request:
+    body: null
+    headers:
+      dribble-disable-active-query:
+      - '1'
+    method: GET
+    uri: https://www.circl.lu/pdns/query/circl.lu
+  response:
+    body:
+      string: '{"rrtype": "A", "rrname": "185.194.93.63", "rdata": "circl.lu", "count":
+        731, "time_first": 1790946729, "time_last": 1794883084, "origin": "https://www.circl.lu/pdns/"}
+
+        {"rrtype": "A", "rrname": "185.194.93.14", "rdata": "circl.lu", "count": 8617,
+        "time_first": 1696798385, "time_last": 1790942704, "origin": "https://www.circl.lu/pdns/"}
+
+        {"rrtype": "AAAA", "rrname": "2a00:5980:93::14", "rdata": "circl.lu", "count":
+        753, "time_first": 1696798385, "time_last": 1791724913, "origin": "https://www.circl.lu/pdns/"}
+
+        {"rrtype": "AAAA", "rrname": "2a00:5980:93::63", "rdata": "circl.lu", "count":
+        49, "time_first": 1790991916, "time_last": 1794864123, "origin": "https://www.circl.lu/pdns/"}
+
+        {"rrtype": "AAAA", "rrname": "2a00:5980:93::67", "rdata": "circl.lu", "count":
+        241, "time_first": 1767696769, "time_last": 1782633986, "origin": "https://www.circl.lu/pdns/"}
+
+        {"rrtype": "MX", "rrname": "10 cppy.circl.lu", "rdata": "circl.lu", "count":
+        11882, "time_first": 1696786636, "time_last": 1794873628, "origin": "https://www.circl.lu/pdns/"}
+
+        {"rrtype": "NS", "rrname": "ns-b.eurodns.org", "rdata": "circl.lu", "count":
+        489, "time_first": 1713474705, "time_last": 1794573263, "origin": "https://www.circl.lu/pdns/"}
+
+        {"rrtype": "NS", "rrname": "ns2.eurodns.com", "rdata": "circl.lu", "count":
+        241, "time_first": 1696798385, "time_last": 1713430150, "origin": "https://www.circl.lu/pdns/"}
+
+        {"rrtype": "NS", "rrname": "ns3.eurodns.com", "rdata": "circl.lu", "count":
+        241, "time_first": 1696798385, "time_last": 1713430150, "origin": "https://www.circl.lu/pdns/"}
+
+        {"rrtype": "NS", "rrname": "ns-c.eurodns.eu", "rdata": "circl.lu", "count":
+        489, "time_first": 1713474705, "time_last": 1794573263, "origin": "https://www.circl.lu/pdns/"}
+
+        {"rrtype": "NS", "rrname": "ns-d.eurodns.biz", "rdata": "circl.lu", "count":
+        489, "time_first": 1713474705, "time_last": 1794573263, "origin": "https://www.circl.lu/pdns/"}
+
+        {"rrtype": "NS", "rrname": "ns1.eurodns.com", "rdata": "circl.lu", "count":
+        241, "time_first": 1696798385, "time_last": 1713430150, "origin": "https://www.circl.lu/pdns/"}
+
+        {"rrtype": "NS", "rrname": "ns4.eurodns.com", "rdata": "circl.lu", "count":
+        241, "time_first": 1696798385, "time_last": 1713430150, "origin": "https://www.circl.lu/pdns/"}
+
+        {"rrtype": "NS", "rrname": "ns-a.eurodns.com", "rdata": "circl.lu", "count":
+        489, "time_first": 1713474705, "time_last": 1794573263, "origin": "https://www.circl.lu/pdns/"}
+
+        {"rrtype": "TXT", "rrname": "v=spf1 mx a:cpb.circl.lu a:cpbb.circl.lu a:mail.mbox.lu
+        a:mail1.mbox.lu a:mail2.mbox.lu ip4:185.194.93.129 ip4:185.194.93.18 ip4:149.13.33.0/25
+        ip4:185.194.94.153 ip6:2a00:5980::/48 ip4:5.196.95.45 ip4:185.194.93.215  ip6:2001:41d0:a:fe2d::1/128
+        ~all", "rdata": "circl.lu", "count": 158, "time_first": 1708587418, "time_last":
+        1792514256, "origin": "https://www.circl.lu/pdns/"}
+
+        {"rrtype": "TXT", "rrname": "_oj0a2malkm3jqtrky4varku73yaur4f", "rdata": "circl.lu",
+        "count": 11, "time_first": 1771573374, "time_last": 1792514256, "origin":
+        "https://www.circl.lu/pdns/"}
+
+        {"rrtype": "TXT", "rrname": "google-site-verification=lyDPcsTtOcU4ItMMMbNaZ8Mc_lOvLGwI2kcZCQL_KMU",
+        "rdata": "circl.lu", "count": 221, "time_first": 1698047426, "time_last":
+        1792514256, "origin": "https://www.circl.lu/pdns/"}
+
+        {"rrtype": "TXT", "rrname": "hqrmw544kfynt5qbmqjyyxdgvkw5sxv7", "rdata": "circl.lu",
+        "count": 221, "time_first": 1698047426, "time_last": 1792514256, "origin":
+        "https://www.circl.lu/pdns/"}
+
+        {"rrtype": "TXT", "rrname": "v=spf1 mx a:cpb.circl.lu a:cpbb.circl.lu a:mail.mbox.lu
+        a:mail1.mbox.lu a:mail2.mbox.lu ip4:185.194.93.129 ip4:185.194.93.18 ip4:149.13.33.0/25
+        ip4:185.194.94.153 ip6:2a00:5980::/48 ip4:5.196.95.45 ip6:2001:41d0:a:fe2d::1/128
+        ~all", "rdata": "circl.lu", "count": 63, "time_first": 1698047426, "time_last":
+        1708502608, "origin": "https://www.circl.lu/pdns/"}
+
+        {"rrtype": "SOA", "rrname": "ns1.eurodns.com hostmaster.eurodns.com 2024022200
+        43200 7200 1209600 86400", "rdata": "circl.lu", "count": 2, "time_first":
+        1708592860, "time_last": 1708698690, "origin": "https://www.circl.lu/pdns/"}
+
+        {"rrtype": "SOA", "rrname": "ns-a.eurodns.com hostmaster.eurodns.com 2025051905
+        43200 7200 1209600 3600", "rdata": "circl.lu", "count": 1, "time_first": 1748251225,
+        "time_last": 1748251225, "origin": "https://www.circl.lu/pdns/"}
+
+        {"rrtype": "SOA", "rrname": "ns-a.eurodns.com hostmaster.eurodns.com 2025092901
+        43200 7200 1209600 3600", "rdata": "circl.lu", "count": 1, "time_first": 1759508542,
+        "time_last": 1759508542, "origin": "https://www.circl.lu/pdns/"}
+
+        {"rrtype": "SOA", "rrname": "ns-a.eurodns.com hostmaster.eurodns.com 2025041702
+        43200 7200 1209600 3600", "rdata": "circl.lu", "count": 2, "time_first": 1745196622,
+        "time_last": 1745268474, "origin": "https://www.circl.lu/pdns/"}
+
+        {"rrtype": "SOA", "rrname": "ns-a.eurodns.com hostmaster.eurodns.com 2025081306
+        43200 7200 1209600 3600", "rdata": "circl.lu", "count": 3, "time_first": 1758048539,
+        "time_last": 1758884748, "origin": "https://www.circl.lu/pdns/"}
+
+        {"rrtype": "SOA", "rrname": "ns-a.eurodns.com hostmaster.eurodns.com 2024041801
+        43200 7200 1209600 3600", "rdata": "circl.lu", "count": 2, "time_first": 1713444879,
+        "time_last": 1713772361, "origin": "https://www.circl.lu/pdns/"}
+
+        {"rrtype": "SOA", "rrname": "ns-a.eurodns.com hostmaster.eurodns.com 2025062400
+        43200 7200 1209600 3600", "rdata": "circl.lu", "count": 1, "time_first": 1750880387,
+        "time_last": 1750880387, "origin": "https://www.circl.lu/pdns/"}
+
+        {"rrtype": "SOA", "rrname": "ns-a.eurodns.com hostmaster.eurodns.com 2025120900
+        43200 7200 1209600 3600", "rdata": "circl.lu", "count": 2, "time_first": 1765568492,
+        "time_last": 1765788592, "origin": "https://www.circl.lu/pdns/"}
+
+        {"rrtype": "SOA", "rrname": "ns-a.eurodns.com hostmaster.eurodns.com 2026022500
+        43200 7200 1209600 3600", "rdata": "circl.lu", "count": 2, "time_first": 1772114262,
+        "time_last": 1772223703, "origin": "https://www.circl.lu/pdns/"}
+
+        {"rrtype": "SOA", "rrname": "ns1.eurodns.com hostmaster.eurodns.com 2024022600
+        43200 7200 1209600 86400", "rdata": "circl.lu", "count": 1, "time_first":
+        1708945755, "time_last": 1708945755, "origin": "https://www.circl.lu/pdns/"}
+
+        {"rrtype": "SOA", "rrname": "ns-a.eurodns.com hostmaster.eurodns.com 2026010602
+        43200 7200 1209600 3600", "rdata": "circl.lu", "count": 3, "time_first": 1768585586,
+        "time_last": 1768990797, "origin": "https://www.circl.lu/pdns/"}
+
+        {"rrtype": "SOA", "rrname": "ns-a.eurodns.com hostmaster.eurodns.com 2026022501
+        43200 7200 1209600 3600", "rdata": "circl.lu", "count": 1, "time_first": 1772355755,
+        "time_last": 1772355755, "origin": "https://www.circl.lu/pdns/"}
+
+        {"rrtype": "SOA", "rrname": "ns-a.eurodns.com hostmaster.eurodns.com 2025102702
+        43200 7200 1209600 3600", "rdata": "circl.lu", "count": 2, "time_first": 1762355660,
+        "time_last": 1762395470, "origin": "https://www.circl.lu/pdns/"}
+
+        {"rrtype": "SOA", "rrname": "ns-a.eurodns.com hostmaster.eurodns.com 2026012702
+        43200 7200 1209600 3600", "rdata": "circl.lu", "count": 8, "time_first": 1770214037,
+        "time_last": 1770674124, "origin": "https://www.circl.lu/pdns/"}
+
+        {"rrtype": "SOA", "rrname": "ns-a.eurodns.com hostmaster.eurodns.com 2025030604
+        43200 7200 1209600 3600", "rdata": "circl.lu", "count": 3, "time_first": 1742189364,
+        "time_last": 1743152259, "origin": "https://www.circl.lu/pdns/"}
+
+        {"rrtype": "SOA", "rrname": "ns-a.eurodns.com hostmaster.eurodns.com 2025030601
+        43200 7200 1209600 3600", "rdata": "circl.lu", "count": 1, "time_first": 1741342016,
+        "time_last": 1741342016, "origin": "https://www.circl.lu/pdns/"}
+
+        {"rrtype": "SOA", "rrname": "ns-a.eurodns.com hostmaster.eurodns.com 2026022502
+        43200 7200 1209600 3600", "rdata": "circl.lu", "count": 1, "time_first": 1772429577,
+        "time_last": 1772429577, "origin": "https://www.circl.lu/pdns/"}
+
+        {"rrtype": "SOA", "rrname": "ns-a.eurodns.com hostmaster.eurodns.com 2025120903
+        43200 7200 1209600 3600", "rdata": "circl.lu", "count": 6, "time_first": 1766071020,
+        "time_last": 1766788768, "origin": "https://www.circl.lu/pdns/"}
+
+        {"rrtype": "SOA", "rrname": "ns1.eurodns.com hostmaster.eurodns.com 2024022000
+        43200 7200 1209600 86400", "rdata": "circl.lu", "count": 1, "time_first":
+        1708440989, "time_last": 1708440989, "origin": "https://www.circl.lu/pdns/"}
+
+        {"rrtype": "SOA", "rrname": "ns-a.eurodns.com hostmaster.eurodns.com 2026010301
+        43200 7200 1209600 3600", "rdata": "circl.lu", "count": 1, "time_first": 1767617682,
+        "time_last": 1767617682, "origin": "https://www.circl.lu/pdns/"}
+
+        {"rrtype": "SOA", "rrname": "ns-a.eurodns.com hostmaster.eurodns.com 2025040802
+        43200 7200 1209600 3600", "rdata": "circl.lu", "count": 3, "time_first": 1744437241,
+        "time_last": 1744557657, "origin": "https://www.circl.lu/pdns/"}
+
+        {"rrtype": "SOA", "rrname": "ns1.eurodns.com hostmaster.eurodns.com 2023091306
+        43200 7200 1209600 86400", "rdata": "circl.lu", "count": 260, "time_first":
+        1696780845, "time_last": 1697183586, "origin": "https://www.circl.lu/pdns/"}
+
+        {"rrtype": "SOA", "rrname": "ns-a.eurodns.com hostmaster.eurodns.com 2025062401
+        43200 7200 1209600 3600", "rdata": "circl.lu", "count": 1, "time_first": 1751453970,
+        "time_last": 1751453970, "origin": "https://www.circl.lu/pdns/"}
+
+        {"rrtype": "SOA", "rrname": "ns-a.eurodns.com hostmaster.eurodns.com 2025070901
+        43200 7200 1209600 3600", "rdata": "circl.lu", "count": 5, "time_first": 1752431903,
+        "time_last": 1752829666, "origin": "https://www.circl.lu/pdns/"}
+
+        {"rrtype": "SOA", "rrname": "ns-a.eurodns.com hostmaster.eurodns.com 2024111900
+        43200 7200 1209600 3600", "rdata": "circl.lu", "count": 1, "time_first": 1732885026,
+        "time_last": 1732885026, "origin": "https://www.circl.lu/pdns/"}
+
+        {"rrtype": "SOA", "rrname": "ns-a.eurodns.com hostmaster.eurodns.com 2025042200
+        43200 7200 1209600 3600", "rdata": "circl.lu", "count": 4, "time_first": 1745399984,
+        "time_last": 1745958853, "origin": "https://www.circl.lu/pdns/"}
+
+        {"rrtype": "SOA", "rrname": "ns1.eurodns.com hostmaster.eurodns.com 2024022704
+        43200 7200 1209600 86400", "rdata": "circl.lu", "count": 1, "time_first":
+        1711344038, "time_last": 1711344038, "origin": "https://www.circl.lu/pdns/"}
+
+        {"rrtype": "SOA", "rrname": "ns-a.eurodns.com hostmaster.eurodns.com 2025102705
+        43200 7200 1209600 3600", "rdata": "circl.lu", "count": 5, "time_first": 1762852453,
+        "time_last": 1763631988, "origin": "https://www.circl.lu/pdns/"}
+
+        {"rrtype": "SOA", "rrname": "ns-a.eurodns.com hostmaster.eurodns.com 2026030201
+        43200 7200 1209600 3600", "rdata": "circl.lu", "count": 3, "time_first": 1772591536,
+        "time_last": 1772932383, "origin": "https://www.circl.lu/pdns/"}
+
+        {"rrtype": "SOA", "rrname": "ns-a.eurodns.com hostmaster.eurodns.com 2026021900
+        43200 7200 1209600 3600", "rdata": "circl.lu", "count": 1, "time_first": 1771602078,
+        "time_last": 1771602078, "origin": "https://www.circl.lu/pdns/"}
+
+        {"rrtype": "SOA", "rrname": "ns-a.eurodns.com hostmaster.eurodns.com 2025040801
+        43200 7200 1209600 3600", "rdata": "circl.lu", "count": 1, "time_first": 1744115570,
+        "time_last": 1744115570, "origin": "https://www.circl.lu/pdns/"}
+
+        {"rrtype": "SOA", "rrname": "ns-a.eurodns.com hostmaster.eurodns.com 2025050701
+        43200 7200 1209600 3600", "rdata": "circl.lu", "count": 2, "time_first": 1746737577,
+        "time_last": 1746882735, "origin": "https://www.circl.lu/pdns/"}
+
+        {"rrtype": "SOA", "rrname": "ns-a.eurodns.com hostmaster.eurodns.com 2024120511
+        43200 7200 1209600 3600", "rdata": "circl.lu", "count": 2, "time_first": 1736783206,
+        "time_last": 1737369520, "origin": "https://www.circl.lu/pdns/"}
+
+        {"rrtype": "SOA", "rrname": "ns-a.eurodns.com hostmaster.eurodns.com 2025052803
+        43200 7200 1209600 3600", "rdata": "circl.lu", "count": 5, "time_first": 1748639211,
+        "time_last": 1749246912, "origin": "https://www.circl.lu/pdns/"}
+
+        {"rrtype": "SOA", "rrname": "ns-a.eurodns.com hostmaster.eurodns.com 2025051901
+        43200 7200 1209600 3600", "rdata": "circl.lu", "count": 1, "time_first": 1748022818,
+        "time_last": 1748022818, "origin": "https://www.circl.lu/pdns/"}
+
+        {"rrtype": "SOA", "rrname": "ns-a.eurodns.com hostmaster.eurodns.com 2024120508
+        43200 7200 1209600 3600", "rdata": "circl.lu", "count": 7, "time_first": 1735209512,
+        "time_last": 1736653977, "origin": "https://www.circl.lu/pdns/"}
+
+        {"rrtype": "SOA", "rrname": "ns-a.eurodns.com hostmaster.eurodns.com 2025022100
+        43200 7200 1209600 3600", "rdata": "circl.lu", "count": 9, "time_first": 1740161537,
+        "time_last": 1741122742, "origin": "https://www.circl.lu/pdns/"}
+
+        {"rrtype": "SOA", "rrname": "ns-a.eurodns.com hostmaster.eurodns.com 2025062403
+        43200 7200 1209600 3600", "rdata": "circl.lu", "count": 6, "time_first": 1751554090,
+        "time_last": 1751983689, "origin": "https://www.circl.lu/pdns/"}
+
+        {"rrtype": "SOA", "rrname": "ns-a.eurodns.com hostmaster.eurodns.com 2026030200
+        43200 7200 1209600 3600", "rdata": "circl.lu", "count": 1, "time_first": 1772453824,
+        "time_last": 1772453824, "origin": "https://www.circl.lu/pdns/"}
+
+        {"rrtype": "SOA", "rrname": "ns1.eurodns.com hostmaster.eurodns.com 2024022703
+        43200 7200 1209600 86400", "rdata": "circl.lu", "count": 6, "time_first":
+        1709816862, "time_last": 1710626746, "origin": "https://www.circl.lu/pdns/"}
+
+        {"rrtype": "SOA", "rrname": "ns-a.eurodns.com hostmaster.eurodns.com 2026010603
+        43200 7200 1209600 3600", "rdata": "circl.lu", "count": 1, "time_first": 1769218887,
+        "time_last": 1769218887, "origin": "https://www.circl.lu/pdns/"}
+
+        {"rrtype": "SOA", "rrname": "ns-a.eurodns.com hostmaster.eurodns.com 2025051201
+        43200 7200 1209600 3600", "rdata": "circl.lu", "count": 2, "time_first": 1747214860,
+        "time_last": 1747225493, "origin": "https://www.circl.lu/pdns/"}
+
+        {"rrtype": "SOA", "rrname": "ns-a.eurodns.com hostmaster.eurodns.com 2024111301
+        43200 7200 1209600 3600", "rdata": "circl.lu", "count": 4, "time_first": 1731768650,
+        "time_last": 1731797706, "origin": "https://www.circl.lu/pdns/"}
+
+        {"rrtype": "SOA", "rrname": "ns-a.eurodns.com hostmaster.eurodns.com 2025020300
+        43200 7200 1209600 3600", "rdata": "circl.lu", "count": 3, "time_first": 1738611620,
+        "time_last": 1739225949, "origin": "https://www.circl.lu/pdns/"}
+
+        {"rrtype": "SOA", "rrname": "ns-a.eurodns.com hostmaster.eurodns.com 2024111300
+        43200 7200 1209600 3600", "rdata": "circl.lu", "count": 1, "time_first": 1731659568,
+        "time_last": 1731659568, "origin": "https://www.circl.lu/pdns/"}
+
+        {"rrtype": "SOA", "rrname": "ns-a.eurodns.com hostmaster.eurodns.com 2024110701
+        43200 7200 1209600 3600", "rdata": "circl.lu", "count": 3, "time_first": 1731093979,
+        "time_last": 1731134378, "origin": "https://www.circl.lu/pdns/"}
+
+        {"rrtype": "SOA", "rrname": "ns-a.eurodns.com hostmaster.eurodns.com 2024120505
+        43200 7200 1209600 3600", "rdata": "circl.lu", "count": 1, "time_first": 1734714185,
+        "time_last": 1734714185, "origin": "https://www.circl.lu/pdns/"}
+
+        {"rrtype": "SOA", "rrname": "ns-a.eurodns.com hostmaster.eurodns.com 2025052807
+        43200 7200 1209600 3600", "rdata": "circl.lu", "count": 1, "time_first": 1750090146,
+        "time_last": 1750090146, "origin": "https://www.circl.lu/pdns/"}
+
+        {"rrtype": "SOA", "rrname": "ns-a.eurodns.com hostmaster.eurodns.com 2025081300
+        43200 7200 1209600 3600", "rdata": "circl.lu", "count": 4, "time_first": 1755262612,
+        "time_last": 1756282197, "origin": "https://www.circl.lu/pdns/"}
+
+        {"rrtype": "SOA", "rrname": "ns-a.eurodns.com hostmaster.eurodns.com 2025080403
+        43200 7200 1209600 3600", "rdata": "circl.lu", "count": 1, "time_first": 1754735730,
+        "time_last": 1754735730, "origin": "https://www.circl.lu/pdns/"}
+
+        {"rrtype": "SOA", "rrname": "ns1.eurodns.com hostmaster.eurodns.com 2024022706
+        43200 7200 1209600 86400", "rdata": "circl.lu", "count": 5, "time_first":
+        1711721266, "time_last": 1712753730, "origin": "https://www.circl.lu/pdns/"}
+
+        {"rrtype": "SOA", "rrname": "ns-a.eurodns.com hostmaster.eurodns.com 2025043003
+        43200 7200 1209600 3600", "rdata": "circl.lu", "count": 3, "time_first": 1746261525,
+        "time_last": 1746440381, "origin": "https://www.circl.lu/pdns/"}
+
+        {"rrtype": "SOA", "rrname": "ns-a.eurodns.com hostmaster.eurodns.com 2025020301
+        43200 7200 1209600 3600", "rdata": "circl.lu", "count": 2, "time_first": 1739241136,
+        "time_last": 1739259338, "origin": "https://www.circl.lu/pdns/"}
+
+        {"rrtype": "SOA", "rrname": "ns-a.eurodns.com hostmaster.eurodns.com 2025081303
+        43200 7200 1209600 3600", "rdata": "circl.lu", "count": 9, "time_first": 1756449706,
+        "time_last": 1757671729, "origin": "https://www.circl.lu/pdns/"}
+
+        {"rrtype": "SOA", "rrname": "ns1.eurodns.com hostmaster.eurodns.com 2024022700
+        43200 7200 1209600 86400", "rdata": "circl.lu", "count": 3, "time_first":
+        1709354511, "time_last": 1709640926, "origin": "https://www.circl.lu/pdns/"}
+
+        {"rrtype": "SOA", "rrname": "ns-a.eurodns.com hostmaster.eurodns.com 2025030607
+        43200 7200 1209600 3600", "rdata": "circl.lu", "count": 4, "time_first": 1743829199,
+        "time_last": 1743988439, "origin": "https://www.circl.lu/pdns/"}
+
+        {"rrtype": "SOA", "rrname": "ns-a.eurodns.com hostmaster.eurodns.com 2025052804
+        43200 7200 1209600 3600", "rdata": "circl.lu", "count": 1, "time_first": 1749650830,
+        "time_last": 1749650830, "origin": "https://www.circl.lu/pdns/"}
+
+        {"rrtype": "SOA", "rrname": "ns-a.eurodns.com hostmaster.eurodns.com 2024102804
+        43200 7200 1209600 3600", "rdata": "circl.lu", "count": 3, "time_first": 1730523884,
+        "time_last": 1730795097, "origin": "https://www.circl.lu/pdns/"}
+
+        {"rrtype": "SOA", "rrname": "ns-a.eurodns.com hostmaster.eurodns.com 2026010601
+        43200 7200 1209600 3600", "rdata": "circl.lu", "count": 1, "time_first": 1767696812,
+        "time_last": 1767696812, "origin": "https://www.circl.lu/pdns/"}
+
+        {"rrtype": "SOA", "rrname": "ns-a.eurodns.com hostmaster.eurodns.com 2024120504
+        43200 7200 1209600 3600", "rdata": "circl.lu", "count": 2, "time_first": 1733589299,
+        "time_last": 1733755588, "origin": "https://www.circl.lu/pdns/"}
+
+        {"rrtype": "SOA", "rrname": "ns-a.eurodns.com hostmaster.eurodns.com 2024092502
+        43200 7200 1209600 3600", "rdata": "circl.lu", "count": 1, "time_first": 1728546772,
+        "time_last": 1728546772, "origin": "https://www.circl.lu/pdns/"}
+
+        {"rrtype": "SOA", "rrname": "ns-a.eurodns.com hostmaster.eurodns.com 2025070904
+        43200 7200 1209600 3600", "rdata": "circl.lu", "count": 4, "time_first": 1753779022,
+        "time_last": 1754182650, "origin": "https://www.circl.lu/pdns/"}
+
+        {"rrtype": "SOA", "rrname": "ns-a.eurodns.com hostmaster.eurodns.com 2025092905
+        43200 7200 1209600 3600", "rdata": "circl.lu", "count": 4, "time_first": 1759670363,
+        "time_last": 1760961435, "origin": "https://www.circl.lu/pdns/"}
+
+        {"rrtype": "SOA", "rrname": "ns-a.eurodns.com hostmaster.eurodns.com 2025120400
+        43200 7200 1209600 3600", "rdata": "circl.lu", "count": 1, "time_first": 1765235699,
+        "time_last": 1765235699, "origin": "https://www.circl.lu/pdns/"}
+
+        {"rrtype": "SOA", "rrname": "ns1.eurodns.com hostmaster.eurodns.com 2024022709
+        43200 7200 1209600 86400", "rdata": "circl.lu", "count": 1, "time_first":
+        1713355500, "time_last": 1713355500, "origin": "https://www.circl.lu/pdns/"}
+
+        {"rrtype": "SOA", "rrname": "ns-a.eurodns.com hostmaster.eurodns.com 2025051902
+        43200 7200 1209600 3600", "rdata": "circl.lu", "count": 1, "time_first": 1748032046,
+        "time_last": 1748032046, "origin": "https://www.circl.lu/pdns/"}
+
+        '
+    headers:
+      Connection:
+      - close
+      Content-Length:
+      - '18999'
+      Content-Type:
+      - application/x-ndjson
+      Date:
+      - Tue, 17 Nov 2026 04:20:23 GMT
+      Server:
+      - dribble
+      X-Dribble-Errors:
+      - '[]'
+    status:
+      code: 200
+      message: OK
+version: 1

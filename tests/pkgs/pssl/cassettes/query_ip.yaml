@@ -1,0 +1,43 @@
+interactions:
+- request:
+    body: null
+    headers: {}
+    method: GET
+    uri: https://www.circl.lu/v2pssl/query/172.228.24.7
+  response:
+    body:
+      string: '{"172.228.24.7": {"certificates": ["37221925980c05deefac014f9a72b4765e716341",
+        "3209cc3ce4f1c22ab64b2e4284100b0022ad2739", "041d0d04b5629698f0abb5348986e4bc38c3a0d5",
+        "4d34ea92764b3a3149119952f41930ca11348361", "6ad2b04e2196e48bf685752890e811cd2ed60606",
+        "c43b30bf08bfb0b92c070f42f51b6980c8ada064", "30d1fd4a296ab1a8831cd56b4110a227f557bfff",
+        "79068f16776372aa6b12b83dd2b7288298727f54"], "subjects": {"37221925980c05deefac014f9a72b4765e716341":
+        {"values": ["C=JP, ST=Tokyo, L=Minato-ku, O=Sony corporation, OU=NPS, CN=psn-rsc.prod.dl.playstation.net"]},
+        "3209cc3ce4f1c22ab64b2e4284100b0022ad2739": {"values": ["C=NL, L=Amsterdam,
+        O=Verizon Enterprise Solutions, OU=Cybertrust, CN=Verizon Akamai SureServer
+        CA G14-SHA1"]}, "041d0d04b5629698f0abb5348986e4bc38c3a0d5": {"values": ["C=JP,
+        ST=Tokyo, L=Minato-ku, O=Sony corporation, OU=NPS, CN=psn-rsc.prod.dl.playstation.net"]},
+        "4d34ea92764b3a3149119952f41930ca11348361": {"values": ["C=IE, O=Baltimore,
+        OU=CyberTrust, CN=Baltimore CyberTrust Root"]}, "c43b30bf08bfb0b92c070f42f51b6980c8ada064":
+        {"values": ["C=CY, ST=Cyprus, L=Limassol, O=Blue Capital Markets Limited,
+        OU=IT, CN=www.easy-forex.com"]}, "6ad2b04e2196e48bf685752890e811cd2ed60606":
+        {"values": ["C=NL, L=Amsterdam, O=Verizon Enterprise Solutions, OU=Cybertrust,
+        CN=Verizon Akamai SureServer CA G14-SHA2"]}, "30d1fd4a296ab1a8831cd56b4110a227f557bfff":
+        {"values": ["O=Cybertrust Inc, CN=Cybertrust Public SureServer SV CA"]}, "79068f16776372aa6b12b83dd2b7288298727f54":
+        {"values": ["C=CY, ST=Cyprus, L=Limassol, O=Easy Forex, OU=IT, CN=www.easy-forex.com"]}}}}'
+    headers:
+      Connection:
+      - close
+      Content-Length:
+      - '1569'
+      Content-Type:
+      - application/json
+      Date:
+      - Tue, 17 Nov 2026 04:20:47 GMT
+      Etag:
+      - '"6d12c47d67e4444dc3ea0e20550e45df488f0a2d"'
+      Server:
+      - SSL Certificate API - https://github.com/adulau/crl-monitor
+    status:
+      code: 200
+      message: OK
+version: 1

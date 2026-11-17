@@ -1,0 +1,13 @@
+// Admin APIs for slib.pdns. Runs asroot, gated by the slib.pdns.admin perm.
+
+// Save the CIRCL Passive DNS credentials (HTTP Basic auth) that every slib.pdns request uses.
+function setAuth(user, passwd) {
+    // TODO
+    return()
+}
+
+// Remove the saved CIRCL Passive DNS credentials.
+function clearAuth() {
+    // TODO
+    return()
+}

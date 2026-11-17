@@ -1,0 +1,6 @@
+init {
+    $pdnslib = $lib.import(slib.pdns.lib)
+    // TODO - $cmdopts.query, $cmdopts.rrtype, $cmdopts.no_active, $cmdopts.page_size, $cmdopts.yield
+}
+
+// TODO - --query (spin, no $node) vs. inbound inet:fqdn/inet:ipv4/inet:ipv6 nodes

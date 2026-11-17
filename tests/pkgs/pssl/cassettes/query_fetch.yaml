@@ -1,0 +1,351 @@
+interactions:
+- request:
+    body: null
+    headers: {}
+    method: GET
+    uri: https://www.circl.lu/v2pssl/query/172.228.24.7
+  response:
+    body:
+      string: '{"172.228.24.7": {"certificates": ["37221925980c05deefac014f9a72b4765e716341",
+        "3209cc3ce4f1c22ab64b2e4284100b0022ad2739", "041d0d04b5629698f0abb5348986e4bc38c3a0d5",
+        "4d34ea92764b3a3149119952f41930ca11348361", "6ad2b04e2196e48bf685752890e811cd2ed60606",
+        "c43b30bf08bfb0b92c070f42f51b6980c8ada064", "30d1fd4a296ab1a8831cd56b4110a227f557bfff",
+        "79068f16776372aa6b12b83dd2b7288298727f54"], "subjects": {"37221925980c05deefac014f9a72b4765e716341":
+        {"values": ["C=JP, ST=Tokyo, L=Minato-ku, O=Sony corporation, OU=NPS, CN=psn-rsc.prod.dl.playstation.net"]},
+        "3209cc3ce4f1c22ab64b2e4284100b0022ad2739": {"values": ["C=NL, L=Amsterdam,
+        O=Verizon Enterprise Solutions, OU=Cybertrust, CN=Verizon Akamai SureServer
+        CA G14-SHA1"]}, "041d0d04b5629698f0abb5348986e4bc38c3a0d5": {"values": ["C=JP,
+        ST=Tokyo, L=Minato-ku, O=Sony corporation, OU=NPS, CN=psn-rsc.prod.dl.playstation.net"]},
+        "4d34ea92764b3a3149119952f41930ca11348361": {"values": ["C=IE, O=Baltimore,
+        OU=CyberTrust, CN=Baltimore CyberTrust Root"]}, "c43b30bf08bfb0b92c070f42f51b6980c8ada064":
+        {"values": ["C=CY, ST=Cyprus, L=Limassol, O=Blue Capital Markets Limited,
+        OU=IT, CN=www.easy-forex.com"]}, "6ad2b04e2196e48bf685752890e811cd2ed60606":
+        {"values": ["C=NL, L=Amsterdam, O=Verizon Enterprise Solutions, OU=Cybertrust,
+        CN=Verizon Akamai SureServer CA G14-SHA2"]}, "30d1fd4a296ab1a8831cd56b4110a227f557bfff":
+        {"values": ["O=Cybertrust Inc, CN=Cybertrust Public SureServer SV CA"]}, "79068f16776372aa6b12b83dd2b7288298727f54":
+        {"values": ["C=CY, ST=Cyprus, L=Limassol, O=Easy Forex, OU=IT, CN=www.easy-forex.com"]}}}}'
+    headers:
+      Connection:
+      - close
+      Content-Length:
+      - '1569'
+      Content-Type:
+      - application/json
+      Date:
+      - Tue, 17 Nov 2026 04:20:46 GMT
+      Etag:
+      - '"6d12c47d67e4444dc3ea0e20550e45df488f0a2d"'
+      Server:
+      - SSL Certificate API - https://github.com/adulau/crl-monitor
+    status:
+      code: 200
+      message: OK
+- request:
+    body: null
+    headers: {}
+    method: GET
+    uri: https://www.circl.lu/v2pssl/cfetch/37221925980c05deefac014f9a72b4765e716341
+  response:
+    body:
+      string: '{"info": {"extension": {"subjectKeyIdentifier": "40:A8:B4:8A:2A:33:F4:58:8C:25:06:14:3F:7B:3B:D2:B3:2E:7A:C0",
+        "authorityKeyIdentifier": "keyid:F8:BD:FA:AF:73:77:C6:C7:1B:F9:4B:4D:11:A7:D1:33:AF:AF:72:11\n",
+        "extendedKeyUsage": "TLS Web Server Authentication, TLS Web Client Authentication",
+        "subjectAltName": "DNS:psn-rsc.prod.dl.playstation.net", "crlDistributionPoints":
+        "\nFull Name:\n  URI:http://vassg142.crl.omniroot.com/vassg142.crl\n", "keyUsage":
+        "Digital Signature, Key Encipherment", "certificatePolicies": "Policy: 1.3.6.1.4.1.6334.1.50\n  CPS:
+        https://secure.omniroot.com/repository\n", "authorityInfoAccess": "OCSP -
+        URI:http://vassg142.ocsp.omniroot.com\nCA Issuers - URI:https://cacert.a.omniroot.com/vassg142.crt\nCA
+        Issuers - URI:https://cacert.a.omniroot.com/vassg142.der\n", "basicConstraints":
+        "CA:FALSE"}, "not_after": "2016-04-23T16:57:59+00:00", "keylength": 2048,
+        "key": "-----BEGIN PUBLIC KEY-----\nMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAtp19/XP3H9LNDAt7PUF/\nK8ug35VTcMM6HJt+bIqzKMKdTogXLv2gI24k/pS/T0y19H80dlg3PpJDyuISUvHf\n33nKT1ad+Z3cddFvo/FJU1gJZulAuovqc5bF6tSP7IKMGIyY9By1R4PsqftUYSu0\nlnfwGc8JDbt6BPGzyOnrk+UFgv7BidKKhlvW3nbKN2ydvFhOWQeFTsNaxkp+PzA1\nm/MwEiCetorBuVFWi5wTo0CFko9cFCFyWUp5eEaNUcVxAHwxnqWu0B9Cwsli9ei7\ngcIDUgPIkAbuo+GSLc8tRyb+pvBe6TPq4qlN0LdPDcMjodM+wUNrA4ojTNmzjRFb\nEwIDAQAB\n-----END
+        PUBLIC KEY-----\n", "fingerprint": "37221925980C05DEEFAC014F9A72B4765E716341",
+        "issuer": "C=NL, L=Amsterdam, O=Verizon Enterprise Solutions, OU=Cybertrust,
+        CN=Verizon Akamai SureServer CA G14-SHA2", "not_before": "2015-04-23T16:58:03+00:00",
+        "subject": "C=JP, ST=Tokyo, L=Minato-ku, O=Sony corporation, OU=NPS, CN=psn-rsc.prod.dl.playstation.net"},
+        "pem": "-----BEGIN CERTIFICATE-----\nMIIFkDCCBHigAwIBAgIUdIcF/AeOFgHhxbQhFzBZ+1ye94EwDQYJKoZIhvcNAQEL\nBQAwgY0xCzAJBgNVBAYTAk5MMRIwEAYDVQQHEwlBbXN0ZXJkYW0xJTAjBgNVBAoT\nHFZlcml6b24gRW50ZXJwcmlzZSBTb2x1dGlvbnMxEzARBgNVBAsTCkN5YmVydHJ1\nc3QxLjAsBgNVBAMTJVZlcml6b24gQWthbWFpIFN1cmVTZXJ2ZXIgQ0EgRzE0LVNI\nQTIwHhcNMTUwNDIzMTY1ODAzWhcNMTYwNDIzMTY1NzU5WjCBhDELMAkGA1UEBhMC\nSlAxDjAMBgNVBAgTBVRva3lvMRIwEAYDVQQHEwlNaW5hdG8ta3UxGTAXBgNVBAoT\nEFNvbnkgY29ycG9yYXRpb24xDDAKBgNVBAsTA05QUzEoMCYGA1UEAxMfcHNuLXJz\nYy5wcm9kLmRsLnBsYXlzdGF0aW9uLm5ldDCCASIwDQYJKoZIhvcNAQEBBQADggEP\nADCCAQoCggEBALadff1z9x/SzQwLez1BfyvLoN+VU3DDOhybfmyKsyjCnU6IFy79\noCNuJP6Uv09MtfR/NHZYNz6SQ8riElLx3995yk9Wnfmd3HXRb6PxSVNYCWbpQLqL\n6nOWxerUj+yCjBiMmPQctUeD7Kn7VGErtJZ38BnPCQ27egTxs8jp65PlBYL+wYnS\nioZb1t52yjdsnbxYTlkHhU7DWsZKfj8wNZvzMBIgnraKwblRVoucE6NAhZKPXBQh\ncllKeXhGjVHFcQB8MZ6lrtAfQsLJYvXou4HCA1IDyJAG7qPhki3PLUcm/qbwXukz\n6uKpTdC3Tw3DI6HTPsFDawOKI0zZs40RWxMCAwEAAaOCAe0wggHpMAwGA1UdEwEB\n/wQCMAAwTAYDVR0gBEUwQzBBBgkrBgEEAbE+ATIwNDAyBggrBgEFBQcCARYmaHR0\ncHM6Ly9zZWN1cmUub21uaXJvb3QuY29tL3JlcG9zaXRvcnkwga8GCCsGAQUFBwEB\nBIGiMIGfMC0GCCsGAQUFBzABhiFodHRwOi8vdmFzc2cxNDIub2NzcC5vbW5pcm9v\ndC5jb20wNgYIKwYBBQUHMAKGKmh0dHBzOi8vY2FjZXJ0LmEub21uaXJvb3QuY29t\nL3Zhc3NnMTQyLmNydDA2BggrBgEFBQcwAoYqaHR0cHM6Ly9jYWNlcnQuYS5vbW5p\ncm9vdC5jb20vdmFzc2cxNDIuZGVyMCoGA1UdEQQjMCGCH3Bzbi1yc2MucHJvZC5k\nbC5wbGF5c3RhdGlvbi5uZXQwDgYDVR0PAQH/BAQDAgWgMB0GA1UdJQQWMBQGCCsG\nAQUFBwMBBggrBgEFBQcDAjAfBgNVHSMEGDAWgBT4vfqvc3fGxxv5S00Rp9Ezr69y\nETA+BgNVHR8ENzA1MDOgMaAvhi1odHRwOi8vdmFzc2cxNDIuY3JsLm9tbmlyb290\nLmNvbS92YXNzZzE0Mi5jcmwwHQYDVR0OBBYEFECotIoqM/RYjCUGFD97O9KzLnrA\nMA0GCSqGSIb3DQEBCwUAA4IBAQAtdu6/cFEzzP3NxTLG0Zidap+g4id4gTru1593\nXOc/RFobetN1/z6PYDR0l1tivaA8q1PU7swF8anK9m2+3Tn/MD9CONhaWHNuE3OY\nJlFreviSUih4EnUB2GKF78ac5I3VgNZwaOT6khsIqvNkFVEX4s0r1BweoTU75/mn\nm22SlEuGYWsree/ltMjYw08k2B/6aBFuwIaFbv57/1V/IBjufqLUNBcp01Rz62gE\nWstynBavGrQQPXInqRUxMSiuhHUQEZNgff5yesowMk4e7A0Q8DUo1VlqSXM4T27X\n5pS20KmmlWetKd5WTjpQYzjetHf6TYRy8+E8eebww2A7uO3A\n-----END
+        CERTIFICATE-----\n", "icsi": {"first_seen": "16749", "version": "1", "validated":
+        "1", "times_seen": "16", "last_seen": "16764"}}'
+    headers:
+      Connection:
+      - close
+      Content-Length:
+      - '3829'
+      Content-Type:
+      - application/json
+      Date:
+      - Tue, 17 Nov 2026 04:20:46 GMT
+      Etag:
+      - '"b5c8d98d716b062c497004245f77335fa474d5df"'
+      Server:
+      - SSL Certificate API - https://github.com/adulau/crl-monitor
+    status:
+      code: 200
+      message: OK
+- request:
+    body: null
+    headers: {}
+    method: GET
+    uri: https://www.circl.lu/v2pssl/cfetch/3209cc3ce4f1c22ab64b2e4284100b0022ad2739
+  response:
+    body:
+      string: '{"info": {"extension": {"subjectKeyIdentifier": "DD:6C:80:7C:BA:B5:32:17:A5:84:41:40:F0:D2:04:66:13:2F:A9:90",
+        "authorityKeyIdentifier": "keyid:E5:9D:59:30:82:47:58:CC:AC:FA:08:54:36:86:7B:3A:B5:04:4D:F0\n",
+        "crlDistributionPoints": "\nFull Name:\n  URI:http://cdp1.public-trust.com/CRL/Omniroot2025.crl\n",
+        "keyUsage": "Digital Signature, Non Repudiation, Certificate Sign, CRL Sign",
+        "certificatePolicies": "Policy: 1.3.6.1.4.1.6334.1.50\n  CPS: https://secure.omniroot.com/repository\n",
+        "authorityInfoAccess": "OCSP - URI:http://ocsp.omniroot.com/baltimoreroot\nCA
+        Issuers - URI:https://cacert.omniroot.com/baltimoreroot.crt\nCA Issuers -
+        URI:https://cacert.omniroot.com/baltimoreroot.der\n", "basicConstraints":
+        "CA:TRUE, pathlen:2"}, "not_after": "2021-04-02T14:31:39+00:00", "keylength":
+        2048, "key": "-----BEGIN PUBLIC KEY-----\nMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAkestNZsMZGzKiy3VObYz\ntPxJChZ416g9NxACdtvX20+cVkuhabRLLUrjQ/ZvFgi173RFj3RWFisVpRZMfW8K\nmbQg54p7nEbprjH7E0/wlxZh47orpSTY3EuWwb7Tq79m2EQm+RaW7Zw2LN8pNCq1\nPRPSsUEtU5PLtXQoBvRjjV7esqgb131PJGYz7caKsIRuxglaligGjORRy6HFS7vf\nRD8KWsNWEYv1PJXbCXvWNIhRov1LqkkUd6mxJKslT2KcufnJBy0QyHC3GLFWMh0/\nqYJSp7CyYSRqX4x09ix4LCBZcAt2zvxQrVLrnKJFNpqLgRtN/0x2m94p7PW95ghe\n6wIDAQAB\n-----END
+        PUBLIC KEY-----\n", "fingerprint": "3209CC3CE4F1C22AB64B2E4284100B0022AD2739",
+        "issuer": "C=IE, O=Baltimore, OU=CyberTrust, CN=Baltimore CyberTrust Root",
+        "not_before": "2014-04-02T14:32:45+00:00", "subject": "C=NL, L=Amsterdam,
+        O=Verizon Enterprise Solutions, OU=Cybertrust, CN=Verizon Akamai SureServer
+        CA G14-SHA1"}, "pem": "-----BEGIN CERTIFICATE-----\nMIIFHzCCBAegAwIBAgIEByekajANBgkqhkiG9w0BAQUFADBaMQswCQYDVQQGEwJJ\nRTESMBAGA1UEChMJQmFsdGltb3JlMRMwEQYDVQQLEwpDeWJlclRydXN0MSIwIAYD\nVQQDExlCYWx0aW1vcmUgQ3liZXJUcnVzdCBSb290MB4XDTE0MDQwMjE0MzI0NVoX\nDTIxMDQwMjE0MzEzOVowgY0xCzAJBgNVBAYTAk5MMRIwEAYDVQQHEwlBbXN0ZXJk\nYW0xJTAjBgNVBAoTHFZlcml6b24gRW50ZXJwcmlzZSBTb2x1dGlvbnMxEzARBgNV\nBAsTCkN5YmVydHJ1c3QxLjAsBgNVBAMTJVZlcml6b24gQWthbWFpIFN1cmVTZXJ2\nZXIgQ0EgRzE0LVNIQTEwggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAwggEKAoIBAQCR\n6y01mwxkbMqLLdU5tjO0/EkKFnjXqD03EAJ229fbT5xWS6FptEstSuND9m8WCLXv\ndEWPdFYWKxWlFkx9bwqZtCDninucRumuMfsTT/CXFmHjuiulJNjcS5bBvtOrv2bY\nRCb5FpbtnDYs3yk0KrU9E9KxQS1Tk8u1dCgG9GONXt6yqBvXfU8kZjPtxoqwhG7G\nCVqWKAaM5FHLocVLu99EPwpaw1YRi/U8ldsJe9Y0iFGi/UuqSRR3qbEkqyVPYpy5\n+ckHLRDIcLcYsVYyHT+pglKnsLJhJGpfjHT2LHgsIFlwC3bO/FCtUuucokU2mouB\nG03/THab3ins9b3mCF7rAgMBAAGjggG3MIIBszASBgNVHRMBAf8ECDAGAQH/AgEC\nMEwGA1UdIARFMEMwQQYJKwYBBAGxPgEyMDQwMgYIKwYBBQUHAgEWJmh0dHBzOi8v\nc2VjdXJlLm9tbmlyb290LmNvbS9yZXBvc2l0b3J5MIG6BggrBgEFBQcBAQSBrTCB\nqjAyBggrBgEFBQcwAYYmaHR0cDovL29jc3Aub21uaXJvb3QuY29tL2JhbHRpbW9y\nZXJvb3QwOQYIKwYBBQUHMAKGLWh0dHBzOi8vY2FjZXJ0Lm9tbmlyb290LmNvbS9i\nYWx0aW1vcmVyb290LmNydDA5BggrBgEFBQcwAoYtaHR0cHM6Ly9jYWNlcnQub21u\naXJvb3QuY29tL2JhbHRpbW9yZXJvb3QuZGVyMA4GA1UdDwEB/wQEAwIBxjAfBgNV\nHSMEGDAWgBTlnVkwgkdYzKz6CFQ2hns6tQRN8DBCBgNVHR8EOzA5MDegNaAzhjFo\ndHRwOi8vY2RwMS5wdWJsaWMtdHJ1c3QuY29tL0NSTC9PbW5pcm9vdDIwMjUuY3Js\nMB0GA1UdDgQWBBTdbIB8urUyF6WEQUDw0gRmEy+pkDANBgkqhkiG9w0BAQUFAAOC\nAQEAWEEi/01CVa7IBodFP4tZ0wc5mrKgkYHSDMFnT09xKFqQHGk6mvabwAj0WiKJ\nVd9vr0W4ohN5GLWq08L+y3BzhSVb1cxvBpCp2K92jnQHUIMQTR15MJbZ6QIf4yHW\n7NI8MCy1U8kSp/LDY+72q/vge4X9hNZbV1A49NMZKT4R8GZA5J/Bu/Bs4m8kPqZr\nNyH1J7unAiK5/EPa7RMP54M2VZF6ABzW+BlsOg9Ec5OVygHW5l+FRxonfgUSNJ1I\nzZcEhDp1+nYUmF2oaWvZ9u3RxsofHcNiqcXwMU0zb4smkUtADfHn0Kc7j6cynd6d\nqXEQ3/RHTMctqSE0jukLbznxyQ==\n-----END
+        CERTIFICATE-----\n", "icsi": {"first_seen": "16276", "version": "1", "validated":
+        "1", "times_seen": "485", "last_seen": "16764"}}'
+    headers:
+      Connection:
+      - close
+      Content-Length:
+      - '3560'
+      Content-Type:
+      - application/json
+      Date:
+      - Tue, 17 Nov 2026 04:20:46 GMT
+      Etag:
+      - '"a07bbae841ac6004c509b3031f50e694123e1a28"'
+      Server:
+      - SSL Certificate API - https://github.com/adulau/crl-monitor
+    status:
+      code: 200
+      message: OK
+- request:
+    body: null
+    headers: {}
+    method: GET
+    uri: https://www.circl.lu/v2pssl/cfetch/041d0d04b5629698f0abb5348986e4bc38c3a0d5
+  response:
+    body:
+      string: '{"info": {"extension": {"subjectKeyIdentifier": "9B:FD:18:53:83:6A:B9:E4:25:B0:1E:92:C9:46:5F:59:65:72:CA:50",
+        "authorityKeyIdentifier": "keyid:F8:BD:FA:AF:73:77:C6:C7:1B:F9:4B:4D:11:A7:D1:33:AF:AF:72:11\n",
+        "extendedKeyUsage": "TLS Web Server Authentication, TLS Web Client Authentication",
+        "subjectAltName": "DNS:psn-rsc.prod.dl.playstation.net", "crlDistributionPoints":
+        "\nFull Name:\n  URI:http://vassg142.crl.omniroot.com/vassg142.crl\n", "keyUsage":
+        "Digital Signature, Key Encipherment", "certificatePolicies": "Policy: 1.3.6.1.4.1.6334.1.50\n  CPS:
+        https://secure.omniroot.com/repository\n", "authorityInfoAccess": "OCSP -
+        URI:http://vassg142.ocsp.omniroot.com\nCA Issuers - URI:https://cacert.a.omniroot.com/vassg142.crt\nCA
+        Issuers - URI:https://cacert.a.omniroot.com/vassg142.der\n", "basicConstraints":
+        "CA:FALSE"}, "not_after": "2017-03-09T19:56:15+00:00", "keylength": 2048,
+        "key": "-----BEGIN PUBLIC KEY-----\nMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAuzCHqdE43THL7mxjilMm\noLTeqnxpHwJItoBytIDnGmmY+Gg15RQasIPZzGdzEns+ZUkyL1wDJj04Sscv8ge7\nMGIy7iwUyvm1/A7CkV2aCuhuKDGPJeWZHFhXWTDD7SBAHH9QVyUfxvcAMD5SK4fa\nL4PFzGhQIHT/PGW3HDFWqZ4Vhkq/OKWNi/0rqdoAmwuYMeL/qG+UrksJDPQ/psEI\nroA3QSTUyBumwxW8yacLKs9yI4CS4s3vzO4c4GopHwRB2Nb/Z/pVbuhzKww8V1dH\n/plP3MiXpIAAocPJ43QJGVRWqAKO9RVaxCyr8+Mh4y0739lQvxxUCf9ianq4mZP2\nrQIDAQAB\n-----END
+        PUBLIC KEY-----\n", "fingerprint": "041D0D04B5629698F0ABB5348986E4BC38C3A0D5",
+        "issuer": "C=NL, L=Amsterdam, O=Verizon Enterprise Solutions, OU=Cybertrust,
+        CN=Verizon Akamai SureServer CA G14-SHA2", "not_before": "2016-03-09T19:56:19+00:00",
+        "subject": "C=JP, ST=Tokyo, L=Minato-ku, O=Sony corporation, OU=NPS, CN=psn-rsc.prod.dl.playstation.net"},
+        "pem": "-----BEGIN CERTIFICATE-----\nMIIFkDCCBHigAwIBAgIUGbMWsB9hj/MoBEz5JRcTGaEKNLQwDQYJKoZIhvcNAQEL\nBQAwgY0xCzAJBgNVBAYTAk5MMRIwEAYDVQQHEwlBbXN0ZXJkYW0xJTAjBgNVBAoT\nHFZlcml6b24gRW50ZXJwcmlzZSBTb2x1dGlvbnMxEzARBgNVBAsTCkN5YmVydHJ1\nc3QxLjAsBgNVBAMTJVZlcml6b24gQWthbWFpIFN1cmVTZXJ2ZXIgQ0EgRzE0LVNI\nQTIwHhcNMTYwMzA5MTk1NjE5WhcNMTcwMzA5MTk1NjE1WjCBhDELMAkGA1UEBhMC\nSlAxDjAMBgNVBAgTBVRva3lvMRIwEAYDVQQHEwlNaW5hdG8ta3UxGTAXBgNVBAoT\nEFNvbnkgY29ycG9yYXRpb24xDDAKBgNVBAsTA05QUzEoMCYGA1UEAxMfcHNuLXJz\nYy5wcm9kLmRsLnBsYXlzdGF0aW9uLm5ldDCCASIwDQYJKoZIhvcNAQEBBQADggEP\nADCCAQoCggEBALswh6nRON0xy+5sY4pTJqC03qp8aR8CSLaAcrSA5xppmPhoNeUU\nGrCD2cxncxJ7PmVJMi9cAyY9OErHL/IHuzBiMu4sFMr5tfwOwpFdmgrobigxjyXl\nmRxYV1kww+0gQBx/UFclH8b3ADA+UiuH2i+DxcxoUCB0/zxltxwxVqmeFYZKvzil\njYv9K6naAJsLmDHi/6hvlK5LCQz0P6bBCK6AN0Ek1MgbpsMVvMmnCyrPciOAkuLN\n78zuHOBqKR8EQdjW/2f6VW7ocysMPFdXR/6ZT9zIl6SAAKHDyeN0CRlUVqgCjvUV\nWsQsq/PjIeMtO9/ZUL8cVAn/Ymp6uJmT9q0CAwEAAaOCAe0wggHpMAwGA1UdEwEB\n/wQCMAAwTAYDVR0gBEUwQzBBBgkrBgEEAbE+ATIwNDAyBggrBgEFBQcCARYmaHR0\ncHM6Ly9zZWN1cmUub21uaXJvb3QuY29tL3JlcG9zaXRvcnkwga8GCCsGAQUFBwEB\nBIGiMIGfMC0GCCsGAQUFBzABhiFodHRwOi8vdmFzc2cxNDIub2NzcC5vbW5pcm9v\ndC5jb20wNgYIKwYBBQUHMAKGKmh0dHBzOi8vY2FjZXJ0LmEub21uaXJvb3QuY29t\nL3Zhc3NnMTQyLmNydDA2BggrBgEFBQcwAoYqaHR0cHM6Ly9jYWNlcnQuYS5vbW5p\ncm9vdC5jb20vdmFzc2cxNDIuZGVyMCoGA1UdEQQjMCGCH3Bzbi1yc2MucHJvZC5k\nbC5wbGF5c3RhdGlvbi5uZXQwDgYDVR0PAQH/BAQDAgWgMB0GA1UdJQQWMBQGCCsG\nAQUFBwMBBggrBgEFBQcDAjAfBgNVHSMEGDAWgBT4vfqvc3fGxxv5S00Rp9Ezr69y\nETA+BgNVHR8ENzA1MDOgMaAvhi1odHRwOi8vdmFzc2cxNDIuY3JsLm9tbmlyb290\nLmNvbS92YXNzZzE0Mi5jcmwwHQYDVR0OBBYEFJv9GFODarnkJbAekslGX1llcspQ\nMA0GCSqGSIb3DQEBCwUAA4IBAQBKOmi46RQSnwN14BeORpis65EAQ6Ib7GXP1qn/\nJ04SFYBvPcjQryb80A7H9hGTYj9Ckcdz8gFR/X4Rce9LyWXCDLTuadWu1h5pBw4S\niIvAQO4sIaRyGXQUO1q63SUv3RJQ85KddsNqmR7q0ZyAYDGROWG6ijtM/p4MWNqd\nBHWpGVOJPjKcsbSiWU3FETYzhdjskm8pvQlwx6axc8VfM3Hx6qW1hSpnIQJLAwH0\nG2GQy+MdE1X+Uvax8P6h9jZ1vhC9WHA8Lj34w9XHQld5hPJMZOSd6+E39HDU1zT5\nN7WqriuH659/Vbh6SS1R9kELqjTkkKrzseVcDlS9urTBXJQ6\n-----END
+        CERTIFICATE-----\n"}'
+    headers:
+      Connection:
+      - close
+      Content-Length:
+      - '3720'
+      Content-Type:
+      - application/json
+      Date:
+      - Tue, 17 Nov 2026 04:20:46 GMT
+      Etag:
+      - '"d546935be7fb08d11a574d9717156dc6c380841c"'
+      Server:
+      - SSL Certificate API - https://github.com/adulau/crl-monitor
+    status:
+      code: 200
+      message: OK
+- request:
+    body: null
+    headers: {}
+    method: GET
+    uri: https://www.circl.lu/v2pssl/cfetch/4d34ea92764b3a3149119952f41930ca11348361
+  response:
+    body:
+      string: '{"info": {"extension": {"crlDistributionPoints": "\nFull Name:\n  URI:http://www.public-trust.com/cgi-bin/CRL/2018/cdp.crl\n",
+        "keyUsage": "Certificate Sign, CRL Sign", "authorityKeyIdentifier": "DirName:/C=US/O=GTE
+        Corporation/OU=GTE CyberTrust Solutions, Inc./CN=GTE CyberTrust Global Root\nserial:01:A5\n",
+        "certificatePolicies": "Policy: X509v3 Any Policy\n  CPS: http://cybertrust.omniroot.com/repository\n",
+        "basicConstraints": "CA:TRUE, pathlen:3"}, "not_after": "2018-08-13T16:35:17+00:00",
+        "keylength": 2048, "key": "-----BEGIN PUBLIC KEY-----\nMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAowS7IquYPVfoJnKatXnU\nKeLh6JWAsbDjW44rKZpk36Fd7bAJBW3bKC7OYqJi/rSI2hLrOOshncBBKwFSe4h3\n0xyPx7q5iLVqCedz6BFAp9HMymKNLeWPC6ZQ0qhQwyjq9aslh4qalhypZ7g/DNX3\n+VITL8Ib1XBw8I/AEsoGy5rh2cozenfW+Oy58WhEQkgT0sDCpK5eYP62pgX8tN0H\nWQLUWRiYY/WlY+CQDH1dsgZ684Xq69QDrl6EPl//Fe1pvPk5NnJ1z3dSTfPJkCy5\nPeXJI1M/HySYIVwHmSm9xjrs526GOmuXdGMzvWgYMfB4jXa//J6OXSqGp02Q3Cca\nOQIDAQAB\n-----END
+        PUBLIC KEY-----\n", "fingerprint": "4D34EA92764B3A3149119952F41930CA11348361",
+        "issuer": "C=US, O=GTE Corporation, OU=GTE CyberTrust Solutions, Inc., CN=GTE
+        CyberTrust Global Root", "not_before": "2012-04-18T16:36:18+00:00", "subject":
+        "C=IE, O=Baltimore, OU=CyberTrust, CN=Baltimore CyberTrust Root"}, "pem":
+        "-----BEGIN CERTIFICATE-----\nMIIEFTCCA36gAwIBAgIEByeO7TANBgkqhkiG9w0BAQUFADB1MQswCQYDVQQGEwJV\nUzEYMBYGA1UEChMPR1RFIENvcnBvcmF0aW9uMScwJQYDVQQLEx5HVEUgQ3liZXJU\ncnVzdCBTb2x1dGlvbnMsIEluYy4xIzAhBgNVBAMTGkdURSBDeWJlclRydXN0IEds\nb2JhbCBSb290MB4XDTEyMDQxODE2MzYxOFoXDTE4MDgxMzE2MzUxN1owWjELMAkG\nA1UEBhMCSUUxEjAQBgNVBAoTCUJhbHRpbW9yZTETMBEGA1UECxMKQ3liZXJUcnVz\ndDEiMCAGA1UEAxMZQmFsdGltb3JlIEN5YmVyVHJ1c3QgUm9vdDCCASIwDQYJKoZI\nhvcNAQEBBQADggEPADCCAQoCggEBAKMEuyKrmD1X6CZymrV51Cni4eiVgLGw41uO\nKymaZN+hXe2wCQVt2yguzmKiYv60iNoS6zjrIZ3AQSsBUnuId9Mcj8e6uYi1agnn\nc+gRQKfRzMpijS3ljwumUNKoUMMo6vWrJYeKmpYcqWe4PwzV9/lSEy/CG9VwcPCP\nwBLKBsua4dnKM3p31vjsufFoREJIE9LAwqSuXmD+tqYF/LTdB1kC1FkYmGP1pWPg\nkAx9XbIGevOF6uvUA65ehD5f/xXtabz5OTZydc93Uk3zyZAsuT3lySNTPx8kmCFc\nB5kpvcY67Oduhjprl3RjM71oGDHweI12v/yejl0qhqdNkNwnGjkCAwEAAaOCAUcw\nggFDMBIGA1UdEwEB/wQIMAYBAf8CAQMwSgYDVR0gBEMwQTA/BgRVHSAAMDcwNQYI\nKwYBBQUHAgEWKWh0dHA6Ly9jeWJlcnRydXN0Lm9tbmlyb290LmNvbS9yZXBvc2l0\nb3J5MA4GA1UdDwEB/wQEAwIBBjCBiQYDVR0jBIGBMH+heaR3MHUxCzAJBgNVBAYT\nAlVTMRgwFgYDVQQKEw9HVEUgQ29ycG9yYXRpb24xJzAlBgNVBAsTHkdURSBDeWJl\nclRydXN0IFNvbHV0aW9ucywgSW5jLjEjMCEGA1UEAxMaR1RFIEN5YmVyVHJ1c3Qg\nR2xvYmFsIFJvb3SCAgGlMEUGA1UdHwQ+MDwwOqA4oDaGNGh0dHA6Ly93d3cucHVi\nbGljLXRydXN0LmNvbS9jZ2ktYmluL0NSTC8yMDE4L2NkcC5jcmwwDQYJKoZIhvcN\nAQEFBQADgYEAkx3+i65G7MupD6vl78qyaBZo2I/6E6mvs8st50tujmkqwisQCo32\nrnO2ufsU/V9tuFC2xIrWQH7Xw8tz3MldW6+wQbU36+rcIJHENGr0ofOWnTeGl+Fx\npN19+kSElK7XCQQidg9kUTWpJA/5C9sy2sL+wbkqXHonE8qxSDpx0EM=\n-----END
+        CERTIFICATE-----\n", "icsi": {"first_seen": "15553", "version": "1", "validated":
+        "1", "times_seen": "1085", "last_seen": "16764"}}'
+    headers:
+      Connection:
+      - close
+      Content-Length:
+      - '2893'
+      Content-Type:
+      - application/json
+      Date:
+      - Tue, 17 Nov 2026 04:20:46 GMT
+      Etag:
+      - '"be4f75ad35fdc81c2af0aa83900458bc26c7dace"'
+      Server:
+      - SSL Certificate API - https://github.com/adulau/crl-monitor
+    status:
+      code: 200
+      message: OK
+- request:
+    body: null
+    headers: {}
+    method: GET
+    uri: https://www.circl.lu/v2pssl/cfetch/6ad2b04e2196e48bf685752890e811cd2ed60606
+  response:
+    body:
+      string: '{"info": {"extension": {"subjectKeyIdentifier": "F8:BD:FA:AF:73:77:C6:C7:1B:F9:4B:4D:11:A7:D1:33:AF:AF:72:11",
+        "authorityKeyIdentifier": "keyid:E5:9D:59:30:82:47:58:CC:AC:FA:08:54:36:86:7B:3A:B5:04:4D:F0\n",
+        "crlDistributionPoints": "\nFull Name:\n  URI:http://cdp1.public-trust.com/CRL/Omniroot2025.crl\n",
+        "keyUsage": "Digital Signature, Non Repudiation, Certificate Sign, CRL Sign",
+        "certificatePolicies": "Policy: 1.3.6.1.4.1.6334.1.50\n  CPS: https://secure.omniroot.com/repository\n",
+        "authorityInfoAccess": "OCSP - URI:http://ocsp.omniroot.com/baltimoreroot\nCA
+        Issuers - URI:https://cacert.omniroot.com/baltimoreroot.crt\nCA Issuers -
+        URI:https://cacert.omniroot.com/baltimoreroot.der\n", "basicConstraints":
+        "CA:TRUE, pathlen:2"}, "not_after": "2021-04-02T14:35:52+00:00", "keylength":
+        2048, "key": "-----BEGIN PUBLIC KEY-----\nMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA3W6eAmkCtaOZLghkMmpZ\n88aepiAH0kjRqJPH6kePgzlA1yBdjZq6q9hw7J2I0b1i9tvsnV41AXYDI+Vv0q9G\nNVlaXNGoI8Hr6SDUSdY/ANioIt5DeYGs6aSS9XdwBR5ctqD3kKTNqygskMLnD8Ov\nHEdZ1YQu3yYHRSNaxuiQyIVLjBYeYPkBE/EUH+boFO3F0m9jKG5yjEmuCHLHk5W0\nCwyuj5pnhPVXG9uB1xedQRFDGb1tSoXtj3Alq2ar9vptHDyr7Re9VoTh23UzsihL\nmY75S4IzUJ+SU+36rQ+VnKPyy2Dwdx3JAYtfLYa+vza4JJYTfMGGWmzBSCp/PpNg\nxQIDAQAB\n-----END
+        PUBLIC KEY-----\n", "fingerprint": "6AD2B04E2196E48BF685752890E811CD2ED60606",
+        "issuer": "C=IE, O=Baltimore, OU=CyberTrust, CN=Baltimore CyberTrust Root",
+        "not_before": "2014-04-02T14:36:10+00:00", "subject": "C=NL, L=Amsterdam,
+        O=Verizon Enterprise Solutions, OU=Cybertrust, CN=Verizon Akamai SureServer
+        CA G14-SHA2"}, "pem": "-----BEGIN CERTIFICATE-----\nMIIFHzCCBAegAwIBAgIEByekazANBgkqhkiG9w0BAQsFADBaMQswCQYDVQQGEwJJ\nRTESMBAGA1UEChMJQmFsdGltb3JlMRMwEQYDVQQLEwpDeWJlclRydXN0MSIwIAYD\nVQQDExlCYWx0aW1vcmUgQ3liZXJUcnVzdCBSb290MB4XDTE0MDQwMjE0MzYxMFoX\nDTIxMDQwMjE0MzU1MlowgY0xCzAJBgNVBAYTAk5MMRIwEAYDVQQHEwlBbXN0ZXJk\nYW0xJTAjBgNVBAoTHFZlcml6b24gRW50ZXJwcmlzZSBTb2x1dGlvbnMxEzARBgNV\nBAsTCkN5YmVydHJ1c3QxLjAsBgNVBAMTJVZlcml6b24gQWthbWFpIFN1cmVTZXJ2\nZXIgQ0EgRzE0LVNIQTIwggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAwggEKAoIBAQDd\nbp4CaQK1o5kuCGQyalnzxp6mIAfSSNGok8fqR4+DOUDXIF2Nmrqr2HDsnYjRvWL2\n2+ydXjUBdgMj5W/Sr0Y1WVpc0agjwevpINRJ1j8A2Kgi3kN5gazppJL1d3AFHly2\noPeQpM2rKCyQwucPw68cR1nVhC7fJgdFI1rG6JDIhUuMFh5g+QET8RQf5ugU7cXS\nb2MobnKMSa4IcseTlbQLDK6PmmeE9Vcb24HXF51BEUMZvW1Khe2PcCWrZqv2+m0c\nPKvtF71WhOHbdTOyKEuZjvlLgjNQn5JT7fqtD5Wco/LLYPB3HckBi18thr6/Nrgk\nlhN8wYZabMFIKn8+k2DFAgMBAAGjggG3MIIBszASBgNVHRMBAf8ECDAGAQH/AgEC\nMEwGA1UdIARFMEMwQQYJKwYBBAGxPgEyMDQwMgYIKwYBBQUHAgEWJmh0dHBzOi8v\nc2VjdXJlLm9tbmlyb290LmNvbS9yZXBvc2l0b3J5MIG6BggrBgEFBQcBAQSBrTCB\nqjAyBggrBgEFBQcwAYYmaHR0cDovL29jc3Aub21uaXJvb3QuY29tL2JhbHRpbW9y\nZXJvb3QwOQYIKwYBBQUHMAKGLWh0dHBzOi8vY2FjZXJ0Lm9tbmlyb290LmNvbS9i\nYWx0aW1vcmVyb290LmNydDA5BggrBgEFBQcwAoYtaHR0cHM6Ly9jYWNlcnQub21u\naXJvb3QuY29tL2JhbHRpbW9yZXJvb3QuZGVyMA4GA1UdDwEB/wQEAwIBxjAfBgNV\nHSMEGDAWgBTlnVkwgkdYzKz6CFQ2hns6tQRN8DBCBgNVHR8EOzA5MDegNaAzhjFo\ndHRwOi8vY2RwMS5wdWJsaWMtdHJ1c3QuY29tL0NSTC9PbW5pcm9vdDIwMjUuY3Js\nMB0GA1UdDgQWBBT4vfqvc3fGxxv5S00Rp9Ezr69yETANBgkqhkiG9w0BAQsFAAOC\nAQEAgNl67XIFN49hqnN8mmr8/gHiGYFwByUysPBvO8dqKD3kUYfmfoLsrkinsXc4\nwtZWr4/yAfxlZRAJ93QptQ6S7pCY0YiiZbfNnA6nhpgovK4Vg7Ya1x3sGdp6jkD5\nmRXVfaW6q/0mmG6cQTu2gRjscEjXbn+m4Xcl1t1i6FLzjBY5Z+IiDXcu+xFs5N04\ntCdfA6g9ROLyhEuE/Vamnk17ohZPB/U0JHKlovoWZiqkSg7IDSdEnHfUEhCH0gAs\neruOiCKRFb6iWco04BxhlIYgM83nTF07kj7L1i3qVPr7r1T1qMULyouHAOaf5pW/\nt8SjWfUWbF8+aVWAOfZ1UBQ+Mg==\n-----END
+        CERTIFICATE-----\n", "icsi": {"first_seen": "16463", "version": "1", "validated":
+        "1", "times_seen": "302", "last_seen": "16764"}}'
+    headers:
+      Connection:
+      - close
+      Content-Length:
+      - '3560'
+      Content-Type:
+      - application/json
+      Date:
+      - Tue, 17 Nov 2026 04:20:47 GMT
+      Etag:
+      - '"8333cdd001b41fec32a19745b3d732f20c34ee58"'
+      Server:
+      - SSL Certificate API - https://github.com/adulau/crl-monitor
+    status:
+      code: 200
+      message: OK
+- request:
+    body: null
+    headers: {}
+    method: GET
+    uri: https://www.circl.lu/v2pssl/cfetch/c43b30bf08bfb0b92c070f42f51b6980c8ada064
+  response:
+    body:
+      string: '{"info": {"extension": {"subjectKeyIdentifier": "73:56:D0:DB:E5:D1:49:EF:44:AF:B7:06:E5:69:78:D8:3B:33:4A:B4",
+        "authorityKeyIdentifier": "keyid:DD:6C:80:7C:BA:B5:32:17:A5:84:41:40:F0:D2:04:66:13:2F:A9:90\n",
+        "extendedKeyUsage": "TLS Web Server Authentication, TLS Web Client Authentication",
+        "subjectAltName": "DNS:www.easy-forex.com", "crlDistributionPoints": "\nFull
+        Name:\n  URI:http://vassg141.crl.omniroot.com/vassg141.crl\n", "keyUsage":
+        "Digital Signature, Key Encipherment", "certificatePolicies": "Policy: 1.3.6.1.4.1.6334.1.50\n  CPS:
+        https://secure.omniroot.com/repository\n", "authorityInfoAccess": "OCSP -
+        URI:http://vassg141.ocsp.omniroot.com\nCA Issuers - URI:https://cacert.a.omniroot.com/vassg141.crt\nCA
+        Issuers - URI:https://cacert.a.omniroot.com/vassg141.der\n", "basicConstraints":
+        "CA:FALSE"}, "not_after": "2016-01-10T06:47:15+00:00", "keylength": 2048,
+        "key": "-----BEGIN PUBLIC KEY-----\nMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAu1LzCDcak9G8DtezBctw\nITq4v1YQcvRWJks63L83IzYMqAfgEVnKIH64W2p0L+sMkGf5umIVJU+iVS8g+ywz\nMhq2O0JL6O8NWyy24Cvl5WTvomfZYmYJLJGKhR1yRinIIvwZ1qgnoTkEAwbemumH\ntrv3byCapzn7ZSP+iGlwj+fXxd102KRJLWt997iJII1gCot/Vsic8Cex5xBdaS7b\n5OOTuagYpOw2c71lSQwS4vpt/b8Wio90bhlKRHK9q1oOmVrHAupijgxm/NlZCLPs\nKP6Ro1AANebO9gPk0U+se5L6rsKAN/7Srvt1WTQHlcL4jwyLK/jO5Ij48Eh1Zw4b\nJQIDAQAB\n-----END
+        PUBLIC KEY-----\n", "fingerprint": "C43B30BF08BFB0B92C070F42F51B6980C8ADA064",
+        "issuer": "C=NL, L=Amsterdam, O=Verizon Enterprise Solutions, OU=Cybertrust,
+        CN=Verizon Akamai SureServer CA G14-SHA1", "not_before": "2015-01-10T06:47:18+00:00",
+        "subject": "C=CY, ST=Cyprus, L=Limassol, O=Blue Capital Markets Limited, OU=IT,
+        CN=www.easy-forex.com"}, "pem": "-----BEGIN CERTIFICATE-----\nMIIFgTCCBGmgAwIBAgIUFuf7X6cQ+qfEhXlRawMIpZXBdekwDQYJKoZIhvcNAQEF\nBQAwgY0xCzAJBgNVBAYTAk5MMRIwEAYDVQQHEwlBbXN0ZXJkYW0xJTAjBgNVBAoT\nHFZlcml6b24gRW50ZXJwcmlzZSBTb2x1dGlvbnMxEzARBgNVBAsTCkN5YmVydHJ1\nc3QxLjAsBgNVBAMTJVZlcml6b24gQWthbWFpIFN1cmVTZXJ2ZXIgQ0EgRzE0LVNI\nQTEwHhcNMTUwMTEwMDY0NzE4WhcNMTYwMTEwMDY0NzE1WjCBgjELMAkGA1UEBhMC\nQ1kxDzANBgNVBAgTBkN5cHJ1czERMA8GA1UEBxMITGltYXNzb2wxJTAjBgNVBAoT\nHEJsdWUgQ2FwaXRhbCBNYXJrZXRzIExpbWl0ZWQxCzAJBgNVBAsTAklUMRswGQYD\nVQQDExJ3d3cuZWFzeS1mb3JleC5jb20wggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAw\nggEKAoIBAQC7UvMINxqT0bwO17MFy3AhOri/VhBy9FYmSzrcvzcjNgyoB+ARWcog\nfrhbanQv6wyQZ/m6YhUlT6JVLyD7LDMyGrY7Qkvo7w1bLLbgK+XlZO+iZ9liZgks\nkYqFHXJGKcgi/BnWqCehOQQDBt6a6Ye2u/dvIJqnOftlI/6IaXCP59fF3XTYpEkt\na333uIkgjWAKi39WyJzwJ7HnEF1pLtvk45O5qBik7DZzvWVJDBLi+m39vxaKj3Ru\nGUpEcr2rWg6ZWscC6mKODGb82VkIs+wo/pGjUAA15s72A+TRT6x7kvquwoA3/tKu\n+3VZNAeVwviPDIsr+M7kiPjwSHVnDhslAgMBAAGjggHgMIIB3DAMBgNVHRMBAf8E\nAjAAMEwGA1UdIARFMEMwQQYJKwYBBAGxPgEyMDQwMgYIKwYBBQUHAgEWJmh0dHBz\nOi8vc2VjdXJlLm9tbmlyb290LmNvbS9yZXBvc2l0b3J5MIGvBggrBgEFBQcBAQSB\nojCBnzAtBggrBgEFBQcwAYYhaHR0cDovL3Zhc3NnMTQxLm9jc3Aub21uaXJvb3Qu\nY29tMDYGCCsGAQUFBzAChipodHRwczovL2NhY2VydC5hLm9tbmlyb290LmNvbS92\nYXNzZzE0MS5jcnQwNgYIKwYBBQUHMAKGKmh0dHBzOi8vY2FjZXJ0LmEub21uaXJv\nb3QuY29tL3Zhc3NnMTQxLmRlcjAdBgNVHREEFjAUghJ3d3cuZWFzeS1mb3JleC5j\nb20wDgYDVR0PAQH/BAQDAgWgMB0GA1UdJQQWMBQGCCsGAQUFBwMBBggrBgEFBQcD\nAjAfBgNVHSMEGDAWgBTdbIB8urUyF6WEQUDw0gRmEy+pkDA+BgNVHR8ENzA1MDOg\nMaAvhi1odHRwOi8vdmFzc2cxNDEuY3JsLm9tbmlyb290LmNvbS92YXNzZzE0MS5j\ncmwwHQYDVR0OBBYEFHNW0Nvl0UnvRK+3BuVpeNg7M0q0MA0GCSqGSIb3DQEBBQUA\nA4IBAQAmqLpwKTd/NXJCneiHU9Fe3MCOhKCblaiqOc57d88oaytZ71OAMeCApfLo\nxIuP+5fmihr9M82/+ot8+iAF+TtRFYwZfF9KZfHdd4e5FB0Si2QK9RviDa5GOgec\nWRbBnQXrEvwJ20TE6sKbtkpjOC5TQ12TpklCVX4PKUXr9g84UCs1ect9wurOM6pQ\n4InTNW3qhGzBSWkUA9j9zkz8yP6t6JSZ6nwjChYWOQ93+5pJNCVfes9TXsVEbwma\nF0FuOtolPPYYGl6PlzJrk3ZJoOwRwJC5M7VKiYgbkeQ3ZdGCQ4vtVgP+bi/RYvig\nt7jcx+7ZYo+vgsZ7mJEK0SZ9CksP\n-----END
+        CERTIFICATE-----\n"}'
+    headers:
+      Connection:
+      - close
+      Content-Length:
+      - '3685'
+      Content-Type:
+      - application/json
+      Date:
+      - Tue, 17 Nov 2026 04:20:47 GMT
+      Etag:
+      - '"74ec150459d8499995735f053d1559bcc02ae285"'
+      Server:
+      - SSL Certificate API - https://github.com/adulau/crl-monitor
+    status:
+      code: 200
+      message: OK
+- request:
+    body: null
+    headers: {}
+    method: GET
+    uri: https://www.circl.lu/v2pssl/cfetch/30d1fd4a296ab1a8831cd56b4110a227f557bfff
+  response:
+    body:
+      string: '{"info": {"extension": {"subjectKeyIdentifier": "04:98:60:DF:80:1B:96:49:5D:65:56:2D:A5:2C:09:24:0A:EC:DC:B9",
+        "authorityKeyIdentifier": "keyid:E5:9D:59:30:82:47:58:CC:AC:FA:08:54:36:86:7B:3A:B5:04:4D:F0\n",
+        "crlDistributionPoints": "\nFull Name:\n  URI:http://cdp1.public-trust.com/CRL/Omniroot2025.crl\n",
+        "keyUsage": "Certificate Sign, CRL Sign", "certificatePolicies": "Policy:
+        1.3.6.1.4.1.6334.1.50\n  CPS: http://cybertrust.omniroot.com/repository\n",
+        "basicConstraints": "CA:TRUE, pathlen:0"}, "not_after": "2020-09-08T17:34:08+00:00",
+        "keylength": 2048, "key": "-----BEGIN PUBLIC KEY-----\nMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAo7qZjbfhzXOI+bnd3vQF\n8yX1P8VSHlFaP5r/TYS3UH/xEIpdf2RVHDuj8/+XfxxL7W9/6VTslypCA2d/uchs\nopf4QJMkwyVepWaLhr3XuSYibtJmg7N4wXxYdhHrFlVHMvC5NBC9jyaiJWjBFCui\nc9ZmPUSHXBN/WJFiPVd/bK5C6BJ+vXjx8axcNWBoRbxTc4cRHcUu+mA12pH52vJV\nbL/KoldcyGS8qVsVoPwc80QuvQbyaNhALbuzYSWSkyUcd0aQv9Cvt4OgPIdepZGo\n/8ExG7ZLrBI0CNXb7ImHYwanU/jV9eZmrF6EZUbJ9DolD2zMD2a4mlWhRmz8kSNf\nvQIDAQAB\n-----END
+        PUBLIC KEY-----\n", "fingerprint": "30D1FD4A296AB1A8831CD56B4110A227F557BFFF",
+        "issuer": "C=IE, O=Baltimore, OU=CyberTrust, CN=Baltimore CyberTrust Root",
+        "not_before": "2010-09-08T17:35:16+00:00", "subject": "O=Cybertrust Inc, CN=Cybertrust
+        Public SureServer SV CA"}, "pem": "-----BEGIN CERTIFICATE-----\nMIIEGzCCAwOgAwIBAgIEByc3DDANBgkqhkiG9w0BAQUFADBaMQswCQYDVQQGEwJJ\nRTESMBAGA1UEChMJQmFsdGltb3JlMRMwEQYDVQQLEwpDeWJlclRydXN0MSIwIAYD\nVQQDExlCYWx0aW1vcmUgQ3liZXJUcnVzdCBSb290MB4XDTEwMDkwODE3MzUxNloX\nDTIwMDkwODE3MzQwOFowRjEXMBUGA1UEChMOQ3liZXJ0cnVzdCBJbmMxKzApBgNV\nBAMTIkN5YmVydHJ1c3QgUHVibGljIFN1cmVTZXJ2ZXIgU1YgQ0EwggEiMA0GCSqG\nSIb3DQEBAQUAA4IBDwAwggEKAoIBAQCjupmNt+HNc4j5ud3e9AXzJfU/xVIeUVo/\nmv9NhLdQf/EQil1/ZFUcO6Pz/5d/HEvtb3/pVOyXKkIDZ3+5yGyil/hAkyTDJV6l\nZouGvde5JiJu0maDs3jBfFh2EesWVUcy8Lk0EL2PJqIlaMEUK6Jz1mY9RIdcE39Y\nkWI9V39srkLoEn69ePHxrFw1YGhFvFNzhxEdxS76YDXakfna8lVsv8qiV1zIZLyp\nWxWg/BzzRC69BvJo2EAtu7NhJZKTJRx3RpC/0K+3g6A8h16lkaj/wTEbtkusEjQI\n1dvsiYdjBqdT+NX15masXoRlRsn0OiUPbMwPZriaVaFGbPyRI1+9AgMBAAGjgfww\ngfkwEgYDVR0TAQH/BAgwBgEB/wIBADBPBgNVHSAESDBGMEQGCSsGAQQBsT4BMjA3\nMDUGCCsGAQUFBwIBFilodHRwOi8vY3liZXJ0cnVzdC5vbW5pcm9vdC5jb20vcmVw\nb3NpdG9yeTAOBgNVHQ8BAf8EBAMCAQYwHwYDVR0jBBgwFoAU5Z1ZMIJHWMys+ghU\nNoZ7OrUETfAwQgYDVR0fBDswOTA3oDWgM4YxaHR0cDovL2NkcDEucHVibGljLXRy\ndXN0LmNvbS9DUkwvT21uaXJvb3QyMDI1LmNybDAdBgNVHQ4EFgQUBJhg34Ablkld\nZVYtpSwJJArs3LkwDQYJKoZIhvcNAQEFBQADggEBAF/fi88peXgr83z0gl954OGz\nKL0IdUHOjIjXDlW5ArUFeT67UjGzSx6x/tOiIUPSkdMW+mt55I5NGexMhmg0Urdv\nwr2ceL7wbz89np9JdMR8lxlFV6xv+lo+P9PW4yvcivjICg1rjD+UeDeYiGGR31kU\nDwnFY1T79Pavl+z8Y2RDprzM5OMf33Owbve1yCmbriVSuLRy4d6TSPEon35mPz+L\nVQ/4FgdxBddlnNcbPDTmRBY6vdhgk4ODDIiWZTNA32qs//6UUWG7iT/3rMTks0fi\n/aJqMoPifm/wEo6jZnZAl/sR4fdzH9qLHDFCi58RxUmlYO1IKwWEFasviixRcsA=\n-----END
+        CERTIFICATE-----\n", "icsi": {"first_seen": "15390", "version": "1", "validated":
+        "1", "times_seen": "1372", "last_seen": "16764"}}'
+    headers:
+      Connection:
+      - close
+      Content-Length:
+      - '2911'
+      Content-Type:
+      - application/json
+      Date:
+      - Tue, 17 Nov 2026 04:20:47 GMT
+      Etag:
+      - '"0f8a0b02975dd0dd255ed10b3ee313e4a3be34ef"'
+      Server:
+      - SSL Certificate API - https://github.com/adulau/crl-monitor
+    status:
+      code: 200
+      message: OK
+- request:
+    body: null
+    headers: {}
+    method: GET
+    uri: https://www.circl.lu/v2pssl/cfetch/79068f16776372aa6b12b83dd2b7288298727f54
+  response:
+    body:
+      string: '{"info": {"extension": {"subjectKeyIdentifier": "90:89:74:2F:FB:9E:C3:5B:94:CE:20:56:98:59:16:61:FA:ED:29:D2",
+        "authorityKeyIdentifier": "keyid:04:98:60:DF:80:1B:96:49:5D:65:56:2D:A5:2C:09:24:0A:EC:DC:B9\n",
+        "extendedKeyUsage": "TLS Web Server Authentication, TLS Web Client Authentication",
+        "crlDistributionPoints": "\nFull Name:\n  URI:http://crl.omniroot.com/PublicSureServerSV.crl\n",
+        "keyUsage": "Digital Signature, Key Encipherment", "nsCertType": "SSL Client,
+        SSL Server", "basicConstraints": "CA:FALSE"}, "not_after": "2015-04-17T10:39:37+00:00",
+        "keylength": 2048, "key": "-----BEGIN PUBLIC KEY-----\nMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAxk+7IkaPeBvjsG4j5Yug\nQr8UJrFXWpv6Wr3RHz0vXmCf6kmqjRMOxmSOt5sVUYmDIL2IVZs4RkD/JPxtnW1U\nzI/kar4bOMH9cKcddD5EEwP8WtDy/t1XC38mujCKnJwhDnDA9vpwSCGOO8PjRR/8\nSDfJnOT3pKxn+IycD61emoj743rSfWKRpAGhPEXVum3z7PKbxeiTtAhi5c27QRRF\nHK7TwrI7S4T8Quw9IL75LK3pqHZilsK8VMsj2IrQhuq2Peo8k+Y3T3yT/KVWDSHv\n8h4AUcCQf/iOVTlLtQzmJau8nzVEKzPL+oxFEWEU5Iw92T20JbUREyoKxb3uZDjj\nCwIDAQAB\n-----END
+        PUBLIC KEY-----\n", "fingerprint": "79068F16776372AA6B12B83DD2B7288298727F54",
+        "issuer": "O=Cybertrust Inc, CN=Cybertrust Public SureServer SV CA", "not_before":
+        "2014-04-17T10:39:37+00:00", "subject": "C=CY, ST=Cyprus, L=Limassol, O=Easy
+        Forex, OU=IT, CN=www.easy-forex.com"}, "pem": "-----BEGIN CERTIFICATE-----\nMIIEEDCCAvigAwIBAgIOAgAAAAABRW9FLpJ8cGMwDQYJKoZIhvcNAQEFBQAwRjEX\nMBUGA1UEChMOQ3liZXJ0cnVzdCBJbmMxKzApBgNVBAMTIkN5YmVydHJ1c3QgUHVi\nbGljIFN1cmVTZXJ2ZXIgU1YgQ0EwHhcNMTQwNDE3MTAzOTM3WhcNMTUwNDE3MTAz\nOTM3WjBwMQswCQYDVQQGEwJDWTEPMA0GA1UECBMGQ3lwcnVzMREwDwYDVQQHEwhM\naW1hc3NvbDETMBEGA1UEChMKRWFzeSBGb3JleDELMAkGA1UECxMCSVQxGzAZBgNV\nBAMTEnd3dy5lYXN5LWZvcmV4LmNvbTCCASIwDQYJKoZIhvcNAQEBBQADggEPADCC\nAQoCggEBAMZPuyJGj3gb47BuI+WLoEK/FCaxV1qb+lq90R89L15gn+pJqo0TDsZk\njrebFVGJgyC9iFWbOEZA/yT8bZ1tVMyP5Gq+GzjB/XCnHXQ+RBMD/FrQ8v7dVwt/\nJrowipycIQ5wwPb6cEghjjvD40Uf/Eg3yZzk96SsZ/iMnA+tXpqI++N60n1ikaQB\noTxF1bpt8+zym8Xok7QIYuXNu0EURRyu08KyO0uE/ELsPSC++Syt6ah2YpbCvFTL\nI9iK0Ibqtj3qPJPmN098k/ylVg0h7/IeAFHAkH/4jlU5S7UM5iWrvJ81RCszy/qM\nRRFhFOSMPdk9tCW1ERMqCsW97mQ44wsCAwEAAaOB0TCBzjAfBgNVHSMEGDAWgBQE\nmGDfgBuWSV1lVi2lLAkkCuzcuTA/BgNVHR8EODA2MDSgMqAwhi5odHRwOi8vY3Js\nLm9tbmlyb290LmNvbS9QdWJsaWNTdXJlU2VydmVyU1YuY3JsMB0GA1UdDgQWBBSQ\niXQv+57DW5TOIFaYWRZh+u0p0jAJBgNVHRMEAjAAMA4GA1UdDwEB/wQEAwIFoDAd\nBgNVHSUEFjAUBggrBgEFBQcDAQYIKwYBBQUHAwIwEQYJYIZIAYb4QgEBBAQDAgbA\nMA0GCSqGSIb3DQEBBQUAA4IBAQBVo9R3s9OhfzBIaot4ky/qs9v+Kckb+Rl15s/t\ns3ftBwH857EyqNUPaYYkZ7OPPC9Zmo1lvklS2S3G3UYLRODR9G4nvYFq3BtcD+Fl\nOlpiCROUG/G1AX4wo2Bu8FbqlCbfQcbtNPV7n7zUz5Gz7CM77Kb1EfJTXBscOMIK\nPa6r50cIE0cwtspi488+qWgjdksbloxD2fXV2Hhro2qS4CBZkPl6syEJif/OOJva\nXcT2UFJLIt/b6z1rupxBm/5uMDri4qd8sA1f7Q4Hw/blFpLf2ofSh1TNSZ7NxfL3\nleETPL3q15un1YJFwEUEzQaBW8S8B8E82LdTuxNYiwgUDn0J\n-----END
+        CERTIFICATE-----\n"}'
+    headers:
+      Connection:
+      - close
+      Content-Length:
+      - '2805'
+      Content-Type:
+      - application/json
+      Date:
+      - Tue, 17 Nov 2026 04:20:47 GMT
+      Etag:
+      - '"476559831a0f96cc7346858658b3b6d913577fb2"'
+      Server:
+      - SSL Certificate API - https://github.com/adulau/crl-monitor
+    status:
+      code: 200
+      message: OK
+version: 1

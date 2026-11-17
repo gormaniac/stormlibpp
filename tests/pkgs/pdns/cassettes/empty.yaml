@@ -1,0 +1,26 @@
+interactions:
+- request:
+    body: null
+    headers: {}
+    method: GET
+    uri: https://www.circl.lu/pdns/query/nonexistent-zzqx-example-12345.com
+  response:
+    body:
+      string: ''
+    headers:
+      Connection:
+      - close
+      Content-Length:
+      - '0'
+      Content-Type:
+      - application/x-ndjson
+      Date:
+      - Tue, 17 Nov 2026 04:20:23 GMT
+      Server:
+      - dribble
+      X-Dribble-Errors:
+      - '[]'
+    status:
+      code: 200
+      message: OK
+version: 1

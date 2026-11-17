@@ -1,0 +1,6 @@
+init {
+    $pssllib = $lib.import(slib.pssl.lib)
+    // TODO - $cmdopts.query, $cmdopts.fetch, $cmdopts.yield
+}
+
+// TODO - --query (spin, no $node) vs. inbound inet:ipv4/inet:cidr4/crypto:x509:cert/hash:sha1 nodes

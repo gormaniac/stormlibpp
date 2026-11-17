@@ -1,0 +1,130 @@
+name: slib.pssl
+version: 0.1.0
+guid: deb77e17fa2e4725ac03419c2c0da5d0
+
+synapse_version: ">=2.162.0,<3.0.0"
+
+genopts:
+    dotstorm: true
+
+author:
+  url: https://github.com/gormaniac
+  name: John Gorman
+
+desc: A Rapid Power-Up that queries CIRCL's Passive SSL API and models the X.509 certificates seen on IPs.
+
+docs:
+  - title: README
+    path: README.md
+
+depends:
+  requires:
+    - name: slib.utils
+      version: ">=0.2.0,<1.0.0"
+      desc: slib.pssl parses the certificates from CIRCL with slib.utils.x509.
+
+# Runs every time the package loads.
+onload: |
+  [ meta:source=7aa991399fab4171a80682a69a1a8d54 :name="circl passive ssl" :url=https://www.circl.lu/services/passive-ssl/ ]
+  | spin
+
+perms:
+  - perm: [ slib, pssl, admin ]
+    gate: cortex
+    desc: Allows a user to call admin APIs of the slib.pssl Storm Package, ex. setting the CIRCL credentials.
+  - perm: [ slib, pssl, user ]
+    gate: cortex
+    desc: Allows a user to call user APIs of the slib.pssl Storm Package.
+
+modules:
+  # asroot so users can make requests with the CIRCL credentials without being able to read them.
+  - name: slib.pssl.lib
+    asroot:perms:
+        - [ slib, pssl, user ]
+  - name: slib.pssl.lib.admin
+    asroot:perms:
+        - [ slib, pssl, admin ]
+
+commands:
+  - name: slib.pssl.lookup
+    perms:
+        - [ slib, pssl, user ]
+    descr: |
+      Look up the input IPs, CIDR blocks and certificates in CIRCL Passive SSL.
+
+      IPs and CIDR blocks (/23 to /32, IPv4 only) return the certificates seen on each IP.
+      Certificates and SHA1 hashes return the IPs the certificate was seen on.
+
+      Examples:
+
+        // Look up the certificates seen on some IPs.
+        inet:ipv4=172.228.24.7 | slib.pssl.lookup
+
+        // Look up a CIDR block, and fetch every certificate seen in it.
+        slib.pssl.lookup --query 172.228.24.0/28 --fetch --yield
+
+        // Look up the IPs a certificate was seen on.
+        crypto:x509:cert:sha1=c46fed822dadac3f31f9bb4d1a78a1d9eae4567b | slib.pssl.lookup
+
+    cmdargs:
+      - - --query
+        - type: str
+          default: ''
+          help: |
+            An IPv4 address, CIDR block or certificate SHA1 to look up.
+
+            Ignores any nodes in the pipeline and uses only the string passed to this arg.
+
+      - - --fetch
+        - default: false
+          action: store_true
+          help: Also fetch and model the full certificate of every SHA1 found.
+
+      - - --yield
+        - default: false
+          action: store_true
+          help: Yield the newly created nodes instead of the inbound nodes.
+
+    cmdinputs:
+      - form: inet:ipv4
+        help: IPs to look up certificates for (ignored when --query is used).
+      - form: inet:cidr4
+        help: CIDR blocks (/23 to /32) to look up certificates for (ignored when --query is used).
+      - form: crypto:x509:cert
+        help: Certificates to look up IPs for, by :sha1 (ignored when --query is used).
+      - form: hash:sha1
+        help: Certificate SHA1s to look up IPs for (ignored when --query is used).
+
+  - name: slib.pssl.admin.key
+    perms:
+        - [ slib, pssl, admin ]
+    descr: |
+      Set the CIRCL Passive SSL credentials (HTTP Basic auth) every slib.pssl user's requests use.
+
+      Request access from CIRCL at https://www.circl.lu/contact/.
+
+      Examples:
+
+        // Set the credentials.
+        slib.pssl.admin.key myuser mypassword
+
+        // Remove the credentials.
+        slib.pssl.admin.key --clear
+
+    cmdargs:
+      - - username
+        - type: str
+          default: ''
+          nargs: '?'
+          help: The CIRCL Passive SSL username.
+
+      - - password
+        - type: str
+          default: ''
+          nargs: '?'
+          help: The CIRCL Passive SSL password.
+
+      - - --clear
+        - default: false
+          action: store_true
+          help: Remove the saved credentials.

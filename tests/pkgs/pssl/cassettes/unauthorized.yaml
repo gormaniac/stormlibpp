@@ -1,0 +1,50 @@
+# Hand written from CIRCL's response to a request with no credentials, see scripts/pkgs/record_circl.py.
+interactions:
+- request:
+    body: null
+    headers: {}
+    method: GET
+    uri: https://www.circl.lu/v2pssl/query/172.228.24.7
+  response:
+    body:
+      string: '<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML 2.0//EN">
+
+        <html><head>
+
+        <title>401 Unauthorized</title>
+
+        </head><body>
+
+        <h1>Unauthorized</h1>
+
+        <p>This server could not verify that you
+
+        are authorized to access the document
+
+        requested.  Either you supplied the wrong
+
+        credentials (e.g., bad password), or your
+
+        browser doesn''t understand how to supply
+
+        the credentials required.</p>
+
+        </body></html>
+
+        '
+    headers:
+      Content-Length:
+      - '381'
+      Content-Type:
+      - text/html; charset=iso-8859-1
+      Date:
+      - Tue, 17 Nov 2026 04:15:40 GMT
+      Server:
+      - Apache
+      WWW-Authenticate:
+      - Basic realm="Access to CIRCL Passive SSL - Password Required - Request via
+        info@circl.lu"
+    status:
+      code: 401
+      message: Unauthorized
+version: 1

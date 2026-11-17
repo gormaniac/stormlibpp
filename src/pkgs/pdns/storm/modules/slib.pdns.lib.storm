@@ -1,0 +1,54 @@
+// slib.pdns.lib - Query CIRCL Passive DNS and model the results.
+//
+// Runs asroot (gated by the slib.pdns.user perm) so it can read the credentials saved by
+// slib.pdns.admin.key without users being able to read them.
+//
+// API docs: https://www.circl.lu/services/passive-dns/
+//
+// GET https://www.circl.lu/pdns/query/<fqdn or ip>, HTTP Basic auth. CIDRs aren't supported.
+//
+// Request headers (all optional):
+//   dribble-disable-active-query  Don't actively resolve the query (only presence is checked)
+//   dribble-filter-rrtype         Only return this rrtype, ex. NS
+//   dribble-paginate-count        Records per page
+//   dribble-paginate-cursor       The X-Dribble-Cursor of the previous page
+//
+// Response headers:
+//   X-Dribble-Cursor  The next page's cursor (only when paginating and more remain)
+//   X-Dribble-Errors  A JSON list, ex. [{"error": "maxset", "record": "cdn1.wixdns.net",
+//                     "value": 1000, "rrtype": "CNAME", "total_value": 13518377}] when an
+//                     rrtype was capped at 1000 records (use pages to get them all)
+//
+// The body is application/x-ndjson, one COF record a line (empty when nothing was found):
+//
+//   {"rrtype": "A", "rrname": "185.194.93.14", "rdata": "circl.lu", "count": 8617,
+//    "time_first": 1696798385, "time_last": 1790942704, "origin": "https://www.circl.lu/pdns/"}
+//
+// NOTE - In CIRCL's responses (as of 2026-11), "rrname" is the record's VALUE and "rdata" is
+// the name that OWNS the record, the reverse of the COF spec. Ex. the record above is
+// "circl.lu A 185.194.93.14", and querying www.circl.lu returns
+// {"rrtype": "CNAME", "rrname": "cpab.circl.lu", "rdata": "www.circl.lu"} for
+// "www.circl.lu CNAME cpab.circl.lu". See tests/pkgs/pdns/cassettes/ for real responses.
+//
+// Times are epoch seconds. MX values are "<pref> <host>", SOA values are the whole SOA rdata.
+// A 401 is a text/html body (bad or missing credentials).
+
+$URL = "https://www.circl.lu/pdns/query"
+
+// Query CIRCL Passive DNS for an FQDN or IP.
+function request(valu, rrtype=(null), active=(true), pagesize=(null), cursor=(null)) {
+    // TODO
+    return()
+}
+
+// Model one COF record from request().
+function modelRecord(record) {
+    // TODO
+    return()
+}
+
+// Query CIRCL Passive DNS for valu and model the records.
+function lookup(valu, rrtype=(null), active=(true), pagesize=(null)) {
+    // TODO
+    return()
+}

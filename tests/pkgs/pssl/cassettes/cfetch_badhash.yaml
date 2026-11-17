@@ -1,0 +1,25 @@
+interactions:
+- request:
+    body: null
+    headers: {}
+    method: GET
+    uri: https://www.circl.lu/v2pssl/cfetch/notasha1
+  response:
+    body:
+      string: Incorrect format of the certificate fingerprint (expected SHA1 in hex
+        format)
+    headers:
+      Connection:
+      - close
+      Content-Length:
+      - '77'
+      Content-Type:
+      - text/html; charset=UTF-8
+      Date:
+      - Tue, 17 Nov 2026 04:20:28 GMT
+      Server:
+      - TornadoServer/5.1.1
+    status:
+      code: 400
+      message: Bad Request
+version: 1

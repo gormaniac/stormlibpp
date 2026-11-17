@@ -1,0 +1,24 @@
+interactions:
+- request:
+    body: null
+    headers: {}
+    method: GET
+    uri: https://www.circl.lu/v2pssl/query/2a00:5980:93::14
+  response:
+    body:
+      string: IPv6 is not (yet) supported
+    headers:
+      Connection:
+      - close
+      Content-Length:
+      - '27'
+      Content-Type:
+      - text/html; charset=UTF-8
+      Date:
+      - Tue, 17 Nov 2026 04:20:48 GMT
+      Server:
+      - TornadoServer/5.1.1
+    status:
+      code: 400
+      message: Bad Request
+version: 1

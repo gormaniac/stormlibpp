@@ -1,0 +1,13 @@
+// Admin APIs for slib.pssl. Runs asroot, gated by the slib.pssl.admin perm.
+
+// Save the CIRCL Passive SSL credentials (HTTP Basic auth) that every slib.pssl request uses.
+function setAuth(user, passwd) {
+    // TODO
+    return()
+}
+
+// Remove the saved CIRCL Passive SSL credentials.
+function clearAuth() {
+    // TODO
+    return()
+}
