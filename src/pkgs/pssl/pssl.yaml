@@ -25,7 +25,7 @@ depends:
 
 # Runs every time the package loads.
 onload: |
-  [ meta:source=7aa991399fab4171a80682a69a1a8d54 :name="circl passive ssl" :url=https://www.circl.lu/services/passive-ssl/ ]
+  [ meta:source=7aa991399fab4171a80682a69a1a8d54 :name="circl.lu passive ssl" :url=https://www.circl.lu/services/passive-ssl/ ]
   | spin
 
 perms:

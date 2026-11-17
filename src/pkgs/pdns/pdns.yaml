@@ -19,7 +19,7 @@ docs:
 
 # Runs every time the package loads.
 onload: |
-  [ meta:source=696c119cb73c4a079a2865108c96668a :name="circl passive dns" :url=https://www.circl.lu/services/passive-dns/ ]
+  [ meta:source=696c119cb73c4a079a2865108c96668a :name="circl.lu passive dns" :url=https://www.circl.lu/services/passive-dns/ ]
   | spin
 
 perms:
