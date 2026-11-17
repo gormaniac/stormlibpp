@@ -69,7 +69,7 @@ class PsslTest(s_test.StormPkgTest):
             # onload makes the meta:source.
             nodes = await core.nodes(f"meta:source={SOURCE}")
             self.len(1, nodes)
-            self.eq("circl passive ssl", nodes[0].get("name"))
+            self.eq("circl.lu passive ssl", nodes[0].get("name"))
 
     async def test_pssl_admin_key(self):
         async with self.getTestCore() as core:

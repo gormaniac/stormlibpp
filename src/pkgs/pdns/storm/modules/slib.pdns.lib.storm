@@ -3,6 +3,8 @@
 // The CIRCL request is in slib.pdns.privsep, along with notes on the API. Remember that in
 // CIRCL's records "rrname" is the record's value and "rdata" is the name that owns it.
 
+$privSep = $lib.import(slib.pdns.privsep)
+
 // The meta:source made by the package's onload.
 $SOURCE = "696c119cb73c4a079a2865108c96668a"
 
@@ -11,7 +13,7 @@ $RRTYPES = ("A", "AAAA", "CNAME", "MX", "NS", "SOA", "TXT")
 
 // Query CIRCL Passive DNS for an FQDN or IP. See slib.pdns.privsep.request().
 function request(valu, rrtype=(null), active=(true), pagesize=(null), cursor=(null)) {
-    return($lib.import(slib.pdns.privsep).request($valu, rrtype=$rrtype, active=$active, pagesize=$pagesize, cursor=$cursor))
+    return($privSep.request($valu, rrtype=$rrtype, active=$active, pagesize=$pagesize, cursor=$cursor))
 }
 
 // The SOA RNAME (ex. "hostmaster.eurodns.com") as an email (ex. "hostmaster@eurodns.com").

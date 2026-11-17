@@ -84,7 +84,7 @@ class PdnsTest(s_test.StormPkgTest):
             # onload makes the meta:source.
             nodes = await core.nodes(f"meta:source={SOURCE}")
             self.len(1, nodes)
-            self.eq("circl passive dns", nodes[0].get("name"))
+            self.eq("circl.lu passive dns", nodes[0].get("name"))
 
     async def test_pdns_admin_key(self):
         async with self.getTestCore() as core:

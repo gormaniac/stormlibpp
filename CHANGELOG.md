@@ -4,6 +4,7 @@
 - Adds version 0.1.0 of the `slib.pssl` Rapid Power-Up, which looks up IPs, CIDR blocks (/23 to /32) and certificates in [CIRCL Passive SSL](https://www.circl.lu/services/passive-ssl/) and models the X.509 certificates seen on each IP as `inet:tls:servercert` nodes. `slib.pssl.lookup` takes `inet:ipv4`, `inet:cidr4`, `crypto:x509:cert` and `hash:sha1` nodes or a `--query` string. `--fetch` also downloads each certificate and parses it with `slib.utils.x509` into a full `crypto:x509:cert`. Requires `slib.utils`. CIRCL needs an account: an admin saves the credentials with `slib.pssl.admin.key`, and users can't read them.
 - Adds `scripts/pkgs/record_circl.py`, which records the CIRCL Passive DNS and Passive SSL responses the `slib.pdns` and `slib.pssl` tests replay.
 ### Fixes
+- `slib.ipapi` imports `slib.utils.inet` and its privsep module once when its modules load, instead of on every call.
 
 ## v1.1.1 - 2026-11-17
 ### Features

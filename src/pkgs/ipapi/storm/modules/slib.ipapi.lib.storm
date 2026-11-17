@@ -1,7 +1,8 @@
 // Query ip-api.com and model its results.
 
 init {
-    $privsep = $lib.import(slib.ipapi.privsep)
+    $privSep = $lib.import(slib.ipapi.privsep)
+    $inet = $lib.import(slib.utils.inet)
 
     // The guid of slib.ipapi's meta:source node, made by the package's onload. It's the same
     // guid the slib.ipapi Storm Service used.
@@ -24,13 +25,13 @@ function userKey() {
 
 // Query ip-api.com for an IP address. Returns {"status", "mesg", "data"}.
 function query(query) {
-    return($privsep.query($query, apikey=$userKey()))
+    return($privSep.query($query, apikey=$userKey()))
 }
 
 // Query ip-api.com for a list of IP addresses with its /batch endpoint.
 // Returns {"status", "mesg", "data"}, data has one query() style result per IP.
 function queryBatch(queries) {
-    return($privsep.queryBatch($queries, apikey=$userKey()))
+    return($privSep.queryBatch($queries, apikey=$userKey()))
 }
 
 // Whether the node is an inet:ipv4 or inet:ipv6 node.
@@ -142,7 +143,7 @@ function buildASNNode(data) {
     $names = ([])
     if $data.asname { $names.append($data.asname) }
 
-    yield $lib.import(slib.utils.inet).asnNode($data.asnum, orgname=$ownerName, names=$names, orgtype=$orgtype)
+    yield $inet.asnNode($data.asnum, orgname=$ownerName, names=$names, orgtype=$orgtype)
     [ <(seen)+ { meta:source=$srcGuid } ]
     if $data.asname { [ :name=$data.asname ] }
 

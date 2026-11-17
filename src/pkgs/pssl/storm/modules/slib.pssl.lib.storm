@@ -6,6 +6,9 @@
 // (CIRCL doesn't say which port) to a crypto:x509:cert. Certificates are deduplicated by
 // :sha1, and fetched certificates are parsed with slib.utils.x509.
 
+$privSep = $lib.import(slib.pssl.privsep)
+$x509 = $lib.import(slib.utils.x509)
+
 // The meta:source made by the package's onload.
 $SOURCE = "7aa991399fab4171a80682a69a1a8d54"
 
@@ -13,17 +16,17 @@ $MSPERDAY = (86400000)
 
 // The certificates seen on an IPv4 address or CIDR block (/23 to /32).
 function query(valu) {
-    return($lib.import(slib.pssl.privsep).query($valu))
+    return($privSep.query($valu))
 }
 
 // The IPs a certificate (by SHA1) was seen on.
 function cquery(sha1) {
-    return($lib.import(slib.pssl.privsep).cquery($sha1))
+    return($privSep.cquery($sha1))
 }
 
 // A certificate (by SHA1), its PEM and CIRCL's parsed info.
 function cfetch(sha1) {
-    return($lib.import(slib.pssl.privsep).cfetch($sha1))
+    return($privSep.cfetch($sha1))
 }
 
 // The crypto:x509:cert node with this SHA1, made if it doesn't exist.
@@ -87,8 +90,6 @@ function _crlSans(crldps) {
 // Model a cfetch() result. Returns the crypto:x509:cert node, or null if the PEM can't be
 // parsed. sha1 is the SHA1 that was fetched.
 function modelCfetch(data, sha1) {
-    $x509 = $lib.import(slib.utils.x509)
-
     try {
         $x = $x509.parse($data.pem)
     } catch * as err {
