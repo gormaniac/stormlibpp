@@ -7,6 +7,8 @@
 - **Security:** `slib.ipapi` (1.1.1) no longer lets a `slib.ipapi.user` read the global ip-api.com pro key. `slib.ipapi.privsep.globalKey()` returned it, and every function in an asroot module can be called by its users. The key is now only read inside `query()` and `queryBatch()`, and only sent to their fixed request paths.
 - `slib.ipapi` imports `slib.utils.inet` and its privsep module once when its modules load, instead of on every call.
 - `slib.utils` (0.2.2) and `slib.ipapi` (1.1.1) require Synapse 2.207.0 or newer, the first with Storm's `str.join`, which `slib.utils.x509` uses. They declared 2.162.0.
+- `slib.ipapi` (1.1.1) no longer lets a `slib.ipapi.user` hold up every ip-api.com query on the Cortex. `slib.ipapi.privsep._block()` set the shared rate limit window to any length, and `_request()` would send a request to any host (ex. a path of `@evil.example/`), whose 429 and `X-Ttl` set it too. The window is now only set from ip-api.com's own responses, and `_request()` only requests `/json/<ip address>` and `/batch`.
+- `ipinfo` (0.1.3) declares its dependency on `slib.utils`, which it already used, and requires Synapse 2.207.0 like `slib.utils`. It imports `slib.utils.inet` once when its module loads.
 
 ## v1.1.1 - 2026-11-17
 ### Features

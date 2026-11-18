@@ -7,6 +7,11 @@
 // queryBatch(), whose request paths are fixed: a caller controlled path could send the key to
 // another host (ex. "@evil.example/" makes "https://pro.ip-api.com@evil.example/?key=...").
 //
+// For the same reason the rate limit globals are only written in _request(), from ip-api.com's
+// own responses, and _request() only sends requests to ip-api.com's /json/<ip> and /batch
+// paths. Otherwise a user could hold up every query on the Cortex, by setting the rate limit
+// window directly or by pointing a request at a server that answers 429 with a long X-Ttl.
+//
 // NOTE: $lib.globals.get/set are the only global var APIs in Synapse 2.x, this package
 // requires Synapse <3.0.0 (see synapse_version), so R005 is ignored here.
 
@@ -89,15 +94,6 @@ function _rlKey(kind) {
     return(`slib:ipapi:ratelimit:{$kind}:until`)
 }
 
-// Hold every request to an endpoint on this Cortex until its rate limit window resets.
-function _block(kind, millis) {
-    $key = $_rlKey($kind)
-    $until = ($lib.time.now() + $millis)
-    $current = $lib.globals.get($key)  // noqa: R005
-    if ($current = null or $until > $current) {
-        $lib.globals.set($key, $until)  // noqa: R005
-    }
-}
 
 // Sleep until an endpoint's rate limit window resets, if a request used it up.
 function _wait(kind) {
@@ -169,7 +165,24 @@ function _toRetn(ipaddr, data) {
 // ip-api.com's free endpoints limit each source IP. Every response says how many requests are
 // left (X-Rl) and when the window resets (X-Ttl), and when none are left every request to that
 // endpoint on this Cortex waits for the reset. The pro endpoints have no limit.
+//
+// Only kind "json" with path "/json/<ip address>", and kind "batch" with path "/batch", are
+// allowed (see the top of this file).
 function _request(kind, path, apikey, desc, body=(null)) {
+    $okPath = (false)
+    if ($kind = "json" and $lib.vars.type($path) = "str") {
+        $okPath = $lib.regex.matches('^/json/[0-9A-Fa-f:.]+$', $path)
+    } elif ($kind = "batch") {
+        $okPath = ($path = "/batch")
+    }
+    if (not $okPath) {
+        return($_fail(`slib.ipapi.privsep._request() only requests ip-api.com's /json/<ip address> and /batch, not: {$kind} {$path}`))
+    }
+
+    // The global var that holds every request to this endpoint on the Cortex until its rate
+    // limit window resets. Only set from ip-api.com's responses below.
+    $rlKey = $_rlKey($kind)
+
     $url = $_url($path, $apikey)
     $tries = (0)
     while (true) {
@@ -182,7 +195,9 @@ function _request(kind, path, apikey, desc, body=(null)) {
         }
 
         if ($resp.code = 429) {
-            $_block($kind, $_ttl($resp.headers))
+            $until = ($lib.time.now() + $_ttl($resp.headers))
+            $current = $lib.globals.get($rlKey)  // noqa: R005
+            if ($current = null or $until > $current) { $lib.globals.set($rlKey, $until) }  // noqa: R005
             if ($tries >= $maxRetries) {
                 return($_fail(`ip-api.com is still rate limiting requests after {$maxRetries} retries, gave up querying for {$desc}`))
             }
@@ -204,7 +219,9 @@ function _request(kind, path, apikey, desc, body=(null)) {
         if (not $apikey) {
             $left = $_header($resp.headers, "X-Rl")
             if ($left != null and $lib.regex.matches('^[0-9]+$', $left) and $_dec($left) <= 0) {
-                $_block($kind, $_ttl($resp.headers))
+                $until = ($lib.time.now() + $_ttl($resp.headers))
+                $current = $lib.globals.get($rlKey)  // noqa: R005
+                if ($current = null or $until > $current) { $lib.globals.set($rlKey, $until) }  // noqa: R005
             }
         }
 

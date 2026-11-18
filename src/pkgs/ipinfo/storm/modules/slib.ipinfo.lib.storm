@@ -1,5 +1,7 @@
 // Storm code for querying and ingesting ipinfo.io data into Synapse
 
+$inet = $lib.import(slib.utils.inet)
+
 function getIpInfo(ip, token) {
     $url = "https://api.ipinfo.io/lite/"
 
@@ -25,7 +27,7 @@ function getIpInfo(ip, token) {
 }
 
 function getOrBuildAsn(data) {
-    return($lib.import(slib.utils.inet).asnNode($data.asn, orgname=$data.as_name))
+    return($inet.asnNode($data.asn, orgname=$data.as_name))
 }
 
 function ingestIpInfo(data, query) {
