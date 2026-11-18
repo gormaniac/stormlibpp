@@ -1,0 +1,52 @@
+interactions:
+- request:
+    body: null
+    headers: {}
+    method: GET
+    uri: https://www.circl.lu/pdns/query/185.194.93.14
+  response:
+    body:
+      string: '{"rrtype": "A", "rrname": "185.194.93.14", "rdata": "attack-community.org",
+        "count": 36, "time_first": 1708567276, "time_last": 1770209991, "origin":
+        "https://www.circl.lu/pdns/"}
+
+        {"rrtype": "A", "rrname": "185.194.93.14", "rdata": "antibot.lu", "count":
+        1, "time_first": 1727076664, "time_last": 1727076664, "origin": "https://www.circl.lu/pdns/"}
+
+        {"rrtype": "A", "rrname": "185.194.93.14", "rdata": "radius.office.circl.lu",
+        "count": 1, "time_first": 1780991173, "time_last": 1780991173, "origin": "https://www.circl.lu/pdns/"}
+
+        {"rrtype": "A", "rrname": "185.194.93.14", "rdata": "open-source-security-software.net",
+        "count": 92, "time_first": 1696845233, "time_last": 1791214952, "origin":
+        "https://www.circl.lu/pdns/"}
+
+        {"rrtype": "A", "rrname": "185.194.93.14", "rdata": "x-isac.org", "count":
+        14, "time_first": 1699485376, "time_last": 1771418433, "origin": "https://www.circl.lu/pdns/"}
+
+        {"rrtype": "A", "rrname": "185.194.93.14", "rdata": "cpab.circl.lu", "count":
+        40572, "time_first": 1696779474, "time_last": 1794888053, "origin": "https://www.circl.lu/pdns/"}
+
+        {"rrtype": "A", "rrname": "185.194.93.14", "rdata": "circl.lu", "count": 8617,
+        "time_first": 1696798385, "time_last": 1790942704, "origin": "https://www.circl.lu/pdns/"}
+
+        {"rrtype": "A", "rrname": "185.194.93.14", "rdata": "d4-project.org", "count":
+        3916, "time_first": 1756369157, "time_last": 1794886226, "origin": "https://www.circl.lu/pdns/"}
+
+        '
+    headers:
+      Connection:
+      - close
+      Content-Length:
+      - '1415'
+      Content-Type:
+      - application/x-ndjson
+      Date:
+      - Tue, 17 Nov 2026 04:20:23 GMT
+      Server:
+      - dribble
+      X-Dribble-Errors:
+      - '[]'
+    status:
+      code: 200
+      message: OK
+version: 1

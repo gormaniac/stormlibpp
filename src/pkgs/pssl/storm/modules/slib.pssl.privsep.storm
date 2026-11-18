@@ -1,0 +1,93 @@
+// slib.pssl.privsep - Privileged (asroot) code for slib.pssl: the CIRCL Passive SSL requests.
+//
+// Runs asroot (gated by the slib.pssl.user perm) so it can read the credentials saved by
+// slib.pssl.admin.key without users being able to read them. Modeling is in slib.pssl.lib.
+//
+// API docs: https://www.circl.lu/services/passive-ssl/
+//
+// Endpoints, all GET with HTTP Basic auth (as of 2026-11, see tests/pkgs/pssl/cassettes/ for
+// real responses):
+//
+//   /query/<ipv4 or cidr>  The certificates seen on each IP. Only IPv4, /23 to /32.
+//       {"<ip>": {"certificates": [<sha1>, ...],
+//                 "subjects": {"<sha1>": {"values": ["C=JP, ST=Tokyo, ..., CN=..."]}}}}
+//       An IP with no certificates is missing, so an empty result is {}.
+//
+//   /cquery/<sha1>  The IPs a certificate was seen on.
+//       {"seen": [<ip>, ...], "hits": <int>, "certificate": <sha1>}
+//       An unknown SHA1 is {"seen": [], "hits": 0, ...}.
+//
+//   /cfetch/<sha1>  The certificate.
+//       {"pem": <PEM str>,
+//        "info": {"subject", "issuer", "fingerprint", "not_before", "not_after", "keylength",
+//                 "key", "extension": {<openssl style extension text>}},
+//        "icsi": {"first_seen", "last_seen", "times_seen", "validated", "version"}}
+//
+// Errors are HTTP 400s with a text/html body, ex. "Maximum CIDR block size reached >/23",
+// "IPv6 is not (yet) supported", "Not existing certificate", "Incorrect format of the
+// certificate fingerprint (expected SHA1 in hex format)". A 401 is bad or missing credentials.
+
+$url = "https://www.circl.lu/v2pssl"
+$userKey = "slib:pssl:auth:user"
+$passKey = "slib:pssl:auth:passwd"
+
+function _fail(mesg) {
+    return(({"status": (false), "mesg": $mesg, "data": (null)}))
+}
+
+// GET <url>/<endpoint>/<valu>. Returns {"status", "mesg", "data"}, data is the JSON response.
+//
+// Raises NeedConfValu if the credentials aren't set.
+function _request(endpoint, valu) {
+    // The credentials are only read here, where they're used. Every function in an asroot module
+    // can be called by a slib.pssl.user (a leading "_" doesn't make one private), so no function
+    // may return them, or anything they can be recovered from, like the Authorization header.
+    $user = $lib.globals.get($userKey)
+    $passwd = $lib.globals.get($passKey)
+    if ($user = null or $passwd = null) {
+        $lib.raise(NeedConfValu, "The CIRCL Passive SSL credentials are not set. Set them with the slib.pssl.admin.key command.")
+    }
+    $creds = `{$user}:{$passwd}`
+    $headers = ({"Authorization": `Basic {$lib.base64.encode($creds.encode())}`})
+
+    $resp = $lib.inet.http.get(`{$url}/{$endpoint}/{$valu}`, headers=$headers)
+
+    if ($resp.code = 401) {
+        return($_fail(`CIRCL Passive SSL rejected the credentials set with slib.pssl.admin.key (HTTP 401) while querying {$endpoint}: {$valu}`))
+    }
+    if ($resp.code = 400) {
+        // CIRCL's error message is the body.
+        return($_fail(`CIRCL Passive SSL could not {$endpoint} {$valu}: {$resp.body.decode().strip()}`))
+    }
+    if ($resp.code != 200) {
+        if ($resp.code = -1) {
+            $err = $resp.reason
+        } else {
+            $err = `HTTP {$resp.code} {$resp.reason}`
+        }
+        return($_fail(`An HTTP error occurred while querying CIRCL Passive SSL ({$endpoint}) for: {$valu} - {$err}`))
+    }
+
+    try {
+        $data = $resp.json()
+    } catch * as err {
+        return($_fail(`CIRCL Passive SSL returned invalid JSON ({$endpoint}) for: {$valu} - {$err.mesg}`))
+    }
+
+    return(({"status": (true), "mesg": `Successfully queried CIRCL Passive SSL ({$endpoint}) for: {$valu}`, "data": $data}))
+}
+
+// The certificates seen on an IPv4 address or CIDR block (/23 to /32).
+function query(valu) {
+    return($_request("query", $valu))
+}
+
+// The IPs a certificate (by SHA1) was seen on.
+function cquery(sha1) {
+    return($_request("cquery", $sha1))
+}
+
+// A certificate (by SHA1), its PEM and CIRCL's parsed info.
+function cfetch(sha1) {
+    return($_request("cfetch", $sha1))
+}

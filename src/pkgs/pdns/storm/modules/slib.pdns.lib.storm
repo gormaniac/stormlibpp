@@ -1,0 +1,146 @@
+// slib.pdns.lib - Model CIRCL Passive DNS records. Runs as the calling user.
+//
+// The CIRCL request is in slib.pdns.privsep, along with notes on the API. Remember that in
+// CIRCL's records "rrname" is the record's value and "rdata" is the name that owns it.
+
+$privSep = $lib.import(slib.pdns.privsep)
+
+// The meta:source made by the package's onload.
+$srcGuid = "696c119cb73c4a079a2865108c96668a"
+
+// The rrtypes modelRecord() knows how to model.
+$rrTypes = ("A", "AAAA", "CNAME", "MX", "NS", "SOA", "TXT")
+
+// Query CIRCL Passive DNS for an FQDN or IP. See slib.pdns.privsep.request().
+function request(valu, rrtype=(null), active=(true), pagesize=(null), cursor=(null)) {
+    return($privSep.request($valu, rrtype=$rrtype, active=$active, pagesize=$pagesize, cursor=$cursor))
+}
+
+// The SOA RNAME (ex. "hostmaster.eurodns.com") as an email (ex. "hostmaster@eurodns.com").
+// RFC 1035 writes a "." in the mailbox name as "\.", so the first unescaped "." is the "@".
+function soaEmail(rname) {
+    $rname = $rname.rstrip(".")
+    $parts = $rname.replace("\\.", "\x00").split(".", maxsplit=1)
+    if ($lib.len($parts) != 2) { return((null)) }
+    return(`{$parts.0.replace("\x00", ".")}@{$parts.1.replace("\x00", ".")}`)
+}
+
+// Model one COF record from request(). Returns the inet:dns:* node made, or null if the
+// rrtype isn't supported or a value isn't valid (ex. a wildcard name like "*.example.com").
+function modelRecord(record) {
+    $owner = $record.rdata.rstrip(".")
+    $valu = $record.rrname
+
+    // The form and its value, checked with trycast before any node is made.
+    switch $record.rrtype {
+        "A": { $form = "inet:dns:a" $ndef = ($owner, $valu) }
+        "AAAA": { $form = "inet:dns:aaaa" $ndef = ($owner, $valu) }
+        "CNAME": { $form = "inet:dns:cname" $ndef = ($owner, $valu.rstrip(".")) }
+        // "<pref> <host>"
+        "MX": { $form = "inet:dns:mx" $ndef = ($owner, $valu.split(" ").index(-1).rstrip(".")) }
+        "NS": { $form = "inet:dns:ns" $ndef = ($owner, $valu.rstrip(".")) }
+        "TXT": { $form = "inet:dns:txt" $ndef = ($owner, $valu) }
+        // "<mname> <rname> <serial> <refresh> <retry> <expire> <minimum>"
+        "SOA": { $form = "inet:dns:soa" $ndef = $soaProps($owner, $valu) }
+        *: { return((null)) }
+    }
+
+    if ($ndef = null) { return((null)) }
+    if ($form != "inet:dns:soa") {
+        ($ok, $ndef) = $lib.trycast($form, $ndef)
+        if (not $ok) { return((null)) }
+    }
+
+    [
+        *$form=$ndef
+        .seen=($lib.time.fromunix($record.time_first), $lib.time.fromunix($record.time_last))
+        <(seen)+ { meta:source=$srcGuid }
+    ]
+
+    // Records that only differ by case (ex. "cpAb.circl.lu" and "cpab.circl.lu") are the same
+    // node, so CIRCL's count and times are kept per record, keyed by its raw "<rdata> <rrname>".
+    // A repeated lookup replaces the same keys.
+    $seen = $node.data.get("slib:pdns")
+    if ($seen = null) { $seen = ({}) }
+    $rawKey = `{$record.rdata} {$record.rrname}`
+    $seen.$rawKey = ({"count": $record.count, "time_first": $record.time_first, "time_last": $record.time_last})
+    $node.data.set("slib:pdns", $seen)
+
+    return($node)
+}
+
+// The inet:dns:soa guid props of an SOA record, or null if the owner isn't a valid inet:fqdn.
+// A bad MNAME or RNAME is left off, the rest of the SOA is still modeled.
+function soaProps(owner, valu) {
+    ($ok, $fqdn) = $lib.trycast(inet:fqdn, $owner)
+    if (not $ok) { return((null)) }
+
+    $parts = $valu.split(" ")
+    $props = ({"fqdn": $fqdn})
+    ($ok, $ns) = $lib.trycast(inet:fqdn, $parts.0.rstrip("."))
+    if $ok { $props.ns = $ns }
+    if ($lib.len($parts) > 1) {
+        $rname = $soaEmail($parts.1)
+        if $rname {
+            ($ok, $email) = $lib.trycast(inet:email, $rname)
+            if $ok { $props.email = $email }
+        }
+    }
+    return($props)
+}
+
+// Query CIRCL Passive DNS for valu and emit each COF record. Warns on CIRCL's errors.
+//
+// When pagesize is set, every page is requested, up to maxpages (0 for no limit).
+function records(valu, rrtype=(null), active=(true), pagesize=(null), maxpages=(10)) {
+    $cursor = (null)
+    $pages = (0)
+    $skipped = ({})
+
+    while (true) {
+        $retn = $request($valu, rrtype=$rrtype, active=$active, pagesize=$pagesize, cursor=$cursor)
+        if (not $retn.status) {
+            $lib.warn($retn.mesg)
+            stop
+        }
+        $pages = ($pages + 1)
+
+        for $err in $retn.data.errors {
+            if ($err.error = "maxset") {
+                $lib.warn(`CIRCL Passive DNS only returned {$err.value} of the {$err.total_value} {$err.rrtype} records for {$err.record}, use --page-size to get more.`)
+            } else {
+                $lib.warn(`CIRCL Passive DNS returned an error for {$valu}: {$lib.json.save($err)}`)
+            }
+        }
+
+        for $record in $retn.data.records {
+            if (not $rrTypes.has($record.rrtype)) {
+                $rtype = $record.rrtype
+                $skipped.$rtype = (true)
+            }
+            emit $record
+        }
+
+        $next = $retn.data.cursor
+        if (not $pagesize or not $next or $next = $cursor) { break }
+        if ($maxpages > 0 and $pages >= $maxpages) {
+            $lib.warn(`Stopped after {$pages} pages of CIRCL Passive DNS records for {$valu}, use --max-pages to get more.`)
+            break
+        }
+        $cursor = $next
+    }
+
+    if $skipped {
+        $lib.warn(`slib.pdns does not model these rrtypes, they were skipped: {(", ").join($lib.dict.keys($skipped))}`)
+    }
+}
+
+// Query CIRCL Passive DNS for valu and model the records. Yields the inet:dns:* nodes made.
+//
+// This yields nodes (it has no emit or return) so it can be used with divert.
+function lookup(valu, rrtype=(null), active=(true), pagesize=(null), maxpages=(10)) {
+    for $record in $records($valu, rrtype=$rrtype, active=$active, pagesize=$pagesize, maxpages=$maxpages) {
+        $dnsnode = $modelRecord($record)
+        if $dnsnode { yield $dnsnode }
+    }
+}

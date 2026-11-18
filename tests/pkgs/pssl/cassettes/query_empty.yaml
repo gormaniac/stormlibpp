@@ -1,0 +1,26 @@
+interactions:
+- request:
+    body: null
+    headers: {}
+    method: GET
+    uri: https://www.circl.lu/v2pssl/query/185.194.93.14
+  response:
+    body:
+      string: '{}'
+    headers:
+      Connection:
+      - close
+      Content-Length:
+      - '2'
+      Content-Type:
+      - application/json
+      Date:
+      - Tue, 17 Nov 2026 04:20:46 GMT
+      Etag:
+      - '"bf21a9e8fbc5a3846fb05b4fa0859e0917b2202f"'
+      Server:
+      - SSL Certificate API - https://github.com/adulau/crl-monitor
+    status:
+      code: 200
+      message: OK
+version: 1

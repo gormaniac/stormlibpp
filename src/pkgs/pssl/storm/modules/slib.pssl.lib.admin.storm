@@ -1,0 +1,19 @@
+// Admin APIs for slib.pssl. Runs asroot, gated by the slib.pssl.admin perm.
+
+$userKey = "slib:pssl:auth:user"
+$passKey = "slib:pssl:auth:passwd"
+
+// Save the CIRCL Passive SSL credentials (HTTP Basic auth) that every slib.pssl request uses.
+function setAuth(user, passwd) {
+    if ($user = '' or $passwd = '') {
+        $lib.raise(BadArg, "slib.pssl.admin.key requires a username and a password, or --clear.")
+    }
+    $lib.globals.set($userKey, $user)
+    $lib.globals.set($passKey, $passwd)
+}
+
+// Remove the saved CIRCL Passive SSL credentials.
+function clearAuth() {
+    $lib.globals.pop($userKey)
+    $lib.globals.pop($passKey)
+}

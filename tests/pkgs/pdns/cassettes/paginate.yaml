@@ -1,0 +1,328 @@
+interactions:
+- request:
+    body: null
+    headers:
+      dribble-filter-rrtype:
+      - CNAME
+      dribble-paginate-count:
+      - '25'
+    method: GET
+    uri: https://www.circl.lu/pdns/query/cdn1.wixdns.net
+  response:
+    body:
+      string: '{"rrtype": "CNAME", "rrname": "cdn1.wixdns.net", "rdata": "*.bymo.io",
+        "count": 2, "time_first": 1771416706, "time_last": 1786014151, "origin": "https://www.circl.lu/pdns/"}
+
+        {"rrtype": "CNAME", "rrname": "cdn1.wixdns.net", "rdata": "*.getalfred.com",
+        "count": 1, "time_first": 1714586572, "time_last": 1714586572, "origin": "https://www.circl.lu/pdns/"}
+
+        {"rrtype": "CNAME", "rrname": "cdn1.wixdns.net", "rdata": "*.wixapps.dev",
+        "count": 1, "time_first": 1747656257, "time_last": 1747656257, "origin": "https://www.circl.lu/pdns/"}
+
+        {"rrtype": "CNAME", "rrname": "cdn1.wixdns.net", "rdata": "0-edition.trailsupramonte.com",
+        "count": 3, "time_first": 1712476796, "time_last": 1764008077, "origin": "https://www.circl.lu/pdns/"}
+
+        {"rrtype": "CNAME", "rrname": "cdn1.wixdns.net", "rdata": "0-site.astranot.net",
+        "count": 1, "time_first": 1775199232, "time_last": 1775199232, "origin": "https://www.circl.lu/pdns/"}
+
+        {"rrtype": "CNAME", "rrname": "cdn1.wixdns.net", "rdata": "0-site.benyuphotoarts.tw",
+        "count": 3, "time_first": 1708977090, "time_last": 1784502374, "origin": "https://www.circl.lu/pdns/"}
+
+        {"rrtype": "CNAME", "rrname": "cdn1.wixdns.net", "rdata": "0-site.groenergras.tv",
+        "count": 1, "time_first": 1719313417, "time_last": 1719313417, "origin": "https://www.circl.lu/pdns/"}
+
+        {"rrtype": "CNAME", "rrname": "cdn1.wixdns.net", "rdata": "0-site.naoya-ito.com",
+        "count": 7, "time_first": 1706524912, "time_last": 1780956910, "origin": "https://www.circl.lu/pdns/"}
+
+        {"rrtype": "CNAME", "rrname": "cdn1.wixdns.net", "rdata": "0-site.oldtimephotos4u.com",
+        "count": 1, "time_first": 1712734961, "time_last": 1712734961, "origin": "https://www.circl.lu/pdns/"}
+
+        {"rrtype": "CNAME", "rrname": "cdn1.wixdns.net", "rdata": "0-st-james-church-rd.balokaerial.com",
+        "count": 1, "time_first": 1710444544, "time_last": 1710444544, "origin": "https://www.circl.lu/pdns/"}
+
+        {"rrtype": "CNAME", "rrname": "cdn1.wixdns.net", "rdata": "00-ktm-enduro-norto.cartscaptures.com",
+        "count": 1, "time_first": 1772578162, "time_last": 1772578162, "origin": "https://www.circl.lu/pdns/"}
+
+        {"rrtype": "CNAME", "rrname": "cdn1.wixdns.net", "rdata": "00-site-2-40.sakuraphoto.nl",
+        "count": 1, "time_first": 1775245715, "time_last": 1775245715, "origin": "https://www.circl.lu/pdns/"}
+
+        {"rrtype": "CNAME", "rrname": "cdn1.wixdns.net", "rdata": "00-site-2-48.sakuraphoto.nl",
+        "count": 1, "time_first": 1769223786, "time_last": 1769223786, "origin": "https://www.circl.lu/pdns/"}
+
+        {"rrtype": "CNAME", "rrname": "cdn1.wixdns.net", "rdata": "00-site-2-83-17.sakuraphoto.nl",
+        "count": 1, "time_first": 1774824192, "time_last": 1774824192, "origin": "https://www.circl.lu/pdns/"}
+
+        {"rrtype": "CNAME", "rrname": "cdn1.wixdns.net", "rdata": "00-site-2-89.sakuraphoto.nl",
+        "count": 2, "time_first": 1774818811, "time_last": 1780859639, "origin": "https://www.circl.lu/pdns/"}
+
+        {"rrtype": "CNAME", "rrname": "cdn1.wixdns.net", "rdata": "00-site-2.hiromismooth.com",
+        "count": 1, "time_first": 1769595234, "time_last": 1769595234, "origin": "https://www.circl.lu/pdns/"}
+
+        {"rrtype": "CNAME", "rrname": "cdn1.wixdns.net", "rdata": "00-site-3-15.sakuraphoto.nl",
+        "count": 1, "time_first": 1780912014, "time_last": 1780912014, "origin": "https://www.circl.lu/pdns/"}
+
+        {"rrtype": "CNAME", "rrname": "cdn1.wixdns.net", "rdata": "00-site-3-3.sakuraphoto.nl",
+        "count": 1, "time_first": 1769215232, "time_last": 1769215232, "origin": "https://www.circl.lu/pdns/"}
+
+        {"rrtype": "CNAME", "rrname": "cdn1.wixdns.net", "rdata": "00-site-39.sakuraphoto.nl",
+        "count": 1, "time_first": 1781427713, "time_last": 1781427713, "origin": "https://www.circl.lu/pdns/"}
+
+        {"rrtype": "CNAME", "rrname": "cdn1.wixdns.net", "rdata": "00-site-4-61-4-69.sakuraphoto.nl",
+        "count": 1, "time_first": 1780763676, "time_last": 1780763676, "origin": "https://www.circl.lu/pdns/"}
+
+        {"rrtype": "CNAME", "rrname": "cdn1.wixdns.net", "rdata": "00-site-44.sakuraphoto.nl",
+        "count": 1, "time_first": 1769215690, "time_last": 1769215690, "origin": "https://www.circl.lu/pdns/"}
+
+        {"rrtype": "CNAME", "rrname": "cdn1.wixdns.net", "rdata": "00-site.benyuphotoarts.tw",
+        "count": 3, "time_first": 1708821593, "time_last": 1778196716, "origin": "https://www.circl.lu/pdns/"}
+
+        {"rrtype": "CNAME", "rrname": "cdn1.wixdns.net", "rdata": "00-site.estudio-altocontraste.com",
+        "count": 4, "time_first": 1711617988, "time_last": 1781045781, "origin": "https://www.circl.lu/pdns/"}
+
+        {"rrtype": "CNAME", "rrname": "cdn1.wixdns.net", "rdata": "00-site.sakuraphoto.nl",
+        "count": 1, "time_first": 1775212023, "time_last": 1775212023, "origin": "https://www.circl.lu/pdns/"}
+
+        {"rrtype": "CNAME", "rrname": "cdn1.wixdns.net", "rdata": "000-angela-dr.kevinsimsphoto.com",
+        "count": 1, "time_first": 1719930110, "time_last": 1719930110, "origin": "https://www.circl.lu/pdns/"}
+
+        {"rrtype": "CNAME", "rrname": "td-ccm-neg-87-45.WIXDNS.NET", "rdata": "cdn1.wixdns.net",
+        "count": 647, "time_first": 1696846921, "time_last": 1794836544, "origin":
+        "https://www.circl.lu/pdns/"}
+
+        {"rrtype": "CNAME", "rrname": "td-ccm-neg-87-45.WIXDNS.net", "rdata": "cdn1.wixdns.net",
+        "count": 5, "time_first": 1709355621, "time_last": 1791998767, "origin": "https://www.circl.lu/pdns/"}
+
+        {"rrtype": "CNAME", "rrname": "td-premium-37-117.wixDNS.net", "rdata": "cdn1.wixdns.net",
+        "count": 1, "time_first": 1777025963, "time_last": 1777025963, "origin": "https://www.circl.lu/pdns/"}
+
+        {"rrtype": "CNAME", "rrname": "td-premium-37-117.WIXDNS.NET", "rdata": "cdn1.wixdns.net",
+        "count": 16, "time_first": 1770385619, "time_last": 1778594737, "origin":
+        "https://www.circl.lu/pdns/"}
+
+        {"rrtype": "CNAME", "rrname": "balancer-ccm.WIXDNS.NET", "rdata": "cdn1.wixdns.net",
+        "count": 32, "time_first": 1699294591, "time_last": 1717409824, "origin":
+        "https://www.circl.lu/pdns/"}
+
+        {"rrtype": "CNAME", "rrname": "balancer-ccm.wixdns.net", "rdata": "cdn1.wixdns.net",
+        "count": 381954, "time_first": 1696864003, "time_last": 1784650926, "origin":
+        "https://www.circl.lu/pdns/"}
+
+        {"rrtype": "CNAME", "rrname": "td-ccm-neg-87-45.Wixdns.net", "rdata": "cdn1.wixdns.net",
+        "count": 9, "time_first": 1704674604, "time_last": 1759735500, "origin": "https://www.circl.lu/pdns/"}
+
+        {"rrtype": "CNAME", "rrname": "td-ccm-neg-87-45.wixdns.net", "rdata": "cdn1.wixdns.net",
+        "count": 58868638, "time_first": 1696780725, "time_last": 1794889206, "origin":
+        "https://www.circl.lu/pdns/"}
+
+        {"rrtype": "CNAME", "rrname": "td-ccm-neg-87-45.wixdns.Net", "rdata": "cdn1.wixdns.net",
+        "count": 7, "time_first": 1699753333, "time_last": 1737699612, "origin": "https://www.circl.lu/pdns/"}
+
+        {"rrtype": "CNAME", "rrname": "td-ccm-neg-87-45.wixDNS.net", "rdata": "cdn1.wixdns.net",
+        "count": 22, "time_first": 1697575802, "time_last": 1739273144, "origin":
+        "https://www.circl.lu/pdns/"}
+
+        {"rrtype": "CNAME", "rrname": "td-premium-37-117.wixdns.NET", "rdata": "cdn1.wixdns.net",
+        "count": 1, "time_first": 1774497494, "time_last": 1774497494, "origin": "https://www.circl.lu/pdns/"}
+
+        {"rrtype": "CNAME", "rrname": "td-ccm-neg-87-45.wixdns.NET", "rdata": "cdn1.wixdns.net",
+        "count": 19, "time_first": 1698656292, "time_last": 1768458044, "origin":
+        "https://www.circl.lu/pdns/"}
+
+        {"rrtype": "CNAME", "rrname": "td-premium-37-117.wixdns.net", "rdata": "cdn1.wixdns.net",
+        "count": 2073134, "time_first": 1770205970, "time_last": 1778596829, "origin":
+        "https://www.circl.lu/pdns/"}
+
+        {"rrtype": "CNAME", "rrname": "td-ccm-neg-87-45.WIXDns.Net", "rdata": "cdn1.wixdns.net",
+        "count": 1, "time_first": 1760269819, "time_last": 1760269819, "origin": "https://www.circl.lu/pdns/"}
+
+        {"rrtype": "CNAME", "rrname": "td-ccm-neg-87-45.Wixdns.Net", "rdata": "cdn1.wixdns.net",
+        "count": 16, "time_first": 1696969862, "time_last": 1794025695, "origin":
+        "https://www.circl.lu/pdns/"}
+
+        {"rrtype": "CNAME", "rrname": "td-ccm-neg-87-45.wixdns.NEt", "rdata": "cdn1.wixdns.net",
+        "count": 1, "time_first": 1741870698, "time_last": 1741870698, "origin": "https://www.circl.lu/pdns/"}
+
+        '
+    headers:
+      Connection:
+      - close
+      Content-Length:
+      - '7851'
+      Content-Type:
+      - application/x-ndjson
+      Date:
+      - Tue, 17 Nov 2026 04:20:27 GMT
+      Server:
+      - dribble
+      X-Dribble-Cursor:
+      - '8475240723766813860'
+      X-Dribble-Errors:
+      - '[]'
+    status:
+      code: 200
+      message: OK
+- request:
+    body: null
+    headers:
+      dribble-filter-rrtype:
+      - CNAME
+      dribble-paginate-count:
+      - '25'
+      dribble-paginate-cursor:
+      - '8475240723766813860'
+    method: GET
+    uri: https://www.circl.lu/pdns/query/cdn1.wixdns.net
+  response:
+    body:
+      string: '{"rrtype": "CNAME", "rrname": "cdn1.wixdns.net", "rdata": "000-hwy-64.kevinsimsphoto.com",
+        "count": 2, "time_first": 1706066151, "time_last": 1716378759, "origin": "https://www.circl.lu/pdns/"}
+
+        {"rrtype": "CNAME", "rrname": "cdn1.wixdns.net", "rdata": "000-site-2.kotamiura.com",
+        "count": 1, "time_first": 1779756198, "time_last": 1779756198, "origin": "https://www.circl.lu/pdns/"}
+
+        {"rrtype": "CNAME", "rrname": "cdn1.wixdns.net", "rdata": "000-site-3.kotamiura.com",
+        "count": 1, "time_first": 1773689308, "time_last": 1773689308, "origin": "https://www.circl.lu/pdns/"}
+
+        {"rrtype": "CNAME", "rrname": "cdn1.wixdns.net", "rdata": "000-stewart-rock-rd.balokaerial.com",
+        "count": 1, "time_first": 1708819964, "time_last": 1708819964, "origin": "https://www.circl.lu/pdns/"}
+
+        {"rrtype": "CNAME", "rrname": "cdn1.wixdns.net", "rdata": "0000.deniselubrano.nl",
+        "count": 1, "time_first": 1761469753, "time_last": 1761469753, "origin": "https://www.circl.lu/pdns/"}
+
+        {"rrtype": "CNAME", "rrname": "cdn1.wixdns.net", "rdata": "0000.fotosceny.com",
+        "count": 5, "time_first": 1709613243, "time_last": 1760823145, "origin": "https://www.circl.lu/pdns/"}
+
+        {"rrtype": "CNAME", "rrname": "cdn1.wixdns.net", "rdata": "0000.praguebased.com",
+        "count": 1, "time_first": 1718333876, "time_last": 1718333876, "origin": "https://www.circl.lu/pdns/"}
+
+        {"rrtype": "CNAME", "rrname": "cdn1.wixdns.net", "rdata": "0000.tsumagoi-fc.com",
+        "count": 5, "time_first": 1709556738, "time_last": 1767296209, "origin": "https://www.circl.lu/pdns/"}
+
+        {"rrtype": "CNAME", "rrname": "cdn1.wixdns.net", "rdata": "0001.aminakurokawa1220.com",
+        "count": 1, "time_first": 1774823044, "time_last": 1774823044, "origin": "https://www.circl.lu/pdns/"}
+
+        {"rrtype": "CNAME", "rrname": "cdn1.wixdns.net", "rdata": "0001.deine-momente.net",
+        "count": 6, "time_first": 1704471660, "time_last": 1725061574, "origin": "https://www.circl.lu/pdns/"}
+
+        {"rrtype": "CNAME", "rrname": "cdn1.wixdns.net", "rdata": "0001.thevirtualdomicile.com",
+        "count": 2, "time_first": 1759927017, "time_last": 1765729630, "origin": "https://www.circl.lu/pdns/"}
+
+        {"rrtype": "CNAME", "rrname": "cdn1.wixdns.net", "rdata": "0001.tsumagoi-fc.com",
+        "count": 3, "time_first": 1717932226, "time_last": 1748793141, "origin": "https://www.circl.lu/pdns/"}
+
+        {"rrtype": "CNAME", "rrname": "cdn1.wixdns.net", "rdata": "0002.fotorazzi.com",
+        "count": 1, "time_first": 1774565454, "time_last": 1774565454, "origin": "https://www.circl.lu/pdns/"}
+
+        {"rrtype": "CNAME", "rrname": "cdn1.wixdns.net", "rdata": "0002.thevirtualdomicile.com",
+        "count": 1, "time_first": 1759953115, "time_last": 1759953115, "origin": "https://www.circl.lu/pdns/"}
+
+        {"rrtype": "CNAME", "rrname": "cdn1.wixdns.net", "rdata": "0002.tsumagoi-fc.com",
+        "count": 4, "time_first": 1704949668, "time_last": 1785601059, "origin": "https://www.circl.lu/pdns/"}
+
+        {"rrtype": "CNAME", "rrname": "cdn1.wixdns.net", "rdata": "0003.ataleoftwobandits.com",
+        "count": 2, "time_first": 1721779832, "time_last": 1737251559, "origin": "https://www.circl.lu/pdns/"}
+
+        {"rrtype": "CNAME", "rrname": "cdn1.wixdns.net", "rdata": "0003.fotorazzi.com",
+        "count": 2, "time_first": 1762442947, "time_last": 1762447167, "origin": "https://www.circl.lu/pdns/"}
+
+        {"rrtype": "CNAME", "rrname": "cdn1.wixdns.net", "rdata": "0003.guatemala1.com",
+        "count": 1, "time_first": 1766980712, "time_last": 1766980712, "origin": "https://www.circl.lu/pdns/"}
+
+        {"rrtype": "CNAME", "rrname": "cdn1.wixdns.net", "rdata": "0003.tsumagoi-fc.com",
+        "count": 4, "time_first": 1720388885, "time_last": 1767406632, "origin": "https://www.circl.lu/pdns/"}
+
+        {"rrtype": "CNAME", "rrname": "cdn1.wixdns.net", "rdata": "0004.fotorazzi.com",
+        "count": 1, "time_first": 1768621690, "time_last": 1768621690, "origin": "https://www.circl.lu/pdns/"}
+
+        {"rrtype": "CNAME", "rrname": "cdn1.wixdns.net", "rdata": "0004.thevirtualdomicile.com",
+        "count": 1, "time_first": 1779652388, "time_last": 1779652388, "origin": "https://www.circl.lu/pdns/"}
+
+        {"rrtype": "CNAME", "rrname": "cdn1.wixdns.net", "rdata": "0004.tsumagoi-fc.com",
+        "count": 1, "time_first": 1707642716, "time_last": 1707642716, "origin": "https://www.circl.lu/pdns/"}
+
+        {"rrtype": "CNAME", "rrname": "cdn1.wixdns.net", "rdata": "0005.tsumagoi-fc.com",
+        "count": 3, "time_first": 1704499764, "time_last": 1719984078, "origin": "https://www.circl.lu/pdns/"}
+
+        {"rrtype": "CNAME", "rrname": "cdn1.wixdns.net", "rdata": "0006.tsumagoi-fc.com",
+        "count": 3, "time_first": 1704965151, "time_last": 1767563513, "origin": "https://www.circl.lu/pdns/"}
+
+        {"rrtype": "CNAME", "rrname": "cdn1.wixdns.net", "rdata": "0007.ataleoftwobandits.com",
+        "count": 2, "time_first": 1726861134, "time_last": 1742459548, "origin": "https://www.circl.lu/pdns/"}
+
+        {"rrtype": "CNAME", "rrname": "td-ccm-neg-87-45.WIXDNS.NET", "rdata": "cdn1.wixdns.net",
+        "count": 647, "time_first": 1696846921, "time_last": 1794836544, "origin":
+        "https://www.circl.lu/pdns/"}
+
+        {"rrtype": "CNAME", "rrname": "td-ccm-neg-87-45.WIXDNS.net", "rdata": "cdn1.wixdns.net",
+        "count": 5, "time_first": 1709355621, "time_last": 1791998767, "origin": "https://www.circl.lu/pdns/"}
+
+        {"rrtype": "CNAME", "rrname": "td-premium-37-117.wixDNS.net", "rdata": "cdn1.wixdns.net",
+        "count": 1, "time_first": 1777025963, "time_last": 1777025963, "origin": "https://www.circl.lu/pdns/"}
+
+        {"rrtype": "CNAME", "rrname": "td-premium-37-117.WIXDNS.NET", "rdata": "cdn1.wixdns.net",
+        "count": 16, "time_first": 1770385619, "time_last": 1778594737, "origin":
+        "https://www.circl.lu/pdns/"}
+
+        {"rrtype": "CNAME", "rrname": "balancer-ccm.WIXDNS.NET", "rdata": "cdn1.wixdns.net",
+        "count": 32, "time_first": 1699294591, "time_last": 1717409824, "origin":
+        "https://www.circl.lu/pdns/"}
+
+        {"rrtype": "CNAME", "rrname": "balancer-ccm.wixdns.net", "rdata": "cdn1.wixdns.net",
+        "count": 381954, "time_first": 1696864003, "time_last": 1784650926, "origin":
+        "https://www.circl.lu/pdns/"}
+
+        {"rrtype": "CNAME", "rrname": "td-ccm-neg-87-45.Wixdns.net", "rdata": "cdn1.wixdns.net",
+        "count": 9, "time_first": 1704674604, "time_last": 1759735500, "origin": "https://www.circl.lu/pdns/"}
+
+        {"rrtype": "CNAME", "rrname": "td-ccm-neg-87-45.wixdns.net", "rdata": "cdn1.wixdns.net",
+        "count": 58868638, "time_first": 1696780725, "time_last": 1794889206, "origin":
+        "https://www.circl.lu/pdns/"}
+
+        {"rrtype": "CNAME", "rrname": "td-ccm-neg-87-45.wixdns.Net", "rdata": "cdn1.wixdns.net",
+        "count": 7, "time_first": 1699753333, "time_last": 1737699612, "origin": "https://www.circl.lu/pdns/"}
+
+        {"rrtype": "CNAME", "rrname": "td-ccm-neg-87-45.wixDNS.net", "rdata": "cdn1.wixdns.net",
+        "count": 22, "time_first": 1697575802, "time_last": 1739273144, "origin":
+        "https://www.circl.lu/pdns/"}
+
+        {"rrtype": "CNAME", "rrname": "td-premium-37-117.wixdns.NET", "rdata": "cdn1.wixdns.net",
+        "count": 1, "time_first": 1774497494, "time_last": 1774497494, "origin": "https://www.circl.lu/pdns/"}
+
+        {"rrtype": "CNAME", "rrname": "td-ccm-neg-87-45.wixdns.NET", "rdata": "cdn1.wixdns.net",
+        "count": 19, "time_first": 1698656292, "time_last": 1768458044, "origin":
+        "https://www.circl.lu/pdns/"}
+
+        {"rrtype": "CNAME", "rrname": "td-premium-37-117.wixdns.net", "rdata": "cdn1.wixdns.net",
+        "count": 2073134, "time_first": 1770205970, "time_last": 1778596829, "origin":
+        "https://www.circl.lu/pdns/"}
+
+        {"rrtype": "CNAME", "rrname": "td-ccm-neg-87-45.WIXDns.Net", "rdata": "cdn1.wixdns.net",
+        "count": 1, "time_first": 1760269819, "time_last": 1760269819, "origin": "https://www.circl.lu/pdns/"}
+
+        {"rrtype": "CNAME", "rrname": "td-ccm-neg-87-45.Wixdns.Net", "rdata": "cdn1.wixdns.net",
+        "count": 16, "time_first": 1696969862, "time_last": 1794025695, "origin":
+        "https://www.circl.lu/pdns/"}
+
+        {"rrtype": "CNAME", "rrname": "td-ccm-neg-87-45.wixdns.NEt", "rdata": "cdn1.wixdns.net",
+        "count": 1, "time_first": 1741870698, "time_last": 1741870698, "origin": "https://www.circl.lu/pdns/"}
+
+        '
+    headers:
+      Connection:
+      - close
+      Content-Length:
+      - '7783'
+      Content-Type:
+      - application/x-ndjson
+      Date:
+      - Tue, 17 Nov 2026 04:20:27 GMT
+      Server:
+      - dribble
+      X-Dribble-Cursor:
+      - '8866616444633982117'
+      X-Dribble-Errors:
+      - '[]'
+    status:
+      code: 200
+      message: OK
+version: 1

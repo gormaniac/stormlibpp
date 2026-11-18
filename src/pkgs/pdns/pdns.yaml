@@ -1,0 +1,141 @@
+name: slib.pdns
+version: 0.1.0
+guid: b0c48ad2eec04567a5ecae461017ebbe
+
+synapse_version: ">=2.207.0,<3.0.0"
+
+genopts:
+    dotstorm: true
+
+author:
+  url: https://github.com/gormaniac
+  name: John Gorman
+
+desc: A Rapid Power-Up that queries CIRCL's Passive DNS API and models the DNS records it has seen.
+
+docs:
+  - title: README
+    path: README.md
+
+# Runs every time the package loads.
+onload: |
+  [ meta:source=696c119cb73c4a079a2865108c96668a :name="circl.lu passive dns" :url=https://www.circl.lu/services/passive-dns/ ]
+  | spin
+
+perms:
+  - perm: [ slib, pdns, admin ]
+    gate: cortex
+    desc: Allows a user to call admin APIs of the slib.pdns Storm Package, ex. setting the CIRCL credentials.
+  - perm: [ slib, pdns, user ]
+    gate: cortex
+    desc: Allows a user to call user APIs of the slib.pdns Storm Package.
+
+modules:
+  # Modeling runs as the calling user, so it needs the user's node edit perms.
+  - name: slib.pdns.lib
+    perms:
+        - [ slib, pdns, user ]
+  # asroot so users can make requests with the CIRCL credentials without being able to read them.
+  - name: slib.pdns.privsep
+    asroot:perms:
+        - [ slib, pdns, user ]
+  - name: slib.pdns.lib.admin
+    asroot:perms:
+        - [ slib, pdns, admin ]
+
+commands:
+  - name: slib.pdns.lookup
+    perms:
+        - [ slib, pdns, user ]
+    descr: |
+      Look up the input FQDNs and IPs in CIRCL Passive DNS.
+
+      Examples:
+
+        // Look up the passive DNS records of some inet:fqdn nodes.
+        inet:fqdn=circl.lu | slib.pdns.lookup
+
+        // Look up a value without any inbound nodes, and yield the DNS records.
+        slib.pdns.lookup --query 185.194.93.14 --yield
+
+        // Only look up NS records, and skip CIRCL's active resolver.
+        inet:fqdn=circl.lu | slib.pdns.lookup --rrtype NS --no-active
+
+    cmdargs:
+      - - --query
+        - type: str
+          default: ''
+          help: |
+            An FQDN or IP address to look up.
+
+            Ignores any nodes in the pipeline and uses only the string passed to this arg.
+
+      - - --rrtype
+        - type: str
+          default: ''
+          help: Only return records of this type (ex. A, AAAA, CNAME, MX, NS, SOA, TXT).
+
+      - - --no-active
+        - default: false
+          action: store_true
+          help: Don't let CIRCL actively resolve the query, only return records it has already seen.
+
+      - - --page-size
+        - type: int
+          default: 0
+          help: |
+            How many records CIRCL returns a request, 0 lets CIRCL decide.
+
+            CIRCL caps a record type at 1000 results unless pages are used.
+
+      - - --max-pages
+        - type: int
+          default: 10
+          help: The most pages to request when --page-size is used, 0 for no limit.
+
+      - - --yield
+        - default: false
+          action: store_true
+          help: Yield the newly created DNS nodes instead of the inbound nodes.
+
+    cmdinputs:
+      - form: inet:fqdn
+        help: FQDNs to look up (ignored when --query is used).
+      - form: inet:ipv4
+        help: IPs to look up (ignored when --query is used).
+      - form: inet:ipv6
+        help: IPs to look up (ignored when --query is used).
+
+  - name: slib.pdns.admin.key
+    perms:
+        - [ slib, pdns, admin ]
+    descr: |
+      Set the CIRCL Passive DNS credentials (HTTP Basic auth) every slib.pdns user's requests use.
+
+      Request access from CIRCL at https://www.circl.lu/contact/.
+
+      Examples:
+
+        // Set the credentials.
+        slib.pdns.admin.key myuser mypassword
+
+        // Remove the credentials.
+        slib.pdns.admin.key --clear
+
+    cmdargs:
+      - - username
+        - type: str
+          default: ''
+          nargs: '?'
+          help: The CIRCL Passive DNS username.
+
+      - - password
+        - type: str
+          default: ''
+          nargs: '?'
+          help: The CIRCL Passive DNS password.
+
+      - - --clear
+        - default: false
+          action: store_true
+          help: Remove the saved credentials.

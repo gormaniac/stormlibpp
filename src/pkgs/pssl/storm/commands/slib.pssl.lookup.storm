@@ -1,0 +1,33 @@
+init {
+    $pssllib = $lib.import(slib.pssl.lib)
+    $queryOpt = $cmdopts.query
+}
+
+// Use the value in --query if it is passed. This branch must not reference $node at all -
+// that would make it non-runtsafe and the command would never run without inbound nodes.
+if ($queryOpt != '') {
+    // We spin when --query is used because this isn't meant to accept inbound nodes.
+    | spin |
+
+    divert $cmdopts.yield $pssllib.lookup($queryOpt, fetch=$cmdopts.fetch)
+}
+else {
+    switch $node.form() {
+        // repr() not value() - CIRCL needs the printable address, not inet:ipv4's int.
+        "inet:ipv4": { $valu = $node.repr() }
+        "inet:cidr4": { $valu = $node.repr() }
+        "hash:sha1": { $valu = $node.value() }
+        "crypto:x509:cert": { $valu = $node.props.sha1 }
+        *: { $valu = (null) }
+    }
+
+    if ($valu = null) {
+        if ($node.form() = "crypto:x509:cert") {
+            $lib.warn(`{$node.form()}={$node.repr()} has no :sha1 to look up.`)
+        } else {
+            $lib.warn(`The node form "{$node.form()}" is not supported by the slib.pssl.lookup command.`)
+        }
+    } else {
+        divert $cmdopts.yield $pssllib.lookup($valu, fetch=$cmdopts.fetch)
+    }
+}

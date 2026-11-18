@@ -52,5 +52,7 @@ function setApiKey(apikey) {
 
 // Whether a global ip-api.com pro key is set.
 function hasApiKey() {
-    return(($lib.import(slib.ipapi.privsep).globalKey() != null))
+    $vault = $lib.vault.bytype(ipapi, scope=global)
+    if ($vault = null or $vault.secrets = null) { return((false)) }
+    return(($vault.secrets.apikey != null))
 }

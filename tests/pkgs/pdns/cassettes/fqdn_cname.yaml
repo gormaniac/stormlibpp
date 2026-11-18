@@ -1,0 +1,78 @@
+interactions:
+- request:
+    body: null
+    headers: {}
+    method: GET
+    uri: https://www.circl.lu/pdns/query/www.circl.lu
+  response:
+    body:
+      string: '{"rrtype": "CNAME", "rrname": "cpAb.circl.lu", "rdata": "www.circl.lu",
+        "count": 12, "time_first": 1713939878, "time_last": 1727363163, "origin":
+        "https://www.circl.lu/pdns/"}
+
+        {"rrtype": "CNAME", "rrname": "cfss1.circl.lu", "rdata": "www.circl.lu", "count":
+        4476, "time_first": 1790946455, "time_last": 1794884488, "origin": "https://www.circl.lu/pdns/"}
+
+        {"rrtype": "CNAME", "rrname": "CPAB.circl.lu", "rdata": "www.circl.lu", "count":
+        8, "time_first": 1717156983, "time_last": 1725382552, "origin": "https://www.circl.lu/pdns/"}
+
+        {"rrtype": "CNAME", "rrname": "Cpab.circl.lu", "rdata": "www.circl.lu", "count":
+        4, "time_first": 1716907923, "time_last": 1719710227, "origin": "https://www.circl.lu/pdns/"}
+
+        {"rrtype": "CNAME", "rrname": "cPab.circl.lu", "rdata": "www.circl.lu", "count":
+        2, "time_first": 1716828516, "time_last": 1719666886, "origin": "https://www.circl.lu/pdns/"}
+
+        {"rrtype": "CNAME", "rrname": "CPaB.circl.lu", "rdata": "www.circl.lu", "count":
+        7, "time_first": 1714040974, "time_last": 1730086272, "origin": "https://www.circl.lu/pdns/"}
+
+        {"rrtype": "CNAME", "rrname": "CPab.circl.lu", "rdata": "www.circl.lu", "count":
+        5, "time_first": 1716810474, "time_last": 1732787194, "origin": "https://www.circl.lu/pdns/"}
+
+        {"rrtype": "CNAME", "rrname": "CpAb.circl.lu", "rdata": "www.circl.lu", "count":
+        3, "time_first": 1713795166, "time_last": 1722196359, "origin": "https://www.circl.lu/pdns/"}
+
+        {"rrtype": "CNAME", "rrname": "CPAb.circl.lu", "rdata": "www.circl.lu", "count":
+        5, "time_first": 1715867897, "time_last": 1732134678, "origin": "https://www.circl.lu/pdns/"}
+
+        {"rrtype": "CNAME", "rrname": "cPAB.circl.lu", "rdata": "www.circl.lu", "count":
+        11, "time_first": 1714795638, "time_last": 1728280210, "origin": "https://www.circl.lu/pdns/"}
+
+        {"rrtype": "CNAME", "rrname": "CpAB.circl.lu", "rdata": "www.circl.lu", "count":
+        8, "time_first": 1714470779, "time_last": 1731863713, "origin": "https://www.circl.lu/pdns/"}
+
+        {"rrtype": "CNAME", "rrname": "cPAb.circl.lu", "rdata": "www.circl.lu", "count":
+        9, "time_first": 1714030136, "time_last": 1727883280, "origin": "https://www.circl.lu/pdns/"}
+
+        {"rrtype": "CNAME", "rrname": "cpab.circl.lu", "rdata": "www.circl.lu", "count":
+        29001, "time_first": 1696779474, "time_last": 1790939251, "origin": "https://www.circl.lu/pdns/"}
+
+        {"rrtype": "CNAME", "rrname": "cpaB.circl.lu", "rdata": "www.circl.lu", "count":
+        7, "time_first": 1714636824, "time_last": 1719178953, "origin": "https://www.circl.lu/pdns/"}
+
+        {"rrtype": "CNAME", "rrname": "cPaB.circl.lu", "rdata": "www.circl.lu", "count":
+        5, "time_first": 1722160346, "time_last": 1733480134, "origin": "https://www.circl.lu/pdns/"}
+
+        {"rrtype": "CNAME", "rrname": "cpAB.circl.lu", "rdata": "www.circl.lu", "count":
+        5, "time_first": 1713975986, "time_last": 1731065354, "origin": "https://www.circl.lu/pdns/"}
+
+        {"rrtype": "CNAME", "rrname": "CpaB.circl.lu", "rdata": "www.circl.lu", "count":
+        5, "time_first": 1716990941, "time_last": 1723145397, "origin": "https://www.circl.lu/pdns/"}
+
+        '
+    headers:
+      Connection:
+      - close
+      Content-Length:
+      - '2985'
+      Content-Type:
+      - application/x-ndjson
+      Date:
+      - Tue, 17 Nov 2026 04:20:23 GMT
+      Server:
+      - dribble
+      X-Dribble-Errors:
+      - '[]'
+    status:
+      code: 200
+      message: OK
+version: 1

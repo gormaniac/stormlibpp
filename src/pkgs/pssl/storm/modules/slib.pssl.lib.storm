@@ -1,0 +1,209 @@
+// slib.pssl.lib - Model CIRCL Passive SSL results. Runs as the calling user.
+//
+// The CIRCL requests are in slib.pssl.privsep, along with notes on the API.
+//
+// Each IP a certificate was seen on is an inet:tls:servercert, from a tcp://<ip> inet:server
+// (CIRCL doesn't say which port) to a crypto:x509:cert. Certificates are deduplicated by
+// :sha1, and fetched certificates are parsed with slib.utils.x509.
+
+$privSep = $lib.import(slib.pssl.privsep)
+$x509 = $lib.import(slib.utils.x509)
+
+// The meta:source made by the package's onload.
+$srcGuid = "7aa991399fab4171a80682a69a1a8d54"
+
+$msPerDay = (86400000)
+
+// The certificates seen on an IPv4 address or CIDR block (/23 to /32).
+function query(valu) {
+    return($privSep.query($valu))
+}
+
+// The IPs a certificate (by SHA1) was seen on.
+function cquery(sha1) {
+    return($privSep.cquery($sha1))
+}
+
+// A certificate (by SHA1), its PEM and CIRCL's parsed info.
+function cfetch(sha1) {
+    return($privSep.cfetch($sha1))
+}
+
+// The crypto:x509:cert node with this SHA1, made if it doesn't exist.
+//
+// subject (CIRCL's subject string) is only set if the cert has no :subject - a fetched cert's
+// :subject (the RFC 4514 DN) is never overwritten.
+function certNode(sha1, subject=(null)) {
+    [ crypto:x509:cert=({"sha1": $sha1}) <(seen)+ { meta:source=$srcGuid } ]
+    if ($subject and not :subject) { [ :subject=$subject ] }
+    return($node)
+}
+
+// The inet:tls:servercert for a cert seen on an IP.
+function serverCert(ip, cert) {
+    if ($ip.find(":") != null) {
+        $server = `tcp://[{$ip}]`
+    } else {
+        $server = `tcp://{$ip}`
+    }
+    [ inet:tls:servercert=($server, $cert) <(seen)+ { meta:source=$srcGuid } ]
+    return($node)
+}
+
+// The subject DN in a query() result's subject "values", or null if there isn't one. The
+// values aren't always DNs, ex. one has a base64 certificate before its DN. A DN starts with an
+// attribute name or OID and "=" (ex. "C=US, ...", "serialNumber=...", "1.3.6.1...=..."), a base64
+// certificate's only "="s are its padding.
+function subjectDn(values) {
+    for $valu in $values {
+        if $lib.regex.matches('^([A-Za-z][A-Za-z0-9-]{0,63}|[0-9]+(\.[0-9]+)+)=', $valu) { return($valu) }
+    }
+    return((null))
+}
+
+// Model a query() result. Emits an inet:tls:servercert for each certificate on each IP.
+function modelQuery(data) {
+    for ($ip, $info) in $data {
+        for $sha1 in $info.certificates {
+            $cert = $certNode($sha1, subject=$subjectDn($info.subjects.$sha1.values))
+            emit $serverCert($ip, $cert)
+        }
+    }
+}
+
+// Model a cquery() result. Emits an inet:tls:servercert for each IP the cert was seen on.
+function modelCquery(data) {
+    if (not $data.seen) { stop }
+    $cert = $certNode($data.certificate)
+    for $ip in $data.seen {
+        emit $serverCert($ip, $cert)
+    }
+}
+
+// The rsa:key of a parsed RSA public key, made if it doesn't exist. Returns its value.
+function _rsaKey(pubkey) {
+    [ rsa:key=($pubkey.rsa.mod, $pubkey.rsa.exp) :bits?=$pubkey.size ]
+    return($node.value())
+}
+
+// The values that are valid for a type, normalized. Certificates hold whatever their issuer put
+// in them (ex. a dNSName of "Acme,Inc.example"), and one bad value would otherwise fail the
+// whole edit and stop a --fetch.
+function _valid(type, values) {
+    $retn = ([])
+    for $valu in $values {
+        ($ok, $norm) = $lib.trycast($type, $valu)
+        if $ok { $retn.append($norm) }
+    }
+    return($retn)
+}
+
+// CRL distribution point full names, as crypto:x509:san values.
+function _crlSans(crldps) {
+    $sans = ([])
+    for $dp in $crldps {
+        for $name in $dp.full { $sans.append($name) }
+    }
+    return($sans)
+}
+
+// Model a cfetch() result. Returns the crypto:x509:cert node, or null if the PEM can't be
+// parsed. sha1 is the SHA1 that was fetched.
+function modelCfetch(data, sha1) {
+    try {
+        $x = $x509.parse($data.pem)
+    } catch * as err {
+        $lib.warn(`Could not parse the certificate CIRCL Passive SSL returned for {$sha1}: {$err.mesg}`)
+        return((null))
+    }
+
+    if ($x.sha1 != $sha1.lower()) {
+        $lib.warn(`CIRCL Passive SSL returned a certificate with the SHA1 {$x.sha1} for {$sha1}.`)
+    }
+
+    $ids = $x509.identities($x.sans, $x.subject.attrs.cn)
+
+    $rsakey = (null)
+    if $x.pubkey.rsa { $rsakey = $_rsaKey($x.pubkey) }
+
+    $cert = $certNode($x.sha1)
+    yield $cert
+    [
+        :sha256=$x.sha256
+        :md5=$x.md5
+        :serial?=$x.serial
+        :version=$x.version
+        :subject=$x.subject.dn
+        :issuer=$x.issuer.dn
+        :validity:notbefore?=$x.notbefore
+        :validity:notafter?=$x.notafter
+        :algo?=$x.sigalgo.oid
+        :signature?=$x.signature
+        :selfsigned=$x.selfsigned
+        :ext:sans=$_valid(crypto:x509:san, $x.sans)
+        :ext:crls=$_valid(crypto:x509:san, $_crlSans($x.crldps))
+        :crl:urls=$_valid(inet:url, $x.crls)
+        :rsa:key?=$rsakey
+        :identities:fqdns=$_valid(inet:fqdn, $ids.fqdns)
+        :identities:emails=$_valid(inet:email, $ids.emails)
+        :identities:ipv4s=$_valid(inet:ipv4, $ids.ipv4s)
+        :identities:ipv6s=$_valid(inet:ipv6, $ids.ipv6s)
+        :identities:urls=$_valid(inet:url, $ids.urls)
+    ]
+
+    // ICSI SSL Notary's first/last seen times are days since the epoch. Not every cert has them.
+    $icsi = $data.icsi
+    if $icsi { $first = $icsi.first_seen $last = $icsi.last_seen }
+    else { $first = (null) $last = (null) }
+    if ($first and $last) {
+        [ .seen=(($lib.cast(int, $first) * $msPerDay), ($lib.cast(int, $last) * $msPerDay)) ]
+    }
+
+    return($cert)
+}
+
+// Look up valu (an IPv4 address, CIDR block, or certificate SHA1) and emit the nodes made.
+function _lookup(valu, fetch) {
+    ($isSha1, $sha1) = $lib.trycast(hash:sha1, $valu)
+    if $isSha1 {
+        $retn = $cquery($sha1)
+    } else {
+        $retn = $query($valu)
+    }
+    if (not $retn.status) {
+        $lib.warn($retn.mesg)
+        stop
+    }
+
+    $sha1s = ({})
+    if $isSha1 {
+        for $pnode in $modelCquery($retn.data) { emit $pnode }
+        if $retn.data.hits { $sha1s.$sha1 = (true) }
+    } else {
+        for $pnode in $modelQuery($retn.data) { emit $pnode }
+        for ($ip, $info) in $retn.data {
+            for $certsha1 in $info.certificates { $sha1s.$certsha1 = (true) }
+        }
+    }
+
+    if (not $fetch) { stop }
+
+    for ($certsha1, $_) in $sha1s {
+        $retn = $cfetch($certsha1)
+        if (not $retn.status) {
+            $lib.warn($retn.mesg)
+            continue
+        }
+        $cert = $modelCfetch($retn.data, $certsha1)
+        if $cert { emit $cert }
+    }
+}
+
+// Look up valu (an IPv4 address, CIDR block, or certificate SHA1) in CIRCL Passive SSL and
+// model the results. Yields an inet:tls:servercert for each IP/cert pair, and with fetch, a
+// crypto:x509:cert for each certificate fetched.
+//
+// This yields nodes (it has no emit or return) so it can be used with divert.
+function lookup(valu, fetch=(false)) {
+    for $pnode in $_lookup($valu, $fetch) { yield $pnode }
+}

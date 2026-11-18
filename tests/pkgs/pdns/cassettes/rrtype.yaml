@@ -1,0 +1,53 @@
+interactions:
+- request:
+    body: null
+    headers:
+      dribble-filter-rrtype:
+      - NS
+    method: GET
+    uri: https://www.circl.lu/pdns/query/circl.lu
+  response:
+    body:
+      string: '{"rrtype": "NS", "rrname": "ns-b.eurodns.org", "rdata": "circl.lu",
+        "count": 489, "time_first": 1713474705, "time_last": 1794573263, "origin":
+        "https://www.circl.lu/pdns/"}
+
+        {"rrtype": "NS", "rrname": "ns2.eurodns.com", "rdata": "circl.lu", "count":
+        241, "time_first": 1696798385, "time_last": 1713430150, "origin": "https://www.circl.lu/pdns/"}
+
+        {"rrtype": "NS", "rrname": "ns3.eurodns.com", "rdata": "circl.lu", "count":
+        241, "time_first": 1696798385, "time_last": 1713430150, "origin": "https://www.circl.lu/pdns/"}
+
+        {"rrtype": "NS", "rrname": "ns-c.eurodns.eu", "rdata": "circl.lu", "count":
+        489, "time_first": 1713474705, "time_last": 1794573263, "origin": "https://www.circl.lu/pdns/"}
+
+        {"rrtype": "NS", "rrname": "ns-d.eurodns.biz", "rdata": "circl.lu", "count":
+        489, "time_first": 1713474705, "time_last": 1794573263, "origin": "https://www.circl.lu/pdns/"}
+
+        {"rrtype": "NS", "rrname": "ns1.eurodns.com", "rdata": "circl.lu", "count":
+        241, "time_first": 1696798385, "time_last": 1713430150, "origin": "https://www.circl.lu/pdns/"}
+
+        {"rrtype": "NS", "rrname": "ns4.eurodns.com", "rdata": "circl.lu", "count":
+        241, "time_first": 1696798385, "time_last": 1713430150, "origin": "https://www.circl.lu/pdns/"}
+
+        {"rrtype": "NS", "rrname": "ns-a.eurodns.com", "rdata": "circl.lu", "count":
+        489, "time_first": 1713474705, "time_last": 1794573263, "origin": "https://www.circl.lu/pdns/"}
+
+        '
+    headers:
+      Connection:
+      - close
+      Content-Length:
+      - '1379'
+      Content-Type:
+      - application/x-ndjson
+      Date:
+      - Tue, 17 Nov 2026 04:20:27 GMT
+      Server:
+      - dribble
+      X-Dribble-Errors:
+      - '[]'
+    status:
+      code: 200
+      message: OK
+version: 1

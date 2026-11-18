@@ -6,6 +6,8 @@ Since this uses only the Lite API, this is basically nothing but a glorified ASN
 
 Requires an ipinfo.io token set as either a user var or a global var (`slib:ipinfo:token`).
 
+Requires the `slib.utils` package (StormLib++'s `utils` package) to be loaded, and Synapse 2.207.0 or newer.
+
 ## Examples
 ```
 // Lift some inet:ipv4 nodes and query ipinfo.io for information.

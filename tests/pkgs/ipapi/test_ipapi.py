@@ -5,6 +5,7 @@ with the slib:ipapi:url global, and the real free/pro URLs are checked with VCR 
 """
 
 import contextlib
+import json
 import os
 import time
 
@@ -405,6 +406,14 @@ class IpApiKeyTest(IpApiBase):
             msgs = await core.stormlist("$lib.print($lib.vault.bytype(ipapi, scope=global).secrets)", opts=uopts)
             self.stormNotInPrint("secretkey", msgs)
 
+            # Every slib.ipapi.privsep function can be called by a user, so none returns the global
+            # key. (globalKey() used to.)
+            msgs = await core.stormlist("$lib.print($lib.import(slib.ipapi.privsep).globalKey())", opts=uopts)
+            self.stormIsInErr("globalKey", msgs)
+            self.notin("secretkey", json.dumps(msgs))
+            retn = await core.callStorm("return($lib.import(slib.ipapi.privsep).query(8.8.8.8))", opts=uopts)
+            self.notin("secretkey", json.dumps(retn))
+
     async def test_ipapi_key_no_ratelimit(self):
         """The pro endpoints have no rate limit, so their responses never hold up queries."""
 
@@ -670,6 +679,33 @@ class IpApiPermsTest(IpApiBase):
 
             self.stormIsInErr("slib.ipapi.user", await core.stormlist(QUERY, opts={"user": nobody.iden}))
             self.stormIsInErr("slib.ipapi.admin", await core.stormlist("slib.ipapi.admin.settag x", opts={"user": user.iden}))
+
+            # Every slib.ipapi.privsep function can be called by a user, so none of them lets the user
+            # set the rate limit window (which holds up every query on the Cortex) or send a request
+            # anywhere but ip-api.com's /json/<ip> and /batch.
+            uopts = {"user": user.iden}
+            privsep = "$lib.import(slib.ipapi.privsep)"
+            self.stormIsInErr("_block", await core.stormlist(f"{privsep}._block(json, (99999999))", opts=uopts))
+            for kind, path in (
+                ("json", "@127.0.0.1:1/json/8.8.8.8"),
+                ("json", "/json/8.8.8.8@127.0.0.1:1"),
+                ("json", "/json/8.8.8.8/../x"),
+                ("batch", "/json/8.8.8.8"),
+                ("json", "/batch"),
+                ("other", "/json/8.8.8.8"),
+            ):
+                retn = await core.callStorm(f"return({privsep}._request({kind}, $path, (null), test))", opts={**uopts, "vars": {"path": path}})
+                self.false(retn["status"], msg=path)
+                self.isin("only requests ip-api.com's", retn["mesg"])
+            retn = await core.callStorm(f'return({privsep}.query("8.8.8.8@127.0.0.1:1"))', opts=uopts)
+            self.false(retn["status"])
+            self.none(await core.callStorm('return($lib.globals.get("slib:ipapi:ratelimit:json:until"))'))
+            self.none(await core.callStorm('return($lib.globals.get("slib:ipapi:ratelimit:other:until"))'))
+            # ip-api.com itself can still set it.
+            fake.headers = {"X-Rl": "0", "X-Ttl": "0.1"}
+            await self.query(core, opts=uopts)
+            self.nn(await core.callStorm('return($lib.globals.get("slib:ipapi:ratelimit:json:until"))'))
+            fake.headers = {"X-Rl": "44", "X-Ttl": "60"}
 
             for cmd in ("slib.ipapi.admin.settag adminprefix", "slib.ipapi.admin.disabletag", "slib.ipapi.admin.enabletag"):
                 self.stormHasNoErr(await core.stormlist(cmd, opts={"user": admin.iden}))
