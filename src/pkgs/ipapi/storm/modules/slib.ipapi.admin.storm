@@ -3,8 +3,6 @@
 // NOTE: $lib.globals.get/set are the only global var APIs in Synapse 2.x, this package
 // requires Synapse <3.0.0 (see synapse_version), so R005 is ignored here.
 
-$privSep = $lib.import(slib.ipapi.privsep)
-
 // Set the tag prefix, raising BadArg if it's empty or not a valid tag.
 function setTagPrefix(prefix) {
     if ($prefix = '') {
@@ -54,5 +52,7 @@ function setApiKey(apikey) {
 
 // Whether a global ip-api.com pro key is set.
 function hasApiKey() {
-    return(($privSep.globalKey() != null))
+    $vault = $lib.vault.bytype(ipapi, scope=global)
+    if ($vault = null or $vault.secrets = null) { return((false)) }
+    return(($vault.secrets.apikey != null))
 }

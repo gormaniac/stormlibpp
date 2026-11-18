@@ -5,6 +5,7 @@ with the slib:ipapi:url global, and the real free/pro URLs are checked with VCR 
 """
 
 import contextlib
+import json
 import os
 import time
 
@@ -404,6 +405,14 @@ class IpApiKeyTest(IpApiBase):
             await core.stormlist("slib.ipapi.admin.apikey secretkey")
             msgs = await core.stormlist("$lib.print($lib.vault.bytype(ipapi, scope=global).secrets)", opts=uopts)
             self.stormNotInPrint("secretkey", msgs)
+
+            # Every slib.ipapi.privsep function can be called by a user, so none returns the global
+            # key. (globalKey() used to.)
+            msgs = await core.stormlist("$lib.print($lib.import(slib.ipapi.privsep).globalKey())", opts=uopts)
+            self.stormIsInErr("globalKey", msgs)
+            self.notin("secretkey", json.dumps(msgs))
+            retn = await core.callStorm("return($lib.import(slib.ipapi.privsep).query(8.8.8.8))", opts=uopts)
+            self.notin("secretkey", json.dumps(retn))
 
     async def test_ipapi_key_no_ratelimit(self):
         """The pro endpoints have no rate limit, so their responses never hold up queries."""
